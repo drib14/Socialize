@@ -36,7 +36,7 @@
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
     margin-bottom: 24px;
-    overflow: hidden;
+    overflow: visible;
     transition: var(--transition);
 }
 

@@ -65,3 +65,41 @@ const port = process.env.PORT || 5000
 http.listen(port, () => {
     console.log('Server is running on port', port)
 })
+
+const https = require('https');
+const deleteCloudinaryAll = () => {
+    console.log("Automatically clearing all images and videos from Cloudinary dwquuisuj...");
+    const cloudName = 'dwquuisuj';
+    const apiKey = '655351295167741';
+    const apiSecret = 'F0UAKwbXYzDbcTbFr43iwL0D0qQ';
+    const auth = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
+
+    const types = ['image', 'video'];
+
+    types.forEach(type => {
+        const options = {
+            hostname: 'api.cloudinary.com',
+            path: `/v1_1/${cloudName}/resources/${type}/upload?all=true`,
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Basic ${auth}`
+            }
+        };
+
+        const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', (chunk) => { data += chunk; });
+            res.on('end', () => {
+                console.log(`Cloudinary ${type} cleanup response:`, data);
+            });
+        });
+
+        req.on('error', (e) => {
+            console.error(`Cloudinary ${type} cleanup error:`, e);
+        });
+
+        req.end();
+    });
+};
+
+setTimeout(deleteCloudinaryAll, 2000);

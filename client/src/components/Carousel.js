@@ -10,7 +10,7 @@ const Carousel = ({images, id}) => {
 
     return (
         <div id={`image${id}`} className="carousel slide" data-ride="carousel">
-            <ol className="carousel-indicators" style={{zIndex: 1}}>
+            <ol className="carousel-indicators" style={{zIndex: 20}}>
                 {
                     images.map((img, index) => (
                         <li key={index} data-target={`#image${id}`} 
@@ -22,21 +22,21 @@ const Carousel = ({images, id}) => {
 
             <div className="carousel-inner">
                 {
-                    images.map((img, index) => (
-                        <div key={index} className={`carousel-item ${isActive(index)}`}>
-                            {
-                                img.url.match(/video/i)
-                                ? <video controls src={img.url} className="d-block w-100" alt={img.url}
-                                style={{filter: theme ? 'invert(1)' : 'invert(0)'}} />
-
-                                : <img src={img.url} className="d-block w-100" alt={img.url}
-                                style={{filter: theme ? 'invert(1)' : 'invert(0)'}} />
-                            }
-                           
-                        </div>
-                    ))
+                    images.map((img, index) => {
+                        const url = img && typeof img === 'string' ? img : (img && img.url ? img.url : '');
+                        if(!url) return null;
+                        const isVideo = url.match(/video/i);
+                        return (
+                            <div key={index} className={`carousel-item ${isActive(index)}`}>
+                                {
+                                    isVideo
+                                    ? <video controls src={url} className="d-block w-100" alt="post media" />
+                                    : <img src={url} className="d-block w-100" alt="post media" />
+                                }
+                            </div>
+                        )
+                    })
                 }
-                
             </div>
             
             {

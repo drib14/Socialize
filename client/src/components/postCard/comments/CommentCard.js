@@ -73,7 +73,7 @@ const CommentCard = ({children, comment, post, commentId}) => {
 
     return (
         <div className="comment_card mt-2" style={styleCard}>
-            <Link to={`/profile/${comment.user._id}`} className="d-flex text-dark">
+            <Link to={`/profile/${comment.user._id}`} className="d-flex" style={{ color: 'var(--text-main)', textDecoration: 'none' }}>
                 <Avatar src={comment.user.avatar} size="small-avatar" />
                 <h6 className="mx-1">{comment.user.username}</h6>
             </Link>
@@ -81,8 +81,7 @@ const CommentCard = ({children, comment, post, commentId}) => {
             <div className="comment_content">
                 <div className="flex-fill" 
                 style={{
-                    filter: theme ? 'invert(1)' : 'invert(0)',
-                    color: theme ? 'white' : '#111',
+                    color: 'var(--text-main)',
                 }}>
                     {
                         onEdit 

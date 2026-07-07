@@ -13,11 +13,11 @@ const PostThumb = ({posts, result}) => {
                         <div className="post_thumb_display">
 
                             {
-                                post.images && post.images.length > 0
+                                post.images && post.images.length > 0 && (post.images[0]?.url || typeof post.images[0] === 'string')
                                 ? (
-                                    post.images[0].url.match(/video/i)
-                                    ?<video src={post.images[0].url} alt={post.images[0].url} />
-                                    :<img src={post.images[0].url} alt={post.images[0].url} />
+                                    (typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url).match(/video/i)
+                                    ?<video src={typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url} alt="post thumb" />
+                                    :<img src={typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url} alt="post thumb" />
                                   )
                                 : (
                                     <div className="post_thumb_text">

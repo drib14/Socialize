@@ -243,7 +243,7 @@ const RightSide = () => {
                     media.map((item, index) => (
                         <div key={index} id="file_media">
                             {
-                                item.type.match(/video/i)
+                                item.type && typeof item.type === 'string' && item.type.match(/video/i)
                                 ? videoShow(URL.createObjectURL(item), theme)
                                 : imageShow(URL.createObjectURL(item), theme)
                             }

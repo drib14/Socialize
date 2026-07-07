@@ -191,6 +191,9 @@ img[src*="loading.gif"] {
 
 /* --------- Responsive ------ */
 @media (max-width: 766px){
+  .main {
+    padding: 0 12px !important;
+  }
   .header .navbar .logo{
     display: none;
   }
