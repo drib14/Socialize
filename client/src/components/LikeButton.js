@@ -1,16 +1,13 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+import { FaHeart, FaRegHeart } from 'react-icons/fa'
 
 const LikeButton = ({isLike, handleLike, handleUnLike}) => {
-    const { theme } = useSelector(state => state)
-
     return (
         <>
             {
                 isLike
-                ? <i className="fas fa-heart text-danger" onClick={handleUnLike}
-                style={{filter: theme ? 'invert(1)' : 'invert(0)'}} />
-                : <i className="far fa-heart" onClick={handleLike} />
+                ? <FaHeart className="text-danger" onClick={handleUnLike} style={{ cursor: 'pointer', fontSize: '24px' }} />
+                : <FaRegHeart onClick={handleLike} style={{ cursor: 'pointer', fontSize: '24px' }} />
             }
         </>
     )

@@ -72,6 +72,10 @@ function App() {
     dispatch({ type: GLOBALTYPES.PEER, payload: newPeer })
   },[dispatch])
 
+  useEffect(() => {
+    document.body.setAttribute('data-theme', theme ? 'dark' : 'light')
+  }, [theme])
+
 
   return (
     <Router>

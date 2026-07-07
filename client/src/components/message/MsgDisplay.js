@@ -4,15 +4,17 @@ import { imageShow, videoShow } from '../../utils/mediaShow'
 import { useSelector, useDispatch } from 'react-redux'
 import { deleteMessages } from '../../redux/actions/messageAction'
 import Times from './Times'
+import { customConfirm } from '../../utils/customAlert'
 
 const MsgDisplay = ({user, msg, theme, data}) => {
     const { auth } = useSelector(state => state)
     const dispatch = useDispatch()
 
-    const handleDeleteMessages = () => {
+    const handleDeleteMessages = async () => {
         if(!data) return;
         
-        if(window.confirm('Do you want to delete?')){
+        const confirmed = await customConfirm('Do you want to delete this message?')
+        if(confirmed){
             dispatch(deleteMessages({msg, data, auth}))
         }
     }
@@ -21,7 +23,7 @@ const MsgDisplay = ({user, msg, theme, data}) => {
         <>
             <div className="chat_title">
                 <Avatar src={user.avatar} size="small-avatar" />
-                <span>{user.username}</span>
+                <span>{user.fullname}</span>
             </div>
 
             <div className="you_content">

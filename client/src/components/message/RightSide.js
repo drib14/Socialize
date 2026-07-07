@@ -8,6 +8,7 @@ import { GLOBALTYPES } from '../../redux/actions/globalTypes'
 import { imageShow, videoShow } from '../../utils/mediaShow'
 import { imageUpload } from '../../utils/imageUpload'
 import { addMessage, getMessages, loadMoreMessages, deleteConversation } from '../../redux/actions/messageAction'
+import { customConfirm } from '../../utils/customAlert'
 
 const RightSide = () => {
     const { auth, message, theme, socket, peer } = useSelector(state => state)
@@ -135,8 +136,9 @@ const RightSide = () => {
         // eslint-disable-next-line
     },[isLoadMore])
 
-    const handleDeleteConversation = () => {
-        if(window.confirm('Do you want to delete?')){
+    const handleDeleteConversation = async () => {
+        const confirmed = await customConfirm('Do you want to delete this conversation?')
+        if(confirmed){
             dispatch(deleteConversation({auth, id}))
             return navigate('/message')
         }

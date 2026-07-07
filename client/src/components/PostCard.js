@@ -21,7 +21,7 @@ const PostCard = ({post, theme}) => {
     const displayPost = isRepost ? post.repostOf : post
 
     return (
-        <div className="card my-3" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}> 
+        <div className="card my-3" style={{ borderRadius: 'var(--radius-lg)' }}> 
             {
                 isRepost && 
                 <div className="px-4 pt-3 font-weight-bold" style={{fontSize: '0.9rem', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px'}}>

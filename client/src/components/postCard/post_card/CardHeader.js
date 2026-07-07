@@ -6,6 +6,7 @@ import moment from 'moment'
 import { GLOBALTYPES } from '../../../redux/actions/globalTypes'
 import { deletePost } from '../../../redux/actions/postAction'
 import { BASE_URL } from '../../../utils/config'
+import { customConfirm } from '../../../utils/customAlert'
 
 const CardHeader = ({post}) => {
     const { auth, socket } = useSelector(state => state)
@@ -17,8 +18,9 @@ const CardHeader = ({post}) => {
         dispatch({ type: GLOBALTYPES.STATUS, payload: {...post, onEdit: true}})
     }
 
-    const handleDeletePost = () => {
-        if(window.confirm("Are you sure want to delete this post?")){
+    const handleDeletePost = async () => {
+        const confirmed = await customConfirm("Are you sure you want to delete this post?")
+        if(confirmed){
             dispatch(deletePost({post, auth, socket}))
             return navigate("/")
         }
@@ -36,7 +38,7 @@ const CardHeader = ({post}) => {
                 <div className="card_name">
                     <h6 className="m-0">
                         <Link to={`/profile/${post.user._id}`} className="text-dark">
-                            {post.user.username}
+                            {post.user.fullname}
                         </Link>
                     </h6>
                     <small className="text-muted">

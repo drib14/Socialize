@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-
 import LikeButton from '../../LikeButton'
 import { useSelector, useDispatch } from 'react-redux'
 import { likePost, unLikePost, savePost, unSavePost, repostPost } from '../../../redux/actions/postAction'
 import ShareModal from '../../ShareModal'
 import { BASE_URL } from '../../../utils/config'
-
+import { FaRegComment, FaRegPaperPlane, FaRetweet, FaRegBookmark, FaBookmark } from 'react-icons/fa'
+import { customConfirm } from '../../../utils/customAlert'
 
 const CardFooter = ({post}) => {
     const [isLike, setIsLike] = useState(false)
@@ -71,8 +71,9 @@ const CardFooter = ({post}) => {
         setSaveLoad(false)
     }
 
-    const handleRepost = () => {
-        if (window.confirm("Do you want to repost this post to your profile?")) {
+    const handleRepost = async () => {
+        const confirmed = await customConfirm("Do you want to repost this post to your profile?")
+        if (confirmed) {
             dispatch(repostPost({post, auth, socket}))
         }
     }
@@ -80,23 +81,23 @@ const CardFooter = ({post}) => {
     return (
         <div className="card_footer">
             <div className="card_icon_menu">
-                <div>
+                <div className="d-flex align-items-center" style={{ gap: '20px' }}>
                     <LikeButton 
                     isLike={isLike}
                     handleLike={handleLike}
                     handleUnLike={handleUnLike}
                     />
 
-                    <Link to={`/post/${post._id}`} className="text-dark">
-                        <i className="far fa-comment" />
+                    <Link to={`/post/${post._id}`} className="text-secondary d-flex align-items-center">
+                        <FaRegComment style={{ fontSize: '24px', cursor: 'pointer' }} />
                     </Link>
 
-                    <i className="far fa-paper-plane text-secondary ml-3" 
+                    <FaRegPaperPlane className="text-secondary" 
                     title="Share"
-                    style={{ cursor: 'pointer', fontSize: '26px' }} 
+                    style={{ cursor: 'pointer', fontSize: '24px' }} 
                     onClick={() => setIsShare(!isShare)} />
 
-                    <i className="fas fa-retweet text-secondary ml-3" 
+                    <FaRetweet className="text-secondary" 
                     title="Repost"
                     style={{ cursor: 'pointer', fontSize: '26px' }}
                     onClick={handleRepost} />
@@ -104,10 +105,10 @@ const CardFooter = ({post}) => {
 
                 {
                     saved 
-                    ?  <i className="fas fa-bookmark text-info"
+                    ?  <FaBookmark className="text-primary" style={{ cursor: 'pointer', fontSize: '24px' }}
                     onClick={handleUnSavePost} />
 
-                    :  <i className="far fa-bookmark"
+                    :  <FaRegBookmark className="text-secondary" style={{ cursor: 'pointer', fontSize: '24px' }}
                     onClick={handleSavePost} />
                 }
                

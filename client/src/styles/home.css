@@ -81,6 +81,7 @@
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
+    z-index: 1050;
 }
 
 .posts .card_header .dropdown-item {

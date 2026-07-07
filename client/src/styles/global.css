@@ -25,7 +25,7 @@
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-#theme:checked ~ .App {
+[data-theme="dark"] {
   --bg-body: #090d16; /* Deep futuristic space navy */
   --bg-card: #111827; /* Dark gray/slate */
   --bg-nav: rgba(17, 24, 39, 0.75);
@@ -72,11 +72,11 @@ code {
 }
 
 .main {
-  max-width: 1100px;
+  max-width: 100%;
   width: 100%;
   min-height: 100vh;
   margin: auto;
-  padding: 0 15px;
+  padding: 0 40px;
 }
 
 img {
