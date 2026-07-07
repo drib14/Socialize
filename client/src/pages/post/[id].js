@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { getPost } from '../../redux/actions/postAction'
-import LoadIcon from '../../images/loading.gif'
+import PostSkeleton from '../../components/skeletons/PostSkeleton'
 import PostCard from '../../components/PostCard'
 
 
@@ -26,7 +26,7 @@ const Post = () => {
         <div className="posts">
             {
                 post.length === 0 &&
-                <img src={LoadIcon} alt="loading" className="d-block mx-auto my-4" />
+                <PostSkeleton />
             }
 
             {

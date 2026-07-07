@@ -59,7 +59,7 @@ const MsgDisplay = ({user, msg, theme, data}) => {
 
                         <span className="material-icons font-weight-bold mr-1"
                         style={{ 
-                            fontSize: '2.5rem', color: msg.call.times === 0 ? 'crimson' : 'green',
+                            fontSize: '2.5rem', color: msg.call.times === 0 ? '#2b8a3e' : 'green',
                             filter: theme ? 'invert(1)' : 'invert(0)'
                         }}>
                             {

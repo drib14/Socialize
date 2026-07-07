@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../redux/actions/authAction'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -13,11 +13,11 @@ const Login = () => {
 
     const { auth } = useSelector(state => state)
     const dispatch = useDispatch()
-    const history = useHistory()
+    const navigate = useNavigate()
 
     useEffect(() => {
-        if(auth.token) history.push("/")
-    }, [auth.token, history])
+        if(auth.token) navigate("/")
+    }, [auth.token, navigate])
 
     const handleChangeInput = e => {
         const { name, value } = e.target
@@ -32,7 +32,7 @@ const Login = () => {
     return (
         <div className="auth_page">
             <form onSubmit={handleSubmit}>
-                <h3 className="text-uppercase text-center mb-4">V-Network</h3>
+                <h3 className="text-uppercase text-center mb-4">Socialize</h3>
 
                 <div className="form-group">
                     <label htmlFor="exampleInputEmail1">Email address</label>
@@ -61,12 +61,17 @@ const Login = () => {
                 </div>
                 
                 <button type="submit" className="btn btn-dark w-100"
-                disabled={email && password ? false : true}>
+                disabled={email && password ? false : true}
+                style={{ background: '#2b8a3e', borderColor: '#2b8a3e' }}>
                     Login
                 </button>
 
                 <p className="my-2">
-                    You don't have an account? <Link to="/register" style={{color: "crimson"}}>Register Now</Link>
+                    You don't have an account? <Link to="/register" style={{color: "#2b8a3e"}}>Register Now</Link>
+                </p>
+
+                <p className="my-2">
+                    <Link to="/forgot_password" style={{color: "#2b8a3e"}}>Forgot Password?</Link>
                 </p>
             </form>
         </div>

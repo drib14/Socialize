@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import {BrowserRouter as Router, Route} from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
 import PageRender from './customRouter/PageRender'
 import PrivateRouter from './customRouter/PrivateRouter'
@@ -7,10 +7,15 @@ import PrivateRouter from './customRouter/PrivateRouter'
 import Home from './pages/home'
 import Login from './pages/login'
 import Register from './pages/register'
+import ForgotPassword from './pages/forgot_password'
+import ResetPassword from './pages/reset_password'
 
 import Alert from './components/alert/Alert'
 import Header from './components/header/Header'
 import StatusModal from './components/StatusModal'
+
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 import { useSelector, useDispatch } from 'react-redux'
 import { refreshToken } from './redux/actions/authAction'
@@ -26,7 +31,7 @@ import CallModal from './components/message/CallModal'
 import Peer from 'peerjs'
 
 function App() {
-  const { auth, status, modal, call } = useSelector(state => state)
+  const { auth, status, modal, call, theme } = useSelector(state => state)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -71,8 +76,9 @@ function App() {
   return (
     <Router>
       <Alert />
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
 
-      <input type="checkbox" id="theme" />
+      <input type="checkbox" id="theme" checked={theme} readOnly />
       <div className={`App ${(status || modal) && 'mode'}`}>
         <div className="main">
           {auth.token && <Header />}
@@ -80,11 +86,23 @@ function App() {
           {auth.token && <SocketClient />}
           {call && <CallModal />}
           
-          <Route exact path="/" component={auth.token ? Home : Login} />
-          <Route exact path="/register" component={Register} />
+          <Routes>
+            <Route path="/" element={auth.token ? <Home /> : <Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot_password" element={<ForgotPassword />} />
+            <Route path="/reset_password/:token" element={<ResetPassword />} />
 
-          <PrivateRouter exact path="/:page" component={PageRender} />
-          <PrivateRouter exact path="/:page/:id" component={PageRender} />
+            <Route path="/:page" element={
+              <PrivateRouter>
+                <PageRender />
+              </PrivateRouter>
+            } />
+            <Route path="/:page/:id" element={
+              <PrivateRouter>
+                <PageRender />
+              </PrivateRouter>
+            } />
+          </Routes>
           
         </div>
       </div>

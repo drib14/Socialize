@@ -1,62 +1,108 @@
-.status_modal{
+.status_modal_overlay {
     position: fixed;
-    top:0;
+    top: 0;
     left: 0;
-    background: #0008;
-    z-index: 4;
-    width: 100%;
-    height: 100vh;
-    overflow: auto;
-}
-.status_modal form{
-    max-width: 450px;
-    width: 100%;
-    background: white;
-    margin: 30px auto;
+    right: 0;
+    bottom: 0;
+    background: rgba(9, 13, 22, 0.6);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 20px;
-    border-radius: 5px;
 }
-.status_header{
+
+.status_modal_content {
+    max-width: 480px;
+    width: 100%;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    outline: none;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition);
+}
+
+.status_header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #ddd;
-    transform: translateY(-13px);
-} 
-.status_header span{
-    font-size: 2rem;
-    font-weight: 900;
-    cursor: pointer;
-    transform: translateY(-5px);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
 }
-.status_body textarea{
+
+.status_header h5 {
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-main);
+}
+
+.status_header span {
+    font-size: 24px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    line-height: 1;
+    transition: var(--transition);
+}
+
+.status_header span:hover {
+    color: #ef4444;
+    transform: rotate(90deg);
+}
+
+.status_body textarea {
     width: 100%;
     min-height: 150px;
-    border: none;
-    outline: none;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    color: var(--text-main);
     resize: none;
+    font-size: 1.05rem;
+    padding: 0;
 }
-.status_body .input_images{
+
+.status_body .input_images {
     display: flex;
     justify-content: center;
-    margin: 10px 0;
+    align-items: center;
+    margin: 20px 0;
+    gap: 15px;
 }
-.status_body .input_images i{
-    font-size: 2rem;
+
+.status_body .input_images i {
+    font-size: 28px;
+    color: var(--text-secondary);
     cursor: pointer;
+    transition: var(--transition);
 }
-.status_body .input_images .file_upload{
+
+.status_body .input_images i:hover {
+    color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.status_body .input_images .file_upload {
     overflow: hidden;
-    margin: 0 10px;
     position: relative;
+    display: flex;
+    align-items: center;
 }
-.status_body .input_images .file_upload #file{
+
+.status_body .input_images .file_upload #file {
     position: absolute;
-    top:0;
+    top: 0;
     left: 0;
     opacity: 0;
+    cursor: pointer;
 }
-.status_body .show_images{
+
+.status_body .show_images {
     max-height: 270px;
     width: 100%;
     overflow-y: auto;
@@ -65,44 +111,58 @@
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     place-items: center;
     padding: 10px 0;
-    grid-gap: 10px;
+    grid-gap: 12px;
 }
-.status_body .show_images #file_img{
+
+.status_body .show_images #file_img {
     position: relative;
     width: 100%;
-    height: 100%;
+    height: 100px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
 }
+
 .status_body .show_images #file_img img,
-.status_body .show_images #file_img video{
+.status_body .show_images #file_img video {
     display: block;
-    object-fit: contain;
+    object-fit: cover;
     width: 100%;
     height: 100%;
-    max-height: 100px;
 }
-.status_body .show_images #file_img span{
+
+.status_body .show_images #file_img span {
     position: absolute;
-    top: -1px;
-    right: -2px;
+    top: 4px;
+    right: 4px;
     z-index: 4;
-    background: white;
-    color: crimson;
-    padding: 3px 7px;
-    border: 1px solid crimson;
+    background: #ef4444;
+    color: white;
+    padding: 2px 6px;
     border-radius: 50%;
     font-size: 10px;
     font-weight: bolder;
     cursor: pointer;
+    line-height: 1;
+    box-shadow: var(--shadow-sm);
 }
-.status_body .stream span{
+
+.status_body .stream span {
     position: absolute;
-    top: -10px;
-    right: 5px;
-    color: crimson;
-    font-size: 2rem;
-    font-weight: 900;
+    top: 15px;
+    right: 15px;
     cursor: pointer;
+    font-size: 2rem;
+    color: #ef4444;
+    transition: var(--transition);
 }
-.status_body .dropdown-menu{
-    transform: translate3d(-153px, -190px, 0px) !important;
+
+.status_body .stream span:hover {
+    transform: scale(1.1);
+}
+
+.status_footer .btn-primary {
+    width: 100%;
+    padding: 12px !important;
 }

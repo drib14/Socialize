@@ -35,7 +35,7 @@ export const createPost = ({content, images, auth, socket}) => async (dispatch) 
             recipients: res.data.newPost.user.followers,
             url: `/post/${res.data.newPost._id}`,
             content, 
-            image: media[0].url
+            image: media.length > 0 ? media[0].url : ''
         }
 
         dispatch(createNotify({msg, auth, socket}))
@@ -112,7 +112,7 @@ export const likePost = ({post, auth, socket}) => async (dispatch) => {
             recipients: [post.user._id],
             url: `/post/${post._id}`,
             content: post.content, 
-            image: post.images[0].url
+            image: post.images.length > 0 ? post.images[0].url : ''
         }
 
         dispatch(createNotify({msg, auth, socket}))
@@ -142,6 +142,35 @@ export const unLikePost = ({post, auth, socket}) => async (dispatch) => {
             url: `/post/${post._id}`,
         }
         dispatch(removeNotify({msg, auth, socket}))
+
+    } catch (err) {
+        dispatch({
+            type: GLOBALTYPES.ALERT,
+            payload: {error: err.response.data.msg}
+        })
+    }
+}
+
+export const repostPost = ({post, auth, socket}) => async (dispatch) => {
+    try {
+        dispatch({ type: GLOBALTYPES.ALERT, payload: {loading: true} })
+        const res = await postDataAPI(`post/${post._id}/repost`, null, auth.token)
+        
+        dispatch({ type: POST_TYPES.CREATE_POST, payload: res.data.newPost })
+        dispatch({ type: GLOBALTYPES.ALERT, payload: {loading: false} })
+        dispatch({ type: GLOBALTYPES.ALERT, payload: {success: res.data.msg} })
+
+        // Notify
+        const msg = {
+            id: res.data.newPost._id,
+            text: 'reposted your post.',
+            recipients: [post.user._id],
+            url: `/post/${post._id}`,
+            content: post.content, 
+            image: post.images && post.images.length > 0 ? post.images[0].url : ''
+        }
+
+        dispatch(createNotify({msg, auth, socket}))
 
     } catch (err) {
         dispatch({

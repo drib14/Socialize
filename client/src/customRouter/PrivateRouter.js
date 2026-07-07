@@ -1,8 +1,8 @@
-import { Route, Redirect} from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 
-const PrivateRouter = (props) => {
+const PrivateRouter = ({ children }) => {
     const firstLogin = localStorage.getItem('firstLogin')
-    return firstLogin ? <Route {...props} /> : <Redirect to="/" />
+    return firstLogin ? children : <Navigate to="/" replace />
 }
 
 export default PrivateRouter

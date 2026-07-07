@@ -5,7 +5,7 @@ import Posts from '../../components/profile/Posts'
 import Saved from '../../components/profile/Saved'
 
 import { useSelector, useDispatch } from 'react-redux'
-import LoadIcon from '../../images/loading.gif'
+import ProfileSkeleton from '../../components/skeletons/ProfileSkeleton'
 import { getProfileUsers } from '../../redux/actions/profileAction'
 import { useParams } from 'react-router-dom'
 
@@ -15,7 +15,7 @@ const Profile = () => {
     const dispatch = useDispatch()
 
     const { id } = useParams()
-    const [saveTab, setSaveTab] = useState(false)
+    const [tab, setTab] = useState('posts')
 
     useEffect(() => {
         if(profile.ids.every(item => item !== id)){
@@ -28,22 +28,27 @@ const Profile = () => {
             
             <Info auth={auth} profile={profile} dispatch={dispatch} id={id} />
 
-            {
-                auth.user._id === id &&
-                <div className="profile_tab">
-                    <button className={saveTab ? '' : 'active'} onClick={() => setSaveTab(false)}>Posts</button>
-                    <button className={saveTab ? 'active' : ''} onClick={() => setSaveTab(true)}>Saved</button>
-                </div>
-            }
+            <div className="profile_tab">
+                <button className={tab === 'posts' ? 'active' : ''} onClick={() => setTab('posts')}>Posts</button>
+                <button className={tab === 'reposts' ? 'active' : ''} onClick={() => setTab('reposts')}>Reposts</button>
+                {
+                    auth.user._id === id &&
+                    <button className={tab === 'saved' ? 'active' : ''} onClick={() => setTab('saved')}>Saved</button>
+                }
+            </div>
 
             {
                 profile.loading 
-                ? <img className="d-block mx-auto" src={LoadIcon} alt="loading" />
+                ? <ProfileSkeleton />
                 : <>
                     {
-                        saveTab
-                        ? <Saved auth={auth} dispatch={dispatch} />
-                        : <Posts auth={auth} profile={profile} dispatch={dispatch} id={id} />
+                        tab === 'saved' && <Saved auth={auth} dispatch={dispatch} />
+                    }
+                    {
+                        tab === 'posts' && <Posts auth={auth} profile={profile} dispatch={dispatch} id={id} isRepostTab={false} />
+                    }
+                    {
+                        tab === 'reposts' && <Posts auth={auth} profile={profile} dispatch={dispatch} id={id} isRepostTab={true} />
                     }
                 </>
             }

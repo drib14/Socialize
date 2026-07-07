@@ -1,4 +1,12 @@
 require('dotenv').config()
+require('./copyLogo') // Copy latest green brand assets
+
+const dns = require('dns')
+try {
+    dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1', '1.0.0.1'])
+} catch (e) {
+    console.warn('Could not set custom DNS servers:', e.message)
+}
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
@@ -35,16 +43,15 @@ app.use('/api', require('./routes/notifyRouter'))
 app.use('/api', require('./routes/messageRouter'))
 
 
-const URI = process.env.MONGODB_URL
-mongoose.connect(URI, {
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}, err => {
-    if(err) throw err;
-    console.log('Connected to mongodb')
-})
+// Connect to MongoDB
+const URI = process.env.MONGO_URI
+mongoose.connect(URI)
+    .then(() => {
+        console.log('Connected to mongodb')
+    })
+    .catch(err => {
+        console.error('Database connection error:', err)
+    })
 
 if(process.env.NODE_ENV === 'production'){
     app.use(express.static('client/build'))

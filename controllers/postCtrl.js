@@ -22,8 +22,8 @@ const postCtrl = {
         try {
             const { content, images } = req.body
 
-            if(images.length === 0)
-            return res.status(400).json({msg: "Please add your photo."})
+            if(content.trim().length === 0 && images.length === 0)
+            return res.status(400).json({msg: "Please add content or a photo."})
 
             const newPost = new Posts({
                 content, images, user: req.user._id
@@ -54,6 +54,13 @@ const postCtrl = {
                 populate: {
                     path: "user likes",
                     select: "-password"
+                }
+            })
+            .populate({
+                path: "repostOf",
+                populate: {
+                    path: "user likes",
+                    select: "avatar username fullname"
                 }
             })
 
@@ -130,6 +137,14 @@ const postCtrl = {
             const features = new APIfeatures(Posts.find({user: req.params.id}), req.query)
             .paginating()
             const posts = await features.query.sort("-createdAt")
+            .populate("user likes", "avatar username fullname followers")
+            .populate({
+                path: "repostOf",
+                populate: {
+                    path: "user likes",
+                    select: "avatar username fullname"
+                }
+            })
 
             res.json({
                 posts,
@@ -149,6 +164,13 @@ const postCtrl = {
                 populate: {
                     path: "user likes",
                     select: "-password"
+                }
+            })
+            .populate({
+                path: "repostOf",
+                populate: {
+                    path: "user likes",
+                    select: "avatar username fullname"
                 }
             })
 
@@ -239,12 +261,55 @@ const postCtrl = {
             }), req.query).paginating()
 
             const savePosts = await features.query.sort("-createdAt")
+            .populate("user likes", "avatar username fullname followers")
+            .populate({
+                path: "repostOf",
+                populate: {
+                    path: "user likes",
+                    select: "avatar username fullname"
+                }
+            })
 
             res.json({
                 savePosts,
                 result: savePosts.length
             })
 
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
+        }
+    },
+    repostPost: async (req, res) => {
+        try {
+            const originalPost = await Posts.findById(req.params.id)
+            if(!originalPost) return res.status(400).json({msg: 'This post does not exist.'})
+
+            const alreadyReposted = await Posts.findOne({user: req.user._id, repostOf: req.params.id})
+            if(alreadyReposted) return res.status(400).json({msg: 'You already reposted this post.'})
+
+            const newPost = new Posts({
+                content: '',
+                images: [],
+                user: req.user._id,
+                repostOf: req.params.id
+            })
+
+            await newPost.save()
+
+            const populatedPost = await Posts.findById(newPost._id)
+            .populate("user likes", "avatar username fullname followers")
+            .populate({
+                path: "repostOf",
+                populate: {
+                    path: "user likes",
+                    select: "avatar username fullname"
+                }
+            })
+
+            res.json({
+                msg: 'Reposted Post!',
+                newPost: populatedPost
+            })
         } catch (err) {
             return res.status(500).json({msg: err.message})
         }

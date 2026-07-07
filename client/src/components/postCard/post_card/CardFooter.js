@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import Send from '../../../images/send.svg'
 import LikeButton from '../../LikeButton'
 import { useSelector, useDispatch } from 'react-redux'
-import { likePost, unLikePost, savePost, unSavePost } from '../../../redux/actions/postAction'
+import { likePost, unLikePost, savePost, unSavePost, repostPost } from '../../../redux/actions/postAction'
 import ShareModal from '../../ShareModal'
 import { BASE_URL } from '../../../utils/config'
 
@@ -71,6 +71,12 @@ const CardFooter = ({post}) => {
         setSaveLoad(false)
     }
 
+    const handleRepost = () => {
+        if (window.confirm("Do you want to repost this post to your profile?")) {
+            dispatch(repostPost({post, auth, socket}))
+        }
+    }
+
     return (
         <div className="card_footer">
             <div className="card_icon_menu">
@@ -86,6 +92,11 @@ const CardFooter = ({post}) => {
                     </Link>
 
                     <img src={Send} alt="Send" onClick={() => setIsShare(!isShare)} />
+
+                    <i className="fas fa-retweet text-secondary ml-3" 
+                    title="Repost"
+                    style={{ cursor: 'pointer', fontSize: '26px' }}
+                    onClick={handleRepost} />
                 </div>
 
                 {

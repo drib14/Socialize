@@ -39,7 +39,7 @@ const Menu = () => {
                         role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 
                         <span className="material-icons"
-                            style={{ color: notify.data.length > 0 ? 'crimson' : '' }}>
+                            style={{ color: notify.data.length > 0 ? '#2b8a3e' : '' }}>
                             favorite
                         </span>
 

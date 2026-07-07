@@ -5,7 +5,7 @@ import Posts from '../components/home/Posts'
 import RightSideBar from '../components/home/RightSideBar'
 
 import { useSelector } from 'react-redux'
-import LoadIcon from '../images/loading.gif'
+import PostSkeleton from '../components/skeletons/PostSkeleton'
 
 
 let scroll = 0;
@@ -33,7 +33,10 @@ const Home = () => {
 
                 {
                     homePosts.loading 
-                    ? <img src={LoadIcon} alt="loading" className="d-block mx-auto" />
+                    ? <>
+                        <PostSkeleton />
+                        <PostSkeleton />
+                      </>
                     : (homePosts.result === 0 && homePosts.posts.length === 0)
                         ? <h2 className="text-center">No Post</h2>
                         : <Posts />

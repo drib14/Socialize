@@ -1,84 +1,180 @@
-* {
-  padding: 0;
-  box-sizing: border-box;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --primary-color: #10b981; /* Leaf Green / Emerald */
+  --primary-hover: #059669;
+  --primary-light: #ecfdf5;
+  --accent-color: #84cc16; /* Lime Accent */
+  --bg-body: #f8fafc; /* Slate-50 */
+  --bg-card: #ffffff;
+  --bg-nav: rgba(255, 255, 255, 0.75);
+  --bg-input: #f1f5f9;
+  --text-main: #0f172a; /* Slate-900 */
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
   
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+  
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+#theme:checked ~ .App {
+  --bg-body: #090d16; /* Deep futuristic space navy */
+  --bg-card: #111827; /* Dark gray/slate */
+  --bg-nav: rgba(17, 24, 39, 0.75);
+  --bg-input: #1f2937;
+  --text-main: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #6b7280;
+  --border-color: #374151;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
 }
 
 #theme {
   display: none;
 }
-#theme:checked ~ * {
-  filter: invert(1);
+
+* {
+  padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  filter: none !important;
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-main);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, monospace;
 }
 
 .App {
   width: 100%;
   min-height: 100vh;
-  background: white;
+  background-color: var(--bg-body);
+  color: var(--text-main);
 }
 
 .main {
-  max-width: 1000px;
+  max-width: 1100px;
   width: 100%;
   min-height: 100vh;
   margin: auto;
+  padding: 0 15px;
 }
 
 img {
   object-fit: cover;
 }
 
-/* -------- AUTH ---------- */
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Modern inputs & buttons overrides */
+input.form-control, textarea.form-control, select.form-control {
+  background-color: var(--bg-input) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 12px 16px !important;
+  font-size: 0.95rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: var(--transition) !important;
+}
+
+input.form-control:focus, textarea.form-control:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
+  background-color: var(--bg-card) !important;
+}
+
+.btn {
+  border-radius: var(--radius-md) !important;
+  padding: 10px 20px !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.2px !important;
+  transition: var(--transition) !important;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
+  border: none !important;
+  color: white !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3) !important;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+}
+
+.btn-primary:active {
+  transform: translateY(0) !important;
+}
+
+/* Custom CSS Loader to replace the 2000s loading.gif */
+img[src*="loading.gif"] {
+  display: block;
+  width: 0 !important;
+  height: 0 !important;
+  padding: 12px !important;
+  margin: 20px auto !important;
+  border: 3px solid rgba(16, 185, 129, 0.15);
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50% !important;
+  animation: spin 0.8s linear infinite;
+  content: "" !important;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* -------- IMPORTS ---------- */
 @import url("./auth.css");
-
-/* -------- LOADING ---------- */
 @import url("./loading.css");
-
-/* -------- Header ---------- */
 @import url("./header.css");
-
-/* -------- Avatar ---------- */
 @import url("./avatar.css");
-
-/* -------- Header ---------- */
-@import url("./header.css");
-
-/* -------- Profile ---------- */
 @import url("./profile.css");
-
-/* -------- Home ---------- */
 @import url("./home.css");
-
-/* -------- Status Modal ---------- */
 @import url("./status_modal.css");
-
-/* -------- Comments ---------- */
 @import url("./comments.css");
-
-/* -------- Post Thumb ---------- */
 @import url("./post_thumb.css");
-
-/* -------- Message---------- */
 @import url("./message.css");
-
-/* -------- Icons---------- */
 @import url("./icons.css");
-
-/* -------- Call Modal---------- */
 @import url("./call_modal.css");
-
-
 
 /* --------- Responsive ------ */
 @media (max-width: 766px){
@@ -116,9 +212,6 @@ img {
     padding: 20px 10px;
   }
 }
-
-
-
 
 .mode{
   width: 100%;

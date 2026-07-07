@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { getDiscoverPosts, DISCOVER_TYPES } from '../redux/actions/discoverAction'
-import LoadIcon from '../images/loading.gif'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 import PostThumb from '../components/PostThumb'
 import LoadMoreBtn from '../components/LoadMoreBtn'
 import { getDataAPI} from '../utils/fetchData'
@@ -29,12 +30,19 @@ const Discover = () => {
         <div>
             {
                 discover.loading 
-                ? <img src={LoadIcon} alt="loading" className="d-block mx-auto my-4" />
+                ? <div className="d-grid my-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '15px', display: 'grid' }}>
+                    <Skeleton height={250} borderRadius={8} />
+                    <Skeleton height={250} borderRadius={8} />
+                    <Skeleton height={250} borderRadius={8} />
+                    <Skeleton height={250} borderRadius={8} />
+                    <Skeleton height={250} borderRadius={8} />
+                    <Skeleton height={250} borderRadius={8} />
+                  </div>
                 : <PostThumb posts={discover.posts} result={discover.result} />
             }
 
             {
-                load && <img src={LoadIcon} alt="loading" className="d-block mx-auto" />
+                load && <div className="text-center my-3"><Skeleton circle width={40} height={40} /></div>
             }
 
             {

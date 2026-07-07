@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import UserCard from '../UserCard'
 import { useSelector, useDispatch } from 'react-redux'
-import { useParams, useHistory } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import MsgDisplay from './MsgDisplay'
 import Icons from '../Icons'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
@@ -28,7 +28,7 @@ const RightSide = () => {
     const [page, setPage] = useState(0)
     const [isLoadMore, setIsLoadMore] = useState(0)
 
-    const history = useHistory()
+    const navigate = useNavigate()
 
     useEffect(() => {
         const newData = message.data.find(item => item._id === id)
@@ -139,7 +139,7 @@ const RightSide = () => {
     const handleDeleteConversation = () => {
         if(window.confirm('Do you want to delete?')){
             dispatch(deleteConversation({auth, id}))
-            return history.push('/message')
+            return navigate('/message')
         }
     }
 

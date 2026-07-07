@@ -112,6 +112,83 @@ const authCtrl = {
         } catch (err) {
             return res.status(500).json({msg: err.message})
         }
+    },
+    forgotPassword: async (req, res) => {
+        try {
+            const { email } = req.body
+            const user = await Users.findOne({email})
+            if(!user) return res.status(400).json({msg: "This email does not exist."})
+
+            const reset_token = jwt.sign({id: user._id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'})
+            const url = `${process.env.CLIENT_URL}/reset_password/${reset_token}`
+
+            const nodemailer = require('nodemailer')
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASSWORD
+                }
+            })
+
+            const mailOptions = {
+                from: `Socialize Support <${process.env.EMAIL_USER}>`,
+                to: email,
+                subject: "Reset your Socialize Password",
+                html: `
+                    <div style="max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 8px; font-family: sans-serif; color: #333333; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <div style="background-color: #2b8a3e; padding: 24px; text-align: center;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 0.5px;">Socialize</h1>
+                        </div>
+                        <div style="padding: 32px 24px;">
+                            <h2 style="color: #2b8a3e; margin-top: 0; font-size: 20px;">Password Reset Request</h2>
+                            <p style="font-size: 16px; line-height: 1.5; color: #555555; margin-bottom: 24px;">
+                                Hello ${user.fullname || user.username},<br/><br/>
+                                We received a request to reset your password for your Socialize account. Click the button below to set a new password. This link is valid for 15 minutes.
+                            </p>
+                            <div style="text-align: center; margin: 32px 0;">
+                                <a href="${url}" target="_blank" style="background-color: #2b8a3e; color: #ffffff; padding: 14px 28px; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 5px; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Reset Password</a>
+                            </div>
+                            <p style="font-size: 14px; color: #777777; line-height: 1.5;">
+                                If you did not request a password reset, please ignore this email or contact support if you have concerns. Your password will remain unchanged.
+                            </p>
+                            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;"/>
+                            <p style="font-size: 12px; color: #999999; line-height: 1.5; text-align: center;">
+                                © 2026 Socialize Inc. All rights reserved.
+                            </p>
+                        </div>
+                    </div>
+                `
+            }
+
+            await transporter.sendMail(mailOptions)
+            res.json({msg: "Password reset link sent to your email!"})
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
+        }
+    },
+    resetPassword: async (req, res) => {
+        try {
+            const { password } = req.body
+            const token = req.header("Authorization")
+            if(!token) return res.status(400).json({msg: "Invalid Authentication."})
+
+            const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+            if(!decoded) return res.status(400).json({msg: "Invalid Authentication."})
+
+            if(password.length < 6)
+            return res.status(400).json({msg: "Password must be at least 6 characters."})
+
+            const passwordHash = await bcrypt.hash(password, 12)
+
+            await Users.findOneAndUpdate({_id: decoded.id}, {
+                password: passwordHash
+            })
+
+            res.json({msg: "Password successfully changed!"})
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
+        }
     }
 }
 

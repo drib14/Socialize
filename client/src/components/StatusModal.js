@@ -4,6 +4,9 @@ import { GLOBALTYPES } from '../redux/actions/globalTypes'
 import { createPost, updatePost } from '../redux/actions/postAction'
 import Icons from './Icons'
 import { imageShow, videoShow } from '../utils/mediaShow'
+import Modal from 'react-modal'
+
+Modal.setAppElement('#root')
 
 const StatusModal = () => {
     const { auth, theme, status, socket } = useSelector(state => state)
@@ -76,9 +79,9 @@ const StatusModal = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        if(images.length === 0)
+        if(content.trim().length === 0 && images.length === 0)
         return dispatch({ 
-            type: GLOBALTYPES.ALERT, payload: {error: "Please add your photo."}
+            type: GLOBALTYPES.ALERT, payload: {error: "Please add content or a photo."}
         })
 
         if(status.onEdit){
@@ -105,7 +108,13 @@ const StatusModal = () => {
    
 
     return (
-        <div className="status_modal">
+        <Modal
+            isOpen={!!status}
+            onRequestClose={() => dispatch({ type: GLOBALTYPES.STATUS, payload: false })}
+            className="status_modal_content"
+            overlayClassName="status_modal_overlay"
+            contentLabel="Status Modal"
+        >
             <form onSubmit={handleSubmit}>
                 <div className="status_header">
                     <h5 className="m-0">Create Post</h5>
@@ -190,13 +199,13 @@ const StatusModal = () => {
                 </div>
 
                 <div className="status_footer">
-                    <button className="btn btn-secondary w-100" type="submit">
+                    <button className="btn btn-secondary w-100" type="submit" style={{ background: '#2b8a3e', borderColor: '#2b8a3e', color: 'white' }}>
                         Post
                     </button>
                 </div>
 
             </form>
-        </div>
+        </Modal>
     )
 }
 

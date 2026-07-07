@@ -4,6 +4,9 @@ import Avatar from '../Avatar'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
 import { addMessage } from '../../redux/actions/messageAction'
 import RingRing from '../../audio/ringring.mp3'
+import Modal from 'react-modal'
+
+Modal.setAppElement('#root')
 
 const CallModal = () => {
     const { call, auth, peer, socket, theme } = useSelector(state => state)
@@ -182,7 +185,13 @@ const CallModal = () => {
 
 
     return (
-        <div className="call_modal">
+        <Modal
+            isOpen={!!call}
+            onRequestClose={handleEndCall}
+            className="call_modal_content"
+            overlayClassName="call_modal"
+            contentLabel="Call Modal"
+        >
             <div className="call_box" style={{
                 display: (answer && call.video) ? 'none' : 'flex'
             }} >
@@ -272,7 +281,7 @@ const CallModal = () => {
 
             </div>
 
-        </div>
+        </Modal>
     )
 }
 
