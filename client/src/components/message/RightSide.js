@@ -231,7 +231,7 @@ const RightSide = () => {
                    {
                        loadMedia && 
                        <div className="chat_row you_message">
-                           <img src={LoadIcon} alt="loading"/>
+                           <img src="/icon-web-01.png" alt="loading" className="loading-logo" />
                        </div>
                    }
 

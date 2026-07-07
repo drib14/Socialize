@@ -40,11 +40,12 @@ const Loading = () => {
                 <div style={{
                     marginTop: '15px',
                     height: '4px',
-                    width: '50px',
-                    background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%)',
+                    width: '80px',
+                    background: 'linear-gradient(90deg, var(--primary-color) 0%, var(--accent-color) 50%, var(--primary-color) 100%)',
+                    backgroundSize: '200% 100%',
                     borderRadius: '4px',
                     margin: '10px auto 0',
-                    animation: 'grow 1.8s infinite alternate ease-in-out'
+                    animation: 'loading-bar-forward 1.5s infinite linear'
                 }}></div>
             </div>
             <style>{`
@@ -53,9 +54,9 @@ const Loading = () => {
                     50% { transform: scale(1.04); opacity: 1; }
                     100% { transform: scale(0.96); opacity: 0.85; }
                 }
-                @keyframes grow {
-                    0% { width: 30px; }
-                    100% { width: 80px; }
+                @keyframes loading-bar-forward {
+                    0% { background-position: 200% 0; }
+                    100% { background-position: -200% 0; }
                 }
             `}</style>
         </div>
