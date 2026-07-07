@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import Send from '../../../images/send.svg'
+
 import LikeButton from '../../LikeButton'
 import { useSelector, useDispatch } from 'react-redux'
 import { likePost, unLikePost, savePost, unSavePost, repostPost } from '../../../redux/actions/postAction'
@@ -91,7 +91,10 @@ const CardFooter = ({post}) => {
                         <i className="far fa-comment" />
                     </Link>
 
-                    <img src={Send} alt="Send" onClick={() => setIsShare(!isShare)} />
+                    <i className="far fa-paper-plane text-secondary ml-3" 
+                    title="Share"
+                    style={{ cursor: 'pointer', fontSize: '26px' }} 
+                    onClick={() => setIsShare(!isShare)} />
 
                     <i className="fas fa-retweet text-secondary ml-3" 
                     title="Repost"

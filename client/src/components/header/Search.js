@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { getDataAPI } from '../../utils/fetchData'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
 import UserCard from '../UserCard'
-import LoadIcon from '../../images/loading.gif'
+
 
 const Search = () => {
     const [search, setSearch] = useState('')
@@ -52,7 +52,7 @@ const Search = () => {
 
             <button type="submit" style={{display: 'none'}}>Search</button>
 
-            { load && <img className="loading" src={LoadIcon} alt="loading"  /> }
+            { load && <i className="fas fa-spinner fa-spin text-primary loading" style={{ position: 'absolute', right: '15px', top: '12px' }} /> }
 
             <div className="users">
                 {

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import NoNotice from '../images/notice.png'
+
 import { Link } from 'react-router-dom'
 import Avatar from './Avatar'
 import moment from 'moment'
@@ -46,7 +46,10 @@ const NotifyModal = () => {
 
             {
                 notify.data.length === 0 &&
-                <img src={NoNotice} alt="NoNotice" className="w-100" />
+                <div className="text-center my-5 text-muted" style={{ opacity: 0.5 }}>
+                    <i className="far fa-bell" style={{ fontSize: '4rem', display: 'block', marginBottom: '15px' }} />
+                    <h5>No notifications yet</h5>
+                </div>
             }
 
             <div style={{maxHeight: 'calc(100vh - 200px)', overflow: 'auto'}}>

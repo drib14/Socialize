@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PostThumb from '../PostThumb'
-import LoadIcon from '../../images/loading.gif'
+
 import LoadMoreBtn from '../LoadMoreBtn'
 import { getDataAPI } from '../../utils/fetchData'
 import { PROFILE_TYPES } from '../../redux/actions/profileAction'
@@ -37,7 +37,7 @@ const Posts = ({auth, id, dispatch, profile, isRepostTab}) => {
             <PostThumb posts={posts} result={result} />
 
             {
-                load && <img src={LoadIcon} alt="loading" className="d-block mx-auto" />
+                load && <i className="fas fa-spinner fa-spin text-primary d-block mx-auto my-3" style={{ fontSize: '2rem' }} />
             }
 
             
