@@ -28,17 +28,27 @@
 .comment_input .postBtn {
     border: none !important;
     outline: none !important;
-    background: transparent !important;
-    color: var(--primary-color) !important;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
+    color: white !important;
+    border-radius: var(--radius-md) !important;
     font-weight: 700;
     transition: var(--transition);
     padding: 6px 14px !important;
     cursor: pointer;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.4),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.15) !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .comment_input .postBtn:hover {
-    color: var(--primary-hover) !important;
-    transform: scale(1.05);
+    color: white !important;
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3),
+                inset 3px 3px 6px rgba(255, 255, 255, 0.5),
+                inset -3px -3px 6px rgba(0, 0, 0, 0.2) !important;
 }
 
 .comment_input .dropdown-menu {

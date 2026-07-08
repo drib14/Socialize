@@ -199,8 +199,8 @@ const StatusModal = () => {
                 </div>
 
                 <div className="status_footer">
-                    <button className="btn btn-secondary w-100" type="submit" style={{ background: '#2b8a3e', borderColor: '#2b8a3e', color: 'white' }}>
-                        Post
+                    <button className="btn btn-secondary w-100" type="submit" style={{ background: '#2b8a3e', borderColor: '#2b8a3e', color: 'white' }} title="Post">
+                        <span className="material-icons">send</span>
                     </button>
                 </div>
 

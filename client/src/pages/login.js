@@ -61,8 +61,8 @@ const Login = () => {
                 
                 <button type="submit" className="btn btn-dark w-100"
                 disabled={email && password ? false : true}
-                style={{ background: '#2b8a3e', borderColor: '#2b8a3e' }}>
-                    Login
+                style={{ background: '#2b8a3e', borderColor: '#2b8a3e' }} title="Login">
+                    <span className="material-icons">login</span>
                 </button>
 
                 <p className="my-2">

@@ -36,8 +36,8 @@ const ForgotPassword = () => {
                 </div>
                 
                 <button type="submit" className="btn btn-dark w-100 mb-2"
-                style={{ background: '#2b8a3e', borderColor: '#2b8a3e' }}>
-                    Send Password Reset Link
+                style={{ background: '#2b8a3e', borderColor: '#2b8a3e' }} title="Send Reset Link">
+                    <span className="material-icons">send</span>
                 </button>
 
                 <p className="my-2 text-center">

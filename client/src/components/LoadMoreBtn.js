@@ -7,8 +7,8 @@ const LoadMoreBtn = ({result, page, load, handleLoadMore}) => {
                 result < 9 * (page - 1) ? '' : 
 
                 !load && <button className="btn btn-dark mx-auto d-block"
-                onClick={handleLoadMore}>
-                    Load more
+                onClick={handleLoadMore} title="Load more">
+                    <span className="material-icons">expand_more</span>
                 </button>
             }
             

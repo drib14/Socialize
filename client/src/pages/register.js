@@ -109,26 +109,26 @@ const Register = () => {
                 <div className="gender_buttons_container d-flex gap-2 mb-3">
                     <button type="button" 
                     className={`gender_btn ${userData.gender === 'male' ? 'active-gender' : ''}`}
-                    onClick={() => setUserData({...userData, gender: 'male'})}>
-                        <i className="fas fa-mars" /> Male
+                    onClick={() => setUserData({...userData, gender: 'male'})} title="Male">
+                        <i className="fas fa-mars" />
                     </button>
 
                     <button type="button" 
                     className={`gender_btn ${userData.gender === 'female' ? 'active-gender' : ''}`}
-                    onClick={() => setUserData({...userData, gender: 'female'})}>
-                        <i className="fas fa-venus" /> Female
+                    onClick={() => setUserData({...userData, gender: 'female'})} title="Female">
+                        <i className="fas fa-venus" />
                     </button>
 
                     <button type="button" 
                     className={`gender_btn ${userData.gender === 'other' ? 'active-gender' : ''}`}
-                    onClick={() => setUserData({...userData, gender: 'other'})}>
-                        <i className="fas fa-genderless" /> Other
+                    onClick={() => setUserData({...userData, gender: 'other'})} title="Other">
+                        <i className="fas fa-genderless" />
                     </button>
                 </div>
                 
                 <button type="submit" className="btn btn-dark w-100"
-                style={{ background: '#2b8a3e', borderColor: '#2b8a3e' }}>
-                    Register
+                style={{ background: '#2b8a3e', borderColor: '#2b8a3e' }} title="Register">
+                    <span className="material-icons">how_to_reg</span>
                 </button>
 
                 <p className="my-2">

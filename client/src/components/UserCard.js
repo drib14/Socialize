@@ -5,7 +5,14 @@ import { useSelector } from 'react-redux'
 
 const UserCard = ({children, user, border, handleClose, setShowFollowers, setShowFollowing, msg}) => {
 
-    const { theme } = useSelector(state => state)
+    const { theme, auth, online } = useSelector(state => state)
+
+    const isMutualFollower = (userId) => {
+        if (!auth.user || !auth.user.following || !auth.user.followers) return false;
+        const isFollowing = auth.user.following.some(item => (item._id ? item._id === userId : item === userId));
+        const isFollower = auth.user.followers.some(item => (item._id ? item._id === userId : item === userId));
+        return isFollowing && isFollower;
+    }
 
     const handleCloseAll = () => {
         if(handleClose) handleClose()
@@ -47,7 +54,22 @@ const UserCard = ({children, user, border, handleClose, setShowFollowers, setSho
                 <Link to={`/profile/${user._id}`} onClick={handleCloseAll}
                 className="d-flex align-items-center">
                     
-                    <Avatar src={user.avatar} size="big-avatar" />
+                    <div className="position-relative">
+                        <Avatar src={user.avatar} size="big-avatar" />
+                        {
+                            online.includes(user._id) && isMutualFollower(user._id) &&
+                            <span className="position-absolute" style={{
+                                width: '12px',
+                                height: '12px',
+                                background: '#2b8a3e',
+                                border: '2px solid var(--bg-card)',
+                                borderRadius: '50%',
+                                bottom: '2px',
+                                right: '2px',
+                                boxShadow: '0 0 0 2px rgba(43,138,62,0.2)'
+                            }} />
+                        }
+                    </div>
 
                     <div className="ml-1" style={{transform: 'translateY(-2px)'}}>
                         <span className="d-block">{user.fullname}</span>

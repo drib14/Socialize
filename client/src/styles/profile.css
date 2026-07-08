@@ -218,33 +218,46 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    border-bottom: 2px solid var(--border-color);
     margin-bottom: 30px;
     gap: 15px;
+    background-color: var(--bg-card);
+    padding: 12px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
 }
 
 .profile_tab button {
-    outline: none;
-    border: none;
-    background: transparent;
+    outline: none !important;
+    border: none !important;
     text-transform: uppercase;
-    font-weight: 700;
-    font-size: 0.95rem;
-    padding: 12px 24px;
-    color: var(--text-secondary);
-    opacity: 0.6;
-    border-bottom: 3px solid transparent;
-    transition: var(--transition);
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    padding: 10px 24px !important;
     cursor: pointer;
+    border-radius: var(--radius-md) !important;
+    background: linear-gradient(135deg, var(--bg-input) 0%, var(--border-color) 100%) !important;
+    color: var(--text-secondary) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.4),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.1) !important;
+    transition: var(--transition) !important;
+    opacity: 0.8;
 }
 
 .profile_tab button.active {
-    border-bottom: 3px solid var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
+    color: white !important;
     opacity: 1;
-    color: var(--primary-color);
+    box-shadow: 0 6px 14px rgba(16, 185, 129, 0.3),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.4),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
 .profile_tab button:hover {
     opacity: 1;
-    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1),
+                inset 3px 3px 6px rgba(255, 255, 255, 0.5),
+                inset -3px -3px 6px rgba(0, 0, 0, 0.15) !important;
 }

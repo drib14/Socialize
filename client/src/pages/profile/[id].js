@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 
 import Info from '../../components/profile/Info'
 import Posts from '../../components/profile/Posts'
-import Saved from '../../components/profile/Saved'
 
 import { useSelector, useDispatch } from 'react-redux'
 import ProfileSkeleton from '../../components/skeletons/ProfileSkeleton'
@@ -29,21 +28,18 @@ const Profile = () => {
             <Info auth={auth} profile={profile} dispatch={dispatch} id={id} />
 
             <div className="profile_tab">
-                <button className={tab === 'posts' ? 'active' : ''} onClick={() => setTab('posts')}>Posts</button>
-                <button className={tab === 'reposts' ? 'active' : ''} onClick={() => setTab('reposts')}>Reposts</button>
-                {
-                    auth.user._id === id &&
-                    <button className={tab === 'saved' ? 'active' : ''} onClick={() => setTab('saved')}>Saved</button>
-                }
+                <button className={tab === 'posts' ? 'active' : ''} onClick={() => setTab('posts')} title="Posts">
+                    <span className="material-icons">grid_on</span>
+                </button>
+                <button className={tab === 'reposts' ? 'active' : ''} onClick={() => setTab('reposts')} title="Reposts">
+                    <span className="material-icons">repeat</span>
+                </button>
             </div>
 
             {
                 profile.loading 
                 ? <ProfileSkeleton />
                 : <>
-                    {
-                        tab === 'saved' && <Saved auth={auth} dispatch={dispatch} />
-                    }
                     {
                         tab === 'posts' && <Posts auth={auth} profile={profile} dispatch={dispatch} id={id} isRepostTab={false} />
                     }

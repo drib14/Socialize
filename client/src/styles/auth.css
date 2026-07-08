@@ -68,30 +68,35 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
     border-radius: var(--radius-md) !important;
-    padding: 10px !important;
-    font-size: 0.9rem !important;
+    padding: 12px !important;
+    font-size: 1.2rem !important;
     font-weight: 600 !important;
-    border: 1px solid var(--border-color) !important;
-    background: var(--bg-card) !important;
+    border: none !important;
+    background: linear-gradient(135deg, var(--bg-input) 0%, var(--border-color) 100%) !important;
     color: var(--text-secondary) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.4),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.1) !important;
     transition: var(--transition) !important;
     cursor: pointer;
     outline: none !important;
 }
 
 .auth_page .gender_btn:hover {
-    background: var(--bg-input) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1),
+                inset 3px 3px 6px rgba(255, 255, 255, 0.5),
+                inset -3px -3px 6px rgba(0, 0, 0, 0.15) !important;
     color: var(--text-main) !important;
-    border-color: var(--border-color) !important;
 }
 
 .auth_page .gender_btn.active-gender {
-    background: var(--primary-color) !important;
-    border-color: var(--primary-color) !important;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
     color: white !important;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+    box-shadow: 0 6px 14px rgba(16, 185, 129, 0.3),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.4),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
 .auth_page form .pass {

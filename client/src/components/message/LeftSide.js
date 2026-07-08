@@ -106,22 +106,22 @@ const LeftSide = () => {
                     </>
                     : <>
                         {
-                            message.users.map(user => (
-                                <div key={user._id} className={`message_user ${isActive(user)}`}
-                                onClick={() => handleAddUser(user)}>
-                                    <UserCard user={user} msg={true}>
-                                        {
-                                            user.online
-                                            ? <i className="fas fa-circle text-success" />
-                                            : auth.user.following.find(item => 
-                                                item._id === user._id
-                                            ) && <i className="fas fa-circle" />
-                                                
-                                        }
-                                        
-                                    </UserCard>
-                                </div>
-                            ))
+                            message.users.map(user => {
+                                const isMutual = auth.user.following.some(item => (item._id || item) === user._id) && 
+                                                 auth.user.followers.some(item => (item._id || item) === user._id);
+                                const isOnline = online.includes(user._id);
+                                return (
+                                    <div key={user._id} className={`message_user ${isActive(user)}`}
+                                    onClick={() => handleAddUser(user)}>
+                                        <UserCard user={user} msg={true}>
+                                            {
+                                                (isOnline && isMutual) &&
+                                                <i className="fas fa-circle text-success" />
+                                            }
+                                        </UserCard>
+                                    </div>
+                                );
+                            })
                         }
                     </>
                 }

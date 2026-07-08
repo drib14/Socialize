@@ -14,7 +14,7 @@ const LeftSideBar = () => {
         { label: 'Home', icon: 'home', path: '/' },
         { label: 'Messages', icon: 'near_me', path: '/message' },
         { label: 'Discover', icon: 'explore', path: '/discover' },
-        { label: 'Saved Posts', icon: 'bookmark', path: `/profile/${auth.user._id}` }
+        { label: 'Saved Posts', icon: 'bookmark', path: '/saved' }
     ]
 
     const isActive = (pn) => {

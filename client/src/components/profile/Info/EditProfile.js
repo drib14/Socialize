@@ -45,8 +45,8 @@ const EditProfile = ({setOnEdit}) => {
     return (
         <div className="edit_profile">
             <button className="btn btn-danger btn_close"
-            onClick={() => setOnEdit(false)}>
-                Close
+            onClick={() => setOnEdit(false)} title="Close">
+                <span className="material-icons">close</span>
             </button>
 
             <form onSubmit={handleSubmit}>
@@ -112,7 +112,9 @@ const EditProfile = ({setOnEdit}) => {
                     </select>
                 </div>
 
-                <button className="btn btn-info w-100" type="submit">Save</button>
+                <button className="btn btn-info w-100" type="submit" title="Save">
+                    <span className="material-icons">save</span>
+                </button>
             </form>
         </div>
     )

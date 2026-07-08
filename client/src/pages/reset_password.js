@@ -64,8 +64,8 @@ const ResetPassword = () => {
                 </div>
                 
                 <button type="submit" className="btn btn-dark w-100"
-                style={{ background: '#2b8a3e', borderColor: '#2b8a3e' }}>
-                    Reset Password
+                style={{ background: '#2b8a3e', borderColor: '#2b8a3e' }} title="Reset Password">
+                    <span className="material-icons">lock_reset</span>
                 </button>
             </form>
         </div>

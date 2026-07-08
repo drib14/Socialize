@@ -95,9 +95,11 @@ const NotifyModal = () => {
             </div>
 
             <hr className="my-1" />
-            <div className="text-right text-danger mr-2" style={{cursor: 'pointer'}}
-            onClick={handleDeleteAll}>
-                Delete All
+            <div className="text-right mr-2">
+                <button className="btn btn-danger" style={{ padding: '6px 12px !important', fontSize: '0.85rem !important' }}
+                onClick={handleDeleteAll} title="Delete All Notifications">
+                    <span className="material-icons">delete_sweep</span>
+                </button>
             </div>
 
         </div>

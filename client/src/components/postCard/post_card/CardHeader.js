@@ -9,10 +9,17 @@ import { BASE_URL } from '../../../utils/config'
 import { customConfirm } from '../../../utils/customAlert'
 
 const CardHeader = ({post}) => {
-    const { auth, socket } = useSelector(state => state)
+    const { auth, socket, online } = useSelector(state => state)
     const dispatch = useDispatch()
 
     const navigate = useNavigate()
+
+    const isMutualFollower = (userId) => {
+        if (!auth.user || !auth.user.following || !auth.user.followers) return false;
+        const isFollowing = auth.user.following.some(item => (item._id ? item._id === userId : item === userId));
+        const isFollower = auth.user.followers.some(item => (item._id ? item._id === userId : item === userId));
+        return isFollowing && isFollower;
+    }
 
     const handleEditPost = () => {
         dispatch({ type: GLOBALTYPES.STATUS, payload: {...post, onEdit: true}})
@@ -32,8 +39,23 @@ const CardHeader = ({post}) => {
 
     return (
         <div className="card_header">
-            <div className="d-flex">
-                <Avatar src={post.user.avatar} size="big-avatar" />
+            <div className="d-flex align-items-center" style={{ gap: '12px' }}>
+                <div className="position-relative">
+                    <Avatar src={post.user.avatar} size="big-avatar" />
+                    {
+                        online.includes(post.user._id) && isMutualFollower(post.user._id) &&
+                        <span className="position-absolute" style={{
+                            width: '12px',
+                            height: '12px',
+                            background: '#2b8a3e',
+                            border: '2px solid var(--bg-card)',
+                            borderRadius: '50%',
+                            bottom: '2px',
+                            right: '2px',
+                            boxShadow: '0 0 0 2px rgba(43,138,62,0.2)'
+                        }} />
+                    }
+                </div>
 
                 <div className="card_name">
                     <h6 className="m-0">
@@ -41,7 +63,10 @@ const CardHeader = ({post}) => {
                             {post.user.fullname}
                         </Link>
                     </h6>
-                    <small className="text-muted">
+                    <span className="text-muted d-block" style={{ fontSize: '0.8rem', lineHeight: '1.2' }}>
+                        @{post.user.username}
+                    </span>
+                    <small className="text-muted d-block" style={{ fontSize: '0.75rem', marginTop: '2px' }}>
                         {moment(post.createdAt).fromNow()}
                     </small>
                 </div>
