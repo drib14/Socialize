@@ -17,7 +17,7 @@ export const createPost = ({content, images, auth, socket}) => async (dispatch) 
     let media = []
     try {
         dispatch({ type: GLOBALTYPES.ALERT, payload: {loading: true} })
-        if(images.length > 0) media = await imageUpload(images)
+        if(images.length > 0) media = await imageUpload(images, auth.token)
 
         const res = await postDataAPI('posts', { content, images: media }, auth.token)
 
@@ -79,7 +79,7 @@ export const updatePost = ({content, images, auth, status}) => async (dispatch) 
 
     try {
         dispatch({ type: GLOBALTYPES.ALERT, payload: {loading: true} })
-        if(imgNewUrl.length > 0) media = await imageUpload(imgNewUrl)
+        if(imgNewUrl.length > 0) media = await imageUpload(imgNewUrl, auth.token)
 
         const res = await patchDataAPI(`post/${status._id}`, { 
             content, images: [...imgOldUrl, ...media] 

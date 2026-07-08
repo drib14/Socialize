@@ -27,5 +27,6 @@ router.patch('/unSavePost/:id', auth, postCtrl.unSavePost)
 
 router.get('/getSavePosts', auth, postCtrl.getSavePosts)
 
+router.post('/upload_media', auth, postCtrl.uploadMedia)
 
 module.exports = router

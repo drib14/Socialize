@@ -1,51 +1,40 @@
+import { postDataAPI } from './fetchData'
+
 export const checkImage = (file) => {
     let err = ""
     if(!file) return err = "File does not exist."
 
-    if(file.size > 1024 * 1024) // 1mb
-    err = "The largest image size is 1mb."
+    if(file.size > 1024 * 1024 * 5) // 5mb to support larger files
+    err = "The largest image size is 5mb."
 
-    if(file.type !== 'image/jpeg' && file.type !== 'image/png' )
+    if(file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/webp')
     err = "Image format is incorrect."
     
     return err;
 }
 
+const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+};
 
-export const imageUpload = async (images) => {
+export const imageUpload = async (images, token) => {
     let imgArr = [];
     for(const item of images){
-        const formData = new FormData()
-
-        if(item.camera){
-            formData.append("file", item.camera)
-        }else{
-            formData.append("file", item)
+        try {
+            const base64Data = item.camera ? item.camera : await fileToBase64(item);
+            
+            const res = await postDataAPI('upload_media', { file: base64Data }, token);
+            
+            imgArr.push({ public_id: res.data.public_id, url: res.data.secure_url });
+        } catch (err) {
+            console.error("Upload error:", err);
+            throw new Error(err.response?.data?.msg || err.message || "Failed to upload media.");
         }
-        
-        const uploadPreset = process.env.REACT_APP_UPLOAD_PRESET || "dwquuisuj_preset";
-        const cloudName = process.env.REACT_APP_CLOUD_NAME || "dwquuisuj";
-        const cloudinaryUrl = process.env.REACT_APP_CLOUDINARY_URL || "https://api.cloudinary.com/v1_1/dwquuisuj/auto/upload";
-
-        formData.append("upload_preset", uploadPreset)
-        formData.append("cloud_name", cloudName)
-
-        const res = await fetch(cloudinaryUrl, {
-            method: "POST",
-            body: formData
-        })
-        
-        if(!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            throw new Error(errData?.error?.message || `Upload failed with status ${res.status}`);
-        }
-
-        const data = await res.json()
-        if(data.error) {
-            throw new Error(data.error.message);
-        }
-
-        imgArr.push({public_id: data.public_id, url: data.secure_url})
     }
     return imgArr;
 }

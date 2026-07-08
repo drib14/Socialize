@@ -61,7 +61,7 @@ export const updateProfileUser = ({userData, avatar, auth}) => async (dispatch) 
         let media;
         dispatch({type: GLOBALTYPES.ALERT, payload: {loading: true}})
 
-        if(avatar) media = await imageUpload([avatar])
+        if(avatar) media = await imageUpload([avatar], auth.token)
 
         const res = await patchDataAPI("user", {
             ...userData,

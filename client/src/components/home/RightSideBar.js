@@ -6,6 +6,9 @@ import FollowBtn from '../FollowBtn'
 
 import { getSuggestions } from '../../redux/actions/suggestionsAction'
 
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
+
 const RightSideBar = () => {
     const { auth, suggestions } = useSelector(state => state)
     const dispatch = useDispatch()
@@ -25,7 +28,9 @@ const RightSideBar = () => {
 
             {
                 suggestions.loading
-                ? <i className="fas fa-spinner fa-spin text-primary d-block mx-auto my-4" style={{ fontSize: '2rem' }} />
+                ? <div className="my-4">
+                    <Skeleton height={50} className="mb-2" borderRadius={8} count={5} />
+                  </div>
                 : <div className="suggestions">
                     {
                         suggestions.users.map(user => (

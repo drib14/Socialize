@@ -314,6 +314,74 @@ const postCtrl = {
             return res.status(500).json({msg: err.message})
         }
     },
+    uploadMedia: async (req, res) => {
+        try {
+            const { file } = req.body;
+            if(!file) return res.status(400).json({msg: "No file provided."});
+
+            const crypto = require('crypto');
+            const https = require('https');
+
+            const timestamp = Math.round(new Date().getTime() / 1000);
+            const cloudName = process.env.CLOUDINARY_CLOUD_NAME || 'dwquuisuj';
+            const apiKey = process.env.CLOUDINARY_API_KEY || '655351295167741';
+            const apiSecret = process.env.CLOUDINARY_API_SECRET || 'F0UAKwbXYzDbcTbFr43iwL0D0qQ';
+
+            const stringToSign = `timestamp=${timestamp}${apiSecret}`;
+            const signature = crypto.createHash('sha1').update(stringToSign).digest('hex');
+
+            const postData = JSON.stringify({
+                file: file,
+                timestamp: timestamp,
+                api_key: apiKey,
+                signature: signature
+            });
+
+            const options = {
+                hostname: 'api.cloudinary.com',
+                path: `/v1_1/${cloudName}/auto/upload`,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(postData)
+                }
+            };
+
+            const cloudinaryUpload = () => {
+                return new Promise((resolve, reject) => {
+                    const request = https.request(options, (response) => {
+                        let rawData = '';
+                        response.on('data', (chunk) => { rawData += chunk; });
+                        response.on('end', () => {
+                            try {
+                                const parsed = JSON.parse(rawData);
+                                if (response.statusCode >= 200 && response.statusCode < 300) {
+                                    resolve(parsed);
+                                } else {
+                                    reject(new Error(parsed.error?.message || `Cloudinary status ${response.statusCode}`));
+                                }
+                            } catch (e) {
+                                reject(new Error(`Failed to parse response: ${rawData}`));
+                            }
+                        });
+                    });
+
+                    request.on('error', (e) => { reject(e); });
+                    request.write(postData);
+                    request.end();
+                });
+            };
+
+            const data = await cloudinaryUpload();
+            res.json({
+                public_id: data.public_id,
+                secure_url: data.secure_url
+            });
+
+        } catch (err) {
+            return res.status(500).json({msg: err.message});
+        }
+    }
 }
 
 module.exports = postCtrl

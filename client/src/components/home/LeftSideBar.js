@@ -10,15 +10,8 @@ const LeftSideBar = () => {
     const dispatch = useDispatch()
     const { pathname } = useLocation()
 
-    const navLinks = [
-        { label: 'Home', icon: 'home', path: '/' },
-        { label: 'Messages', icon: 'near_me', path: '/message' },
-        { label: 'Discover', icon: 'explore', path: '/discover' },
-        { label: 'Saved Posts', icon: 'bookmark', path: '/saved' }
-    ]
-
     const isActive = (pn) => {
-        if (pn === pathname) return 'active'
+        if (pn === pathname) return 'active-link'
     }
 
     return (
@@ -41,16 +34,12 @@ const LeftSideBar = () => {
             {/* Navigation Menu */}
             <div className="sidebar_menu card p-2 mb-4" style={{ borderRadius: 'var(--radius-lg)', background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
                 <ul className="nav flex-column">
-                    {
-                        navLinks.map((link, index) => (
-                            <li className={`nav-item rounded ${isActive(link.path) ? 'active-link' : ''}`} key={index} style={{ margin: '4px 0' }}>
-                                <Link className="nav-link d-flex align-items-center py-3 px-4" to={link.path} style={{ color: isActive(link.path) ? 'var(--primary-color)' : 'var(--text-main)', fontWeight: isActive(link.path) ? '700' : '500', gap: '15px', transition: 'var(--transition)' }}>
-                                    <span className="material-icons" style={{ fontSize: '24px' }}>{link.icon}</span>
-                                    <span style={{ fontSize: '1rem' }}>{link.label}</span>
-                                </Link>
-                            </li>
-                        ))
-                    }
+                    <li className={`nav-item rounded ${isActive('/saved') ? 'active-link' : ''}`} style={{ margin: '4px 0' }}>
+                        <Link className="nav-link d-flex align-items-center py-3 px-4" to="/saved" style={{ color: isActive('/saved') ? 'var(--primary-color)' : 'var(--text-main)', fontWeight: isActive('/saved') ? '700' : '500', gap: '15px', transition: 'var(--transition)' }}>
+                            <span className="material-icons" style={{ fontSize: '24px' }}>bookmark</span>
+                            <span style={{ fontSize: '1rem' }}>Saved Posts</span>
+                        </Link>
+                    </li>
 
                     <li className="nav-item rounded" style={{ margin: '4px 0', cursor: 'pointer' }}
                         onClick={() => dispatch({ type: GLOBALTYPES.THEME, payload: !theme })}>

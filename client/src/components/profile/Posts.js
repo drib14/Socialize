@@ -5,6 +5,9 @@ import LoadMoreBtn from '../LoadMoreBtn'
 import { getDataAPI } from '../../utils/fetchData'
 import { PROFILE_TYPES } from '../../redux/actions/profileAction'
 
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
+
 const Posts = ({auth, id, dispatch, profile, isRepostTab}) => {
     const [posts, setPosts] = useState([])
     const [result, setResult] = useState(9)
@@ -37,7 +40,12 @@ const Posts = ({auth, id, dispatch, profile, isRepostTab}) => {
             <PostThumb posts={posts} result={result} />
 
             {
-                load && <i className="fas fa-spinner fa-spin text-primary d-block mx-auto my-3" style={{ fontSize: '2rem' }} />
+                load && 
+                <div className="d-grid my-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '15px', display: 'grid' }}>
+                    <Skeleton height={250} borderRadius={8} />
+                    <Skeleton height={250} borderRadius={8} />
+                    <Skeleton height={250} borderRadius={8} />
+                </div>
             }
 
             

@@ -7,6 +7,9 @@ import LoadMoreBtn from '../components/LoadMoreBtn'
 import { getDataAPI } from '../utils/fetchData'
 import { GLOBALTYPES } from '../redux/actions/globalTypes'
 import PostSkeleton from '../components/skeletons/PostSkeleton'
+import { unSavePost } from '../redux/actions/postAction'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 const Saved = () => {
     const { auth } = useSelector(state => state)
@@ -36,6 +39,12 @@ const Saved = () => {
 
         return () => setSavePosts([])
     }, [auth.token, dispatch])
+
+    const handleUnSave = (post) => {
+        dispatch(unSavePost({post, auth}))
+        setSavePosts(savePosts.filter(item => item._id !== post._id))
+        setResult(result - 1)
+    }
 
     const handleLoadMore = async () => {
         setLoad(true)
@@ -72,10 +81,15 @@ const Saved = () => {
                             <h4>No Saved Posts</h4>
                           </div>
                         : <>
-                            <PostThumb posts={savePosts} result={result} />
+                            <PostThumb posts={savePosts} result={result} handleUnSave={handleUnSave} />
                             
                             {
-                                load && <div className="text-center my-3"><i className="fas fa-spinner fa-spin text-primary" style={{ fontSize: '2rem' }} /></div>
+                                load && 
+                                <div className="d-grid my-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '15px', display: 'grid' }}>
+                                    <Skeleton height={250} borderRadius={8} />
+                                    <Skeleton height={250} borderRadius={8} />
+                                    <Skeleton height={250} borderRadius={8} />
+                                </div>
                             }
 
                             <LoadMoreBtn result={result} page={page} load={load} handleLoadMore={handleLoadMore} />

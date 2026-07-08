@@ -83,7 +83,7 @@ const RightSide = () => {
         setLoadMedia(true)
 
         let newArr = [];
-        if(media.length > 0) newArr = await imageUpload(media)
+        if(media.length > 0) newArr = await imageUpload(media, auth.token)
 
         const msg = {
             sender: auth.user._id,

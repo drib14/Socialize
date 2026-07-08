@@ -8,6 +8,8 @@ import { getDataAPI } from '../../utils/fetchData'
 import { POST_TYPES } from '../../redux/actions/postAction'
 
 
+import PostSkeleton from '../skeletons/PostSkeleton'
+
 const Posts = () => {
     const { homePosts, auth, theme } = useSelector(state => state)
     const dispatch = useDispatch()
@@ -35,7 +37,7 @@ const Posts = () => {
             }
 
             {
-                load && <i className="fas fa-spinner fa-spin text-primary d-block mx-auto my-3" style={{ fontSize: '2rem' }} />
+                load && <PostSkeleton />
             }
 
             

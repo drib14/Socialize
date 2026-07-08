@@ -19,6 +19,56 @@ const MsgDisplay = ({user, msg, theme, data}) => {
         }
     }
 
+    const renderMediaOrFile = (item, index) => {
+        if (!item || !item.url) return null;
+        
+        const url = item.url;
+        const isVideo = typeof url === 'string' && (url.match(/\.(mp4|webm|ogg|quicktime)/i) || url.includes('/video/upload/') || url.match(/video/i));
+        const isImage = typeof url === 'string' && (url.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) || url.includes('/image/upload/') || !url.match(/video/i));
+
+        if (isImage) {
+            return (
+                <div key={index} className="chat_media_container position-relative mb-2" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', maxWidth: '280px', boxShadow: 'var(--shadow-sm)' }}>
+                    <img src={url} alt="chat attachment" className="img-thumbnail p-0 border-0" style={{ width: '100%', height: 'auto', display: 'block', transition: 'var(--transition)' }} />
+                    <a href={url} target="_blank" rel="noopener noreferrer" className="chat_media_download position-absolute d-flex align-items-center justify-content-center" 
+                       style={{ top: '8px', right: '8px', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.85)', color: 'var(--text-main)', boxShadow: '0 2px 6px rgba(0,0,0,0.15)', textDecoration: 'none' }}>
+                        <span className="material-icons" style={{ fontSize: '1.1rem' }}>file_download</span>
+                    </a>
+                </div>
+            );
+        }
+
+        if (isVideo) {
+            return (
+                <div key={index} className="chat_media_container position-relative mb-2" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', maxWidth: '320px', boxShadow: 'var(--shadow-sm)' }}>
+                    <video src={url} controls className="w-100" style={{ display: 'block', borderRadius: 'var(--radius-md)' }} />
+                </div>
+            );
+        }
+
+        // Generic File
+        const fileName = typeof url === 'string' ? url.substring(url.lastIndexOf('/') + 1) : "file";
+        const displayName = fileName.length > 20 ? fileName.substring(0, 15) + '...' + fileName.substring(fileName.lastIndexOf('.')) : fileName;
+        
+        return (
+            <div key={index} className="chat_file_bubble d-flex align-items-center p-3 mb-2" 
+                 style={{ background: 'var(--bg-body)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', maxWidth: '280px', gap: '12px', boxShadow: 'var(--shadow-sm)' }}>
+                <span className="material-icons text-primary" style={{ fontSize: '2.5rem' }}>insert_drive_file</span>
+                <div className="text-left overflow-hidden" style={{ flex: 1 }}>
+                    <div className="font-weight-bold text-truncate" style={{ fontSize: '0.9rem', color: 'var(--text-main)' }} title={fileName}>
+                        {displayName}
+                    </div>
+                    <small className="text-muted" style={{ fontSize: '0.75rem' }}>Attachment</small>
+                </div>
+                <a href={url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-clay" 
+                   style={{ padding: '6px', borderRadius: '50%', minWidth: 'auto', background: 'var(--bg-card)' }}
+                   title="Download file">
+                    <span className="material-icons" style={{ fontSize: '1.1rem', color: 'var(--primary-color)' }}>download</span>
+                </a>
+            </div>
+        );
+    };
+
     return (
         <>
             <div className="chat_title">
@@ -30,7 +80,7 @@ const MsgDisplay = ({user, msg, theme, data}) => {
                 { 
                     user._id === auth.user._id && 
                     <i className="fas fa-trash text-danger"
-                    onClick={handleDeleteMessages} />
+                     onClick={handleDeleteMessages} />
                 }
 
                 <div>
@@ -42,15 +92,7 @@ const MsgDisplay = ({user, msg, theme, data}) => {
                         </div>
                     }
                     {
-                        msg.media.map((item, index) => (
-                            <div key={index}>
-                                 {
-                                     item && item.url && typeof item.url === 'string' && item.url.match(/video/i)
-                                     ? videoShow(item.url, theme)
-                                     : imageShow(item.url ? item.url : '', theme)
-                                 }
-                            </div>
-                        ))
+                        msg.media.map((item, index) => renderMediaOrFile(item, index))
                     }
                 </div>
             

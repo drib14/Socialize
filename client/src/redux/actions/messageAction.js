@@ -33,11 +33,19 @@ export const getConversations = ({auth, page = 1}) => async (dispatch) => {
         
         let newArr = [];
         res.data.conversations.forEach(item => {
-            item.recipients.forEach(cv => {
-                if(cv._id !== auth.user._id){
-                    newArr.push({...cv, text: item.text, media: item.media, call: item.call})
-                }
-            })
+            const isSelfChat = item.recipients.length === 1 
+                ? item.recipients[0]._id === auth.user._id 
+                : item.recipients.every(r => r._id === auth.user._id);
+
+            if (isSelfChat) {
+                newArr.push({...auth.user, text: item.text, media: item.media, call: item.call})
+            } else {
+                item.recipients.forEach(cv => {
+                    if(cv._id !== auth.user._id){
+                        newArr.push({...cv, text: item.text, media: item.media, call: item.call})
+                    }
+                })
+            }
         })
 
         dispatch({
