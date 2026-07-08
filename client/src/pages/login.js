@@ -35,8 +35,8 @@ const Login = () => {
                 <h3 className="text-uppercase text-center mb-4">Socialize</h3>
 
                 <div className="form-group">
-                    <label htmlFor="exampleInputEmail1">Email address</label>
                     <input type="email" className="form-control" id="exampleInputEmail1" name="email"
+                    placeholder="Email address"
                     aria-describedby="emailHelp" onChange={handleChangeInput} value={email} />
                     
                     <small id="emailHelp" className="form-text text-muted">
@@ -45,12 +45,11 @@ const Login = () => {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="exampleInputPassword1">Password</label>
-
                     <div className="pass">
                         
                         <input type={ typePass ? "text" : "password" } 
                         className="form-control" id="exampleInputPassword1"
+                        placeholder="Password"
                         onChange={handleChangeInput} value={password} name="password" />
 
                         <small onClick={() => setTypePass(!typePass)}>

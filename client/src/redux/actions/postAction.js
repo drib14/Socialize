@@ -43,7 +43,7 @@ export const createPost = ({content, images, auth, socket}) => async (dispatch) 
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT,
-            payload: {error: err.response.data.msg}
+            payload: {error: err.response?.data?.msg || err.message}
         })
     }
 }
@@ -62,7 +62,7 @@ export const getPosts = (token) => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT,
-            payload: {error: err.response.data.msg}
+            payload: {error: err.response?.data?.msg || err.message}
         })
     }
 }
@@ -91,7 +91,7 @@ export const updatePost = ({content, images, auth, status}) => async (dispatch) 
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT,
-            payload: {error: err.response.data.msg}
+            payload: {error: err.response?.data?.msg || err.message}
         })
     }
 }
@@ -120,7 +120,7 @@ export const likePost = ({post, auth, socket}) => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT,
-            payload: {error: err.response.data.msg}
+            payload: {error: err.response?.data?.msg || err.message}
         })
     }
 }
@@ -146,7 +146,7 @@ export const unLikePost = ({post, auth, socket}) => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT,
-            payload: {error: err.response.data.msg}
+            payload: {error: err.response?.data?.msg || err.message}
         })
     }
 }
@@ -175,7 +175,7 @@ export const repostPost = ({post, auth, socket}) => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT,
-            payload: {error: err.response.data.msg}
+            payload: {error: err.response?.data?.msg || err.message}
         })
     }
 }
@@ -188,7 +188,7 @@ export const getPost = ({detailPost, id, auth}) => async (dispatch) => {
         } catch (err) {
             dispatch({
                 type: GLOBALTYPES.ALERT,
-                payload: {error: err.response.data.msg}
+                payload: {error: err.response?.data?.msg || err.message}
             })
         }
     }
@@ -212,7 +212,7 @@ export const deletePost = ({post, auth, socket}) => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT,
-            payload: {error: err.response.data.msg}
+            payload: {error: err.response?.data?.msg || err.message}
         })
     }
 }
@@ -226,7 +226,7 @@ export const savePost = ({post, auth}) => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT,
-            payload: {error: err.response.data.msg}
+            payload: {error: err.response?.data?.msg || err.message}
         })
     }
 }
@@ -240,7 +240,7 @@ export const unSavePost = ({post, auth}) => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT,
-            payload: {error: err.response.data.msg}
+            payload: {error: err.response?.data?.msg || err.message}
         })
     }
 }

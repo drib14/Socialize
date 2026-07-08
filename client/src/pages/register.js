@@ -38,8 +38,8 @@ const Register = () => {
                 <h3 className="text-uppercase text-center mb-4">Socialize</h3>
 
                 <div className="form-group">
-                    <label htmlFor="fullname">Full Name</label>
                     <input type="text" className="form-control" id="fullname" name="fullname"
+                    placeholder="Full Name"
                     onChange={handleChangeInput} value={fullname}
                     style={{background: `${alert.fullname ? '#fd2d6a14' : ''}`}} />
                     
@@ -49,8 +49,8 @@ const Register = () => {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="username">User Name</label>
                     <input type="text" className="form-control" id="username" name="username"
+                    placeholder="Username"
                     onChange={handleChangeInput} value={username.toLowerCase().replace(/ /g, '')}
                     style={{background: `${alert.username ? '#fd2d6a14' : ''}`}} />
                     
@@ -60,8 +60,8 @@ const Register = () => {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="exampleInputEmail1">Email address</label>
                     <input type="email" className="form-control" id="exampleInputEmail1" name="email"
+                    placeholder="Email address"
                     onChange={handleChangeInput} value={email}
                     style={{background: `${alert.email ? '#fd2d6a14' : ''}`}} />
                     
@@ -71,12 +71,10 @@ const Register = () => {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="exampleInputPassword1">Password</label>
-
                     <div className="pass">
-                        
                         <input type={ typePass ? "text" : "password" } 
                         className="form-control" id="exampleInputPassword1"
+                        placeholder="Password"
                         onChange={handleChangeInput} value={password} name="password"
                         style={{background: `${alert.password ? '#fd2d6a14' : ''}`}} />
 
@@ -91,12 +89,10 @@ const Register = () => {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="cf_password">Confirm Password</label>
-
                     <div className="pass">
-                        
                         <input type={ typeCfPass ? "text" : "password" } 
                         className="form-control" id="cf_password"
+                        placeholder="Confirm Password"
                         onChange={handleChangeInput} value={cf_password} name="cf_password"
                         style={{background: `${alert.cf_password ? '#fd2d6a14' : ''}`}} />
 
@@ -110,21 +106,24 @@ const Register = () => {
                     </small>
                 </div>
 
-                <div className="row justify-content-between mx-0 mb-1">
-                    <label htmlFor="male">
-                        Male: <input type="radio" id="male" name="gender"
-                        value="male" defaultChecked onChange={handleChangeInput} />
-                    </label>
+                <div className="gender_buttons_container d-flex gap-2 mb-3">
+                    <button type="button" 
+                    className={`gender_btn ${userData.gender === 'male' ? 'active-gender' : ''}`}
+                    onClick={() => setUserData({...userData, gender: 'male'})}>
+                        <i className="fas fa-mars" /> Male
+                    </button>
 
-                    <label htmlFor="female">
-                        Female: <input type="radio" id="female" name="gender"
-                        value="female" onChange={handleChangeInput} />
-                    </label>
+                    <button type="button" 
+                    className={`gender_btn ${userData.gender === 'female' ? 'active-gender' : ''}`}
+                    onClick={() => setUserData({...userData, gender: 'female'})}>
+                        <i className="fas fa-venus" /> Female
+                    </button>
 
-                    <label htmlFor="other">
-                        Other: <input type="radio" id="other" name="gender"
-                        value="other" onChange={handleChangeInput} />
-                    </label>
+                    <button type="button" 
+                    className={`gender_btn ${userData.gender === 'other' ? 'active-gender' : ''}`}
+                    onClick={() => setUserData({...userData, gender: 'other'})}>
+                        <i className="fas fa-genderless" /> Other
+                    </button>
                 </div>
                 
                 <button type="submit" className="btn btn-dark w-100"

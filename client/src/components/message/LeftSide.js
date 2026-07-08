@@ -30,7 +30,7 @@ const LeftSide = () => {
             setSearchUsers(res.data.users)
         } catch (err) {
             dispatch({
-                type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}
+                type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}
             })
         }
     }

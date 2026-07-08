@@ -25,7 +25,7 @@ const Search = () => {
             setLoad(false)
         } catch (err) {
             dispatch({
-                type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}
+                type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}
             })
         }
     }

@@ -18,7 +18,9 @@ const profileReducer = (state = initialState, action) => {
         case PROFILE_TYPES.GET_USER:
             return {
                 ...state,
-                users: [...state.users, action.payload.user]
+                users: state.users.every(user => user._id !== action.payload.user._id)
+                    ? [...state.users, action.payload.user]
+                    : EditData(state.users, action.payload.user._id, action.payload.user)
             };
         case PROFILE_TYPES.FOLLOW:
             return {
@@ -33,12 +35,16 @@ const profileReducer = (state = initialState, action) => {
         case PROFILE_TYPES.GET_ID:
             return {
                 ...state,
-                ids: [...state.ids, action.payload]
+                ids: state.ids.every(id => id !== action.payload)
+                    ? [...state.ids, action.payload]
+                    : state.ids
             };
         case PROFILE_TYPES.GET_POSTS:
             return {
                 ...state,
-                posts: [...state.posts, action.payload]
+                posts: state.posts.every(post => post._id !== action.payload._id)
+                    ? [...state.posts, action.payload]
+                    : EditData(state.posts, action.payload._id, action.payload)
             };
         case PROFILE_TYPES.UPDATE_POST:
             return {

@@ -27,7 +27,7 @@ export const login = (data) => async (dispatch) => {
         dispatch({ 
             type: GLOBALTYPES.ALERT, 
             payload: {
-                error: err.response.data.msg
+                error: err.response?.data?.msg || err.message
             } 
         })
     }
@@ -55,7 +55,7 @@ export const refreshToken = () => async (dispatch) => {
             dispatch({ 
                 type: GLOBALTYPES.ALERT, 
                 payload: {
-                    error: err.response.data.msg
+                    error: err.response?.data?.msg || err.message
                 } 
             })
         }
@@ -90,7 +90,7 @@ export const register = (data) => async (dispatch) => {
         dispatch({ 
             type: GLOBALTYPES.ALERT, 
             payload: {
-                error: err.response.data.msg
+                error: err.response?.data?.msg || err.message
             } 
         })
     }
@@ -106,7 +106,7 @@ export const logout = () => async (dispatch) => {
         dispatch({ 
             type: GLOBALTYPES.ALERT, 
             payload: {
-                error: err.response.data.msg
+                error: err.response?.data?.msg || err.message
             } 
         })
     }

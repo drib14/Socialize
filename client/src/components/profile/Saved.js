@@ -20,7 +20,7 @@ const Saved = ({auth, dispatch}) => {
             setLoad(false)
         })
         .catch(err => {
-            dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+            dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}})
         })
 
         return () => setSavePosts([])

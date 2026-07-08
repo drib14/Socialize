@@ -23,7 +23,7 @@ export const addMessage = ({msg, auth, socket}) => async (dispatch) =>{
     try {
         await postDataAPI('message', msg, auth.token)
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}})
     }
 }
 
@@ -46,7 +46,7 @@ export const getConversations = ({auth, page = 1}) => async (dispatch) => {
         })
 
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}})
     }
 }
 
@@ -57,7 +57,7 @@ export const getMessages = ({auth, id, page = 1}) => async (dispatch) => {
 
         dispatch({type: MESS_TYPES.GET_MESSAGES, payload: {...newData, _id: id, page}})
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}})
     }
 }
 
@@ -68,7 +68,7 @@ export const loadMoreMessages = ({auth, id, page = 1}) => async (dispatch) => {
 
         dispatch({type: MESS_TYPES.UPDATE_MESSAGES, payload: {...newData, _id: id, page}})
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}})
     }
 }
 
@@ -78,7 +78,7 @@ export const deleteMessages = ({msg, data, auth}) => async (dispatch) => {
     try {
         await deleteDataAPI(`message/${msg._id}`, auth.token)
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}})
     }
 }
 
@@ -87,6 +87,6 @@ export const deleteConversation = ({auth, id}) => async (dispatch) => {
     try {
         await deleteDataAPI(`conversation/${id}`, auth.token)
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}})
     }
 }

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 
 import Status from '../components/home/Status'
 import Posts from '../components/home/Posts'
+import LeftSideBar from '../components/home/LeftSideBar'
 import RightSideBar from '../components/home/RightSideBar'
 
 import { useSelector } from 'react-redux'
@@ -27,8 +28,12 @@ const Home = () => {
     },[])
 
     return (
-        <div className="home row mx-0">
-            <div className="col-md-8">
+        <div className="home row mx-0" style={{ width: '100%' }}>
+            <div className="col-md-3 col-lg-3 d-none d-md-block">
+                <LeftSideBar />
+            </div>
+
+            <div className="col-12 col-md-6 col-lg-6">
                 <Status />
 
                 {
@@ -44,7 +49,7 @@ const Home = () => {
                 
             </div>
             
-            <div className="col-md-4">
+            <div className="col-md-3 col-lg-3 d-none d-md-block">
                 <RightSideBar />
             </div>
         </div>

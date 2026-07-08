@@ -33,7 +33,7 @@ export const createComment = ({post, newComment, auth, socket}) => async (dispat
         dispatch(createNotify({msg, auth, socket}))
         
     } catch (err) {
-        dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg} })
+        dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message} })
     }
 }
 
@@ -45,7 +45,7 @@ export const updateComment = ({comment, post, content, auth}) => async (dispatch
     try {
         patchDataAPI(`comment/${comment._id}`, { content }, auth.token)
     } catch (err) {
-        dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg} })
+        dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message} })
     }
 }
 
@@ -61,7 +61,7 @@ export const likeComment = ({comment, post, auth}) => async (dispatch) => {
     try {
         await patchDataAPI(`comment/${comment._id}/like`, null, auth.token)
     } catch (err) {
-        dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg} })
+        dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message} })
     }
 }
 
@@ -78,7 +78,7 @@ export const unLikeComment = ({comment, post, auth}) => async (dispatch) => {
     try {
         await patchDataAPI(`comment/${comment._id}/unlike`, null, auth.token)
     } catch (err) {
-        dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg} })
+        dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message} })
     }
 }
 
@@ -107,7 +107,7 @@ export const deleteComment = ({post, comment, auth, socket}) => async (dispatch)
             dispatch(removeNotify({msg, auth, socket}))
        })
     } catch (err) {
-        dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg} })
+        dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message} })
     }
 
 }

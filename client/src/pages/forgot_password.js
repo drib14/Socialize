@@ -19,7 +19,7 @@ const ForgotPassword = () => {
         } catch (err) {
             dispatch({ 
                 type: GLOBALTYPES.ALERT, 
-                payload: {error: err.response.data.msg} 
+                payload: {error: err.response?.data?.msg || err.message} 
             })
         }
     }
@@ -30,8 +30,8 @@ const ForgotPassword = () => {
                 <h3 className="text-uppercase text-center mb-4">Forgot Password</h3>
 
                 <div className="form-group">
-                    <label htmlFor="exampleInputEmail1">Email address</label>
                     <input type="email" className="form-control" id="exampleInputEmail1" name="email"
+                    placeholder="Email address"
                     onChange={e => setEmail(e.target.value)} value={email} required />
                 </div>
                 

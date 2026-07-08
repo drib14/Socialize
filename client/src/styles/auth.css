@@ -29,11 +29,69 @@
     margin-bottom: 25px;
 }
 
-.auth_page form .form-group label {
-    font-weight: 600;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: 6px;
+.auth_page form .form-group {
+    margin-bottom: 20px;
+}
+
+.auth_page form .form-control {
+    background-color: var(--bg-input) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 14px 16px !important;
+    font-size: 0.95rem !important;
+    color: var(--text-main) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: none !important;
+}
+
+.auth_page form .form-control::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.7;
+}
+
+.auth_page form .form-control:focus {
+    border-color: var(--primary-color) !important;
+    background-color: var(--bg-card) !important;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15) !important;
+}
+
+/* Gender Selection Buttons */
+.auth_page .gender_buttons_container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.auth_page .gender_btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: var(--radius-md) !important;
+    padding: 10px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    border: 1px solid var(--border-color) !important;
+    background: var(--bg-card) !important;
+    color: var(--text-secondary) !important;
+    transition: var(--transition) !important;
+    cursor: pointer;
+    outline: none !important;
+}
+
+.auth_page .gender_btn:hover {
+    background: var(--bg-input) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+.auth_page .gender_btn.active-gender {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
 }
 
 .auth_page form .pass {

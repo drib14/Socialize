@@ -22,7 +22,7 @@ export const createNotify = ({msg, auth, socket}) => async (dispatch) => {
             }
         })
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}})
     }
 }
 
@@ -32,7 +32,7 @@ export const removeNotify = ({msg, auth, socket}) => async (dispatch) => {
         
         socket.emit('removeNotify', msg)
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}})
     }
 }
 
@@ -42,7 +42,7 @@ export const getNotifies = (token) => async (dispatch) => {
         
         dispatch({ type: NOTIFY_TYPES.GET_NOTIFIES, payload: res.data.notifies })
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}})
     }
 }
 
@@ -52,7 +52,7 @@ export const isReadNotify = ({msg, auth}) => async (dispatch) => {
     try {
         await patchDataAPI(`/isReadNotify/${msg._id}`, null, auth.token)
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}})
     }
 }
 
@@ -61,6 +61,6 @@ export const deleteAllNotifies = (token) => async (dispatch) => {
     try {
         await deleteDataAPI('deleteAllNotify', token)
     } catch (err) {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}})
     }
 }

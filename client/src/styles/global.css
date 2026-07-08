@@ -89,7 +89,7 @@ code {
   width: 100%;
   min-height: 100vh;
   margin: auto;
-  padding: 0 40px;
+  padding: 0;
 }
 
 img {
@@ -233,4 +233,74 @@ img[src*="loading.gif"] {
   width: 100%;
   height: 100vh;
   overflow: hidden;
+}
+
+/* --------- Left Sidebar --------- */
+.left_sidebar {
+  position: sticky;
+  top: 90px;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+  padding-bottom: 20px;
+}
+
+.left_sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.left_sidebar .sidebar_menu .nav-item {
+  transition: var(--transition);
+}
+
+.left_sidebar .sidebar_menu .nav-item:hover {
+  background-color: var(--bg-input);
+}
+
+.left_sidebar .sidebar_menu .nav-item.active-link {
+  background-color: var(--primary-light);
+}
+
+.left_sidebar .sidebar_menu .nav-item.active-link a {
+  color: var(--primary-color) !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="dark"] .left_sidebar .sidebar_menu .nav-item.active-link {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.left_sidebar .sidebar_profile_card,
+.left_sidebar .sidebar_menu,
+.left_sidebar .sidebar_footer {
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.left_sidebar .sidebar_profile_card:hover,
+.left_sidebar .sidebar_menu:hover,
+.left_sidebar .sidebar_footer:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.left_sidebar .sidebar_footer a:hover {
+  color: var(--primary-color) !important;
+  text-decoration: underline !important;
+}
+
+/* --------- Layout Width Overrides --------- */
+.header {
+  padding: 0 40px !important;
+}
+
+.home {
+  padding: 0 40px !important;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0 15px !important;
+  }
+  .home {
+    padding: 0 15px !important;
+  }
 }

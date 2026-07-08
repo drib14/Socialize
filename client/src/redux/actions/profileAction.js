@@ -40,7 +40,7 @@ export const getProfileUsers = ({id, auth}) => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT, 
-            payload: {error: err.response.data.msg}
+            payload: {error: err.response?.data?.msg || err.message}
         })
     }
     
@@ -83,7 +83,7 @@ export const updateProfileUser = ({userData, avatar, auth}) => async (dispatch) 
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT, 
-            payload: {error: err.response.data.msg}
+            payload: {error: err.response?.data?.msg || err.message}
         })
     }
 }
@@ -129,7 +129,7 @@ export const follow = ({users, user, auth, socket}) => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT, 
-            payload: {error: err.response.data.msg}
+            payload: {error: err.response?.data?.msg || err.message}
         })
     }
 }
@@ -179,7 +179,7 @@ export const unfollow = ({users, user, auth, socket}) => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT, 
-            payload: {error: err.response.data.msg}
+            payload: {error: err.response?.data?.msg || err.message}
         })
     }
 }

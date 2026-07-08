@@ -31,7 +31,7 @@ const ResetPassword = () => {
         } catch (err) {
             dispatch({ 
                 type: GLOBALTYPES.ALERT, 
-                payload: {error: err.response.data.msg} 
+                payload: {error: err.response?.data?.msg || err.message} 
             })
         }
     }
@@ -42,10 +42,9 @@ const ResetPassword = () => {
                 <h3 className="text-uppercase text-center mb-4">Reset Password</h3>
 
                 <div className="form-group">
-                    <label htmlFor="exampleInputPassword1">New Password</label>
                     <div className="pass">
                         <input type={typePass ? "text" : "password"} className="form-control" 
-                        id="exampleInputPassword1" name="password"
+                        id="exampleInputPassword1" name="password" placeholder="New Password"
                         onChange={e => setPassword(e.target.value)} value={password} required />
                         <small onClick={() => setTypePass(!typePass)}>
                             {typePass ? 'Hide' : 'Show'}
@@ -54,10 +53,9 @@ const ResetPassword = () => {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="cf_password">Confirm New Password</label>
                     <div className="pass">
                         <input type={typeCfPass ? "text" : "password"} className="form-control" 
-                        id="cf_password" name="cf_password"
+                        id="cf_password" name="cf_password" placeholder="Confirm New Password"
                         onChange={e => setCfPassword(e.target.value)} value={cf_password} required />
                         <small onClick={() => setTypeCfPass(!typeCfPass)}>
                             {typeCfPass ? 'Hide' : 'Show'}
