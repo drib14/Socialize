@@ -1,3 +1,5 @@
+const Users = require('./models/userModel')
+
 let users = []
 
 const EditData = (data, id, call) => {
@@ -9,13 +11,24 @@ const EditData = (data, id, call) => {
 
 const SocketServer = (socket) => {
     // Connect - Disconnect
-    socket.on('joinUser', user => {
+    socket.on('joinUser', async user => {
         users.push({id: user._id, socketId: socket.id, followers: user.followers})
+        try {
+            await Users.findByIdAndUpdate(user._id, { lastActive: new Date() })
+        } catch (e) {
+            console.error(e)
+        }
     })
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async () => {
         const data = users.find(user => user.socketId === socket.id)
         if(data){
+            try {
+                await Users.findByIdAndUpdate(data.id, { lastActive: new Date() })
+            } catch (e) {
+                console.error(e)
+            }
+
             const clients = users.filter(user => 
                 data.followers.find(item => item._id === user.id)
             )
@@ -116,6 +129,16 @@ const SocketServer = (socket) => {
     socket.on('addMessage', msg => {
         const user = users.find(user => user.id === msg.recipient)
         user && socket.to(`${user.socketId}`).emit('addMessageToClient', msg)
+    })
+
+    socket.on('updateMessage', msg => {
+        const user = users.find(user => user.id === msg.recipient)
+        user && socket.to(`${user.socketId}`).emit('updateMessageToClient', msg)
+    })
+
+    socket.on('reactMessage', msg => {
+        const user = users.find(user => user.id === msg.recipient || user.id === msg.sender)
+        user && socket.to(`${user.socketId}`).emit('reactMessageToClient', msg)
     })
 
 

@@ -5,6 +5,8 @@ import { createPost, updatePost } from '../redux/actions/postAction'
 import Icons from './Icons'
 import { imageShow, videoShow } from '../utils/mediaShow'
 import Modal from 'react-modal'
+import axios from 'axios'
+import { getDataAPI } from '../utils/fetchData'
 
 Modal.setAppElement('#root')
 
@@ -18,7 +20,20 @@ const StatusModal = () => {
     const [stream, setStream] = useState(false)
     const videoRef = useRef()
     const refCanvas = useRef()
+    const textareaRef = useRef()
     const [tracks, setTracks] = useState('')
+
+    // Location states
+    const [location, setLocation] = useState('')
+    const [loadingLocation, setLoadingLocation] = useState(false)
+
+    useEffect(() => {
+        if(status && textareaRef.current){
+            setTimeout(() => {
+                textareaRef.current.focus()
+            }, 100)
+        }
+    }, [status])
 
     const handleChangeImages = e => {
         const files = [...e.target.files]
@@ -77,6 +92,36 @@ const StatusModal = () => {
         setStream(false)
     }
 
+    const handleShareLocation = async () => {
+        if (navigator.geolocation) {
+            setLoadingLocation(true)
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                    const keyRes = await getDataAPI('location_key', auth.token);
+                    const key = keyRes.data.key;
+                    
+                    const res = await axios.get(`https://us1.locationiq.com/v1/reverse.php?key=${key}&lat=${latitude}&lon=${longitude}&format=json`);
+                    if (res.data && res.data.address) {
+                        const addr = res.data.address;
+                        const city = addr.city || addr.town || addr.village || addr.suburb || '';
+                        const country = addr.country || '';
+                        const locationName = city ? `${city}, ${country}` : country;
+                        setLocation(locationName);
+                    }
+                } catch (err) {
+                    dispatch({ type: GLOBALTYPES.ALERT, payload: { error: "Failed to fetch geocoded location." } })
+                }
+                setLoadingLocation(false)
+            }, (err) => {
+                dispatch({ type: GLOBALTYPES.ALERT, payload: { error: err.message } })
+                setLoadingLocation(false)
+            })
+        } else {
+            dispatch({ type: GLOBALTYPES.ALERT, payload: { error: "Geolocation is not supported by your browser." } })
+        }
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault()
         if(content.trim().length === 0 && images.length === 0)
@@ -85,14 +130,22 @@ const StatusModal = () => {
         })
 
         if(status.onEdit){
-            dispatch(updatePost({content, images, auth, status}))
+            dispatch(updatePost({content, images, auth, status, location}))
         }else{
-            dispatch(createPost({content, images, auth, socket}))
+            dispatch(createPost({content, images, auth, socket, location}))
         }
-        
 
         setContent('')
         setImages([])
+        setLocation('')
+        if(tracks) tracks.stop()
+        dispatch({ type: GLOBALTYPES.STATUS, payload: false})
+    }
+
+    const handleCloseModal = () => {
+        setContent('')
+        setImages([])
+        setLocation('')
         if(tracks) tracks.stop()
         dispatch({ type: GLOBALTYPES.STATUS, payload: false})
     }
@@ -101,16 +154,14 @@ const StatusModal = () => {
         if(status.onEdit){
             setContent(status.content)
             setImages(status.images)
+            setLocation(status.location || '')
         }
     },[status])
-
-
-   
 
     return (
         <Modal
             isOpen={!!status}
-            onRequestClose={() => dispatch({ type: GLOBALTYPES.STATUS, payload: false })}
+            onRequestClose={handleCloseModal}
             className="status_modal_content"
             overlayClassName="status_modal_overlay"
             contentLabel="Status Modal"
@@ -118,9 +169,7 @@ const StatusModal = () => {
             <form onSubmit={handleSubmit}>
                 <div className="status_header">
                     <h5 className="m-0">Create Post</h5>
-                    <span onClick={() => dispatch({
-                        type: GLOBALTYPES.STATUS, payload: false
-                    })}>
+                    <span onClick={handleCloseModal}>
                         &times;
                     </span>
                 </div>
@@ -129,11 +178,30 @@ const StatusModal = () => {
                     <textarea name="content" value={content}
                     placeholder={`${auth.user.username}, what are you thinking?`}
                     onChange={e => setContent(e.target.value)}
+                    autoFocus
+                    ref={textareaRef}
                     style={{
-                        filter: theme ? 'invert(1)' : 'invert(0)',
-                        color: theme ? 'white' : '#111',
-                        background: theme ? 'rgba(0,0,0,.03)' : '',
+                        color: 'var(--text-main)',
+                        background: 'var(--bg-input)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '12px'
                     }} />
+
+                    {
+                        loadingLocation && <small className="text-muted d-block mb-2">Fetching GPS coordinates...</small>
+                    }
+                    
+                    {
+                        location && (
+                            <div className="d-flex align-items-center mb-2 px-2 py-1" 
+                                 style={{ background: 'var(--bg-body)', borderRadius: '12px', border: '1px solid var(--border-color)', width: 'fit-content', gap: '6px' }}>
+                                <span className="material-icons text-primary" style={{ fontSize: '1rem' }}>place</span>
+                                <small style={{ color: 'var(--text-main)', fontSize: '0.8rem' }}>{location}</small>
+                                <span className="material-icons text-danger" style={{ fontSize: '1rem', cursor: 'pointer' }} onClick={() => setLocation('')}>close</span>
+                            </div>
+                        )
+                    }
 
                     <div className="d-flex">
                         <div className="flex-fill"></div>
@@ -190,6 +258,10 @@ const StatusModal = () => {
                                     <i className="fas fa-image" />
                                     <input type="file" name="file" id="file"
                                     multiple accept="image/*,video/*" onChange={handleChangeImages} />
+                                </div>
+
+                                <div className="file_upload" onClick={handleShareLocation} title="Share Location" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <span className="material-icons text-success" style={{ fontSize: '1.4rem', verticalAlign: 'middle' }}>place</span>
                                 </div>
                             </>
                         }

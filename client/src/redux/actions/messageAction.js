@@ -1,5 +1,5 @@
 import { GLOBALTYPES, DeleteData } from '../actions/globalTypes'
-import { postDataAPI, getDataAPI, deleteDataAPI } from '../../utils/fetchData'
+import { postDataAPI, getDataAPI, deleteDataAPI, putDataAPI, patchDataAPI } from '../../utils/fetchData'
 
 export const MESS_TYPES = {
     ADD_USER: 'ADD_USER',
@@ -96,5 +96,33 @@ export const deleteConversation = ({auth, id}) => async (dispatch) => {
         await deleteDataAPI(`conversation/${id}`, auth.token)
     } catch (err) {
         dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}})
+    }
+}
+
+export const updateMessage = ({msg, text, auth, socket}) => async (dispatch) => {
+    const updatedMsg = { ...msg, text };
+    dispatch({ type: MESS_TYPES.UPDATE_MESSAGES, payload: updatedMsg });
+    socket.emit('updateMessage', updatedMsg);
+    
+    try {
+        await putDataAPI(`message/${msg._id}`, { text }, auth.token);
+    } catch (err) {
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}});
+    }
+}
+
+export const reactMessage = ({msg, emoji, auth, socket}) => async (dispatch) => {
+    try {
+        const res = await patchDataAPI(`message/${msg._id}/react`, { emoji }, auth.token);
+        const updatedMsg = { ...msg, reactions: res.data.reactions };
+        dispatch({ type: MESS_TYPES.UPDATE_MESSAGES, payload: updatedMsg });
+        socket.emit('reactMessage', {
+            _id: msg._id,
+            reactions: res.data.reactions,
+            sender: msg.sender,
+            recipient: msg.recipient
+        });
+    } catch (err) {
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}});
     }
 }

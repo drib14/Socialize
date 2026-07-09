@@ -20,13 +20,13 @@ class APIfeatures {
 const postCtrl = {
     createPost: async (req, res) => {
         try {
-            const { content, images } = req.body
+            const { content, images, location } = req.body
 
             if(content.trim().length === 0 && images.length === 0)
             return res.status(400).json({msg: "Please add content or a photo."})
 
             const newPost = new Posts({
-                content, images, user: req.user._id
+                content, images, user: req.user._id, location
             })
             await newPost.save()
 
@@ -48,7 +48,7 @@ const postCtrl = {
             }), req.query).paginating()
 
             const posts = await features.query.sort('-createdAt')
-            .populate("user likes", "avatar username fullname followers")
+            .populate("user likes", "avatar username fullname followers lastActive")
             .populate({
                 path: "comments",
                 populate: {
@@ -60,7 +60,7 @@ const postCtrl = {
                 path: "repostOf",
                 populate: {
                     path: "user likes",
-                    select: "avatar username fullname"
+                    select: "avatar username fullname lastActive"
                 }
             })
 
@@ -76,11 +76,11 @@ const postCtrl = {
     },
     updatePost: async (req, res) => {
         try {
-            const { content, images } = req.body
+            const { content, images, location } = req.body
 
             const post = await Posts.findOneAndUpdate({_id: req.params.id}, {
-                content, images
-            }).populate("user likes", "avatar username fullname")
+                content, images, location
+            }).populate("user likes", "avatar username fullname lastActive")
             .populate({
                 path: "comments",
                 populate: {
@@ -158,7 +158,7 @@ const postCtrl = {
     getPost: async (req, res) => {
         try {
             const post = await Posts.findById(req.params.id)
-            .populate("user likes", "avatar username fullname followers")
+            .populate("user likes", "avatar username fullname followers lastActive")
             .populate({
                 path: "comments",
                 populate: {
@@ -170,7 +170,7 @@ const postCtrl = {
                 path: "repostOf",
                 populate: {
                     path: "user likes",
-                    select: "avatar username fullname"
+                    select: "avatar username fullname lastActive"
                 }
             })
 
@@ -261,12 +261,12 @@ const postCtrl = {
             }), req.query).paginating()
 
             const savePosts = await features.query.sort("-createdAt")
-            .populate("user likes", "avatar username fullname followers")
+            .populate("user likes", "avatar username fullname followers lastActive")
             .populate({
                 path: "repostOf",
                 populate: {
                     path: "user likes",
-                    select: "avatar username fullname"
+                    select: "avatar username fullname lastActive"
                 }
             })
 
@@ -297,12 +297,12 @@ const postCtrl = {
             await newPost.save()
 
             const populatedPost = await Posts.findById(newPost._id)
-            .populate("user likes", "avatar username fullname followers")
+            .populate("user likes", "avatar username fullname followers lastActive")
             .populate({
                 path: "repostOf",
                 populate: {
                     path: "user likes",
-                    select: "avatar username fullname"
+                    select: "avatar username fullname lastActive"
                 }
             })
 

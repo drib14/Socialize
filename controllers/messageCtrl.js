@@ -19,7 +19,7 @@ class APIfeatures {
 const messageCtrl = {
     createMessage: async (req, res) => {
         try {
-            const { sender, recipient, text, media, call } = req.body
+            const { sender, recipient, text, media, call, replyTo } = req.body
 
             if(!recipient || (!text.trim() && media.length === 0 && !call)) return;
 
@@ -36,7 +36,7 @@ const messageCtrl = {
             const newMessage = new Messages({
                 conversation: newConversation._id,
                 sender, call,
-                recipient, text, media
+                recipient, text, media, replyTo
             })
 
             await newMessage.save()
@@ -54,7 +54,7 @@ const messageCtrl = {
             }), req.query).paginating()
 
             const conversations = await features.query.sort('-updatedAt')
-            .populate('recipients', 'avatar username fullname')
+            .populate('recipients', 'avatar username fullname lastActive')
 
             res.json({
                 conversations,
@@ -75,6 +75,7 @@ const messageCtrl = {
             }), req.query).paginating()
 
             const messages = await features.query.sort('-createdAt')
+            .populate('replyTo')
 
             res.json({
                 messages,
@@ -108,6 +109,47 @@ const messageCtrl = {
             return res.status(500).json({msg: err.message})
         }
     },
+    updateMessage: async (req, res) => {
+        try {
+            const { text } = req.body;
+            const updated = await Messages.findOneAndUpdate(
+                { _id: req.params.id, sender: req.user._id }, 
+                { text },
+                { new: true }
+            ).populate('replyTo');
+            
+            res.json({ msg: 'Update Success!', message: updated })
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
+        }
+    },
+    reactMessage: async (req, res) => {
+        try {
+            const { emoji } = req.body;
+            const message = await Messages.findById(req.params.id);
+            if(!message) return res.status(400).json({msg: 'Message does not exist.'});
+
+            let reactions = message.reactions || [];
+            const index = reactions.findIndex(r => r.user.toString() === req.user._id.toString());
+            
+            if (index > -1) {
+                if (reactions[index].emoji === emoji) {
+                    reactions.splice(index, 1);
+                } else {
+                    reactions[index].emoji = emoji;
+                }
+            } else {
+                reactions.push({ user: req.user._id, emoji });
+            }
+
+            const updated = await Messages.findByIdAndUpdate(req.params.id, { reactions }, { new: true })
+            .populate('replyTo');
+
+            res.json({ msg: 'Reacted success!', reactions: updated.reactions });
+        } catch (err) {
+            return res.status(500).json({msg: err.message});
+        }
+    }
 }
 
 

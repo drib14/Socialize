@@ -129,6 +129,22 @@ const SocketClient = () => {
         return () => socket.off('addMessageToClient')
     },[socket, dispatch])
 
+    // Update Message
+    useEffect(() => {
+        socket.on('updateMessageToClient', msg => {
+            dispatch({ type: MESS_TYPES.UPDATE_MESSAGES, payload: msg })
+        })
+        return () => socket.off('updateMessageToClient')
+    }, [socket, dispatch])
+
+    // React Message
+    useEffect(() => {
+        socket.on('reactMessageToClient', msg => {
+            dispatch({ type: MESS_TYPES.UPDATE_MESSAGES, payload: msg })
+        })
+        return () => socket.off('reactMessageToClient')
+    }, [socket, dispatch])
+
     // Check User Online / Offline
     useEffect(() => {
         socket.emit('checkUserOnline', auth.user)

@@ -30,6 +30,11 @@ const RightSide = () => {
 
     const navigate = useNavigate()
 
+    // Voice message recording states
+    const [recording, setRecording] = useState(false)
+    const [mediaRecorder, setMediaRecorder] = useState(null)
+    const [replyMessage, setReplyMessage] = useState(null)
+
     useEffect(() => {
         const newData = message.data.find(item => item._id === id)
         if(newData){
@@ -42,7 +47,9 @@ const RightSide = () => {
     useEffect(() => {
         if(id && message.users.length > 0){
             setTimeout(() => {
-                refDisplay.current.scrollIntoView({behavior: 'smooth', block: 'end'})
+                if(refDisplay.current) {
+                    refDisplay.current.scrollIntoView({behavior: 'smooth', block: 'end'})
+                }
             },50)
 
             const newUser = message.users.find(user => user._id === id)
@@ -59,7 +66,7 @@ const RightSide = () => {
             if(!file) return err = "File does not exist."
 
             if(file.size > 1024 * 1024 * 5){
-                return err = "The image/video largest is 5mb."
+                return err = "The largest file size is 5mb."
             }
 
             return newMedia.push(file)
@@ -76,20 +83,27 @@ const RightSide = () => {
     }
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
+        if(e) e.preventDefault();
         if(!text.trim() && media.length === 0) return;
+        
+        const textToSend = text;
+        const mediaToSend = media;
+        const replyToSend = replyMessage;
+
         setText('')
         setMedia([])
+        setReplyMessage(null)
         setLoadMedia(true)
 
         let newArr = [];
-        if(media.length > 0) newArr = await imageUpload(media, auth.token)
+        if(mediaToSend.length > 0) newArr = await imageUpload(mediaToSend, auth.token)
 
         const msg = {
             sender: auth.user._id,
             recipient: id,
-            text, 
+            text: textToSend, 
             media: newArr,
+            replyTo: replyToSend ? replyToSend._id : undefined,
             createdAt: new Date().toISOString()
         }
 
@@ -105,13 +119,14 @@ const RightSide = () => {
             if(message.data.every(item => item._id !== id)){
                 await dispatch(getMessages({auth, id}))
                 setTimeout(() => {
-                    refDisplay.current.scrollIntoView({behavior: 'smooth', block: 'end'})
+                    if(refDisplay.current) {
+                        refDisplay.current.scrollIntoView({behavior: 'smooth', block: 'end'})
+                    }
                 },50)
             }
         }
         getMessagesData()
     },[id, dispatch, auth, message.data])
-
 
     // Load More
     useEffect(() => {
@@ -123,7 +138,9 @@ const RightSide = () => {
             threshold: 0.1
         })
 
-        observer.observe(pageEnd.current)
+        if(pageEnd.current) {
+            observer.observe(pageEnd.current)
+        }
     },[setIsLoadMore])
 
     useEffect(() => {
@@ -180,6 +197,65 @@ const RightSide = () => {
         callUser({video: true})
     }
 
+    // Audio Voice Message Recording
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const recorder = new MediaRecorder(stream);
+            let chunks = [];
+            
+            recorder.ondataavailable = (e) => {
+                if (e.data.size > 0) chunks.push(e.data);
+            };
+            
+            recorder.onstop = async () => {
+                const audioBlob = new Blob(chunks, { type: 'audio/mp3' });
+                const audioFile = new File([audioBlob], `voice_${Date.now()}.mp3`, { type: 'audio/mp3' });
+                
+                // Upload and send voice message immediately for modern experience
+                setLoadMedia(true)
+                const uploaded = await imageUpload([audioFile], auth.token);
+                const msg = {
+                    sender: auth.user._id,
+                    recipient: id,
+                    text: "", 
+                    media: uploaded,
+                    replyTo: replyMessage ? replyMessage._id : undefined,
+                    createdAt: new Date().toISOString()
+                }
+                setReplyMessage(null)
+                setLoadMedia(false)
+                await dispatch(addMessage({msg, auth, socket}))
+                if(refDisplay.current){
+                    refDisplay.current.scrollIntoView({behavior: 'smooth', block: 'end'})
+                }
+            };
+            
+            recorder.start();
+            setMediaRecorder(recorder);
+            setRecording(true);
+        } catch (err) {
+            dispatch({ type: GLOBALTYPES.ALERT, payload: { error: "Microphone access denied or unavailable." } });
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorder) {
+            mediaRecorder.stop();
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            setRecording(false);
+        }
+    };
+
+    const cancelRecording = () => {
+        if (mediaRecorder) {
+            mediaRecorder.ondataavailable = null;
+            mediaRecorder.stop();
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            setRecording(false);
+        }
+    };
+
     return (
         <>
             <div className="message_header" style={{cursor: 'pointer'}} >
@@ -213,14 +289,14 @@ const RightSide = () => {
                                     {
                                         msg.sender !== auth.user._id &&
                                         <div className="chat_row other_message">
-                                            <MsgDisplay user={user} msg={msg} theme={theme} />
+                                            <MsgDisplay user={user} msg={msg} theme={theme} setOnReply={setReplyMessage} />
                                         </div>
                                     }
 
                                     {
                                         msg.sender === auth.user._id &&
                                         <div className="chat_row you_message">
-                                            <MsgDisplay user={auth.user} msg={msg} theme={theme} data={data} />
+                                            <MsgDisplay user={auth.user} msg={msg} theme={theme} data={data} setOnReply={setReplyMessage} />
                                         </div>
                                     }
                                 </div>
@@ -245,7 +321,9 @@ const RightSide = () => {
                             {
                                 item.type && typeof item.type === 'string' && item.type.match(/video/i)
                                 ? videoShow(URL.createObjectURL(item), theme)
-                                : imageShow(URL.createObjectURL(item), theme)
+                                : (item.type && typeof item.type === 'string' && item.type.match(/image/i)
+                                   ? imageShow(URL.createObjectURL(item), theme)
+                                   : <div className="d-flex align-items-center justify-content-center h-100" style={{background: '#eee'}}><span className="material-icons text-primary">insert_drive_file</span></div>)
                             }
                             <span onClick={() => handleDeleteMedia(index)} >&times;</span>
                         </div>
@@ -253,28 +331,72 @@ const RightSide = () => {
                 }
             </div>
 
-            <form className="chat_input" onSubmit={handleSubmit} >
-                <input type="text" placeholder="Enter you message..."
-                value={text} onChange={e => setText(e.target.value)}
-                style={{
-                    filter: theme ? 'invert(1)' : 'invert(0)',
-                    background: theme ? '#040404' : '',
-                    color: theme ? 'white' : ''
-                }} />
+            {/* Quoted Message Preview above text bar */}
+            {
+                replyMessage && (
+                    <div className="d-flex justify-content-between align-items-center px-3 py-2" 
+                         style={{ background: 'var(--bg-body)', borderTop: '1px solid var(--border-color)', gap: '10px', borderLeft: '4px solid var(--primary-color)' }}>
+                        <div className="text-left overflow-hidden" style={{ flex: 1 }}>
+                            <small className="font-weight-bold d-block" style={{ color: 'var(--primary-color)' }}>
+                                Replying to {replyMessage.sender === auth.user._id ? 'Yourself' : user.fullname}
+                            </small>
+                            <small className="text-muted text-truncate d-block" style={{ fontSize: '0.85rem' }}>
+                                {replyMessage.text || (replyMessage.media.length > 0 ? 'Attachment' : '')}
+                            </small>
+                        </div>
+                        <span className="material-icons text-muted" style={{ cursor: 'pointer', fontSize: '1.25rem' }} 
+                              onClick={() => setReplyMessage(null)}>
+                            close
+                        </span>
+                    </div>
+                )
+            }
 
-                <Icons setContent={setText} content={text} theme={theme} />
+            {/* Voice Message Recorder Bar vs Text Inputs */}
+            {
+                recording ? (
+                    <div className="chat_input d-flex align-items-center justify-content-between py-2 px-3" style={{ background: 'var(--bg-card)', borderTop: '1px solid var(--border-color)', gap: '16px' }}>
+                        <div className="d-flex align-items-center" style={{ gap: '8px', color: '#ef4444' }}>
+                            <span className="material-icons animated flash infinite" style={{ animation: 'blink 1s infinite' }}>mic</span>
+                            <small className="font-weight-bold">Recording Voice Message...</small>
+                        </div>
+                        <div className="d-flex align-items-center" style={{ gap: '12px' }}>
+                            <button className="btn btn-sm btn-outline-danger py-1 px-3" style={{ borderRadius: '16px' }} onClick={cancelRecording}>Cancel</button>
+                            <button className="btn btn-sm btn-clay py-1 px-3 text-white" style={{ borderRadius: '16px', background: 'var(--primary-color)' }} onClick={stopRecording}>Done</button>
+                        </div>
+                    </div>
+                ) : (
+                    <form className="chat_input" onSubmit={handleSubmit} >
+                        <input type="text" placeholder="Enter your message..."
+                        value={text} onChange={e => setText(e.target.value)}
+                        style={{
+                            background: 'var(--bg-input)',
+                            color: 'var(--text-main)',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '18px'
+                        }} />
 
-                <div className="file_upload">
-                    <i className="fas fa-image text-danger" />
-                    <input type="file" name="file" id="file"
-                    multiple accept="image/*,video/*" onChange={handleChangeMedia} />
-                </div>
+                        <Icons setContent={setText} content={text} theme={theme} />
 
-                <button type="submit" className="material-icons" 
-                disabled={(text || media.length > 0) ? false : true}>
-                    near_me
-                </button>
-            </form>
+                        {/* Record Trigger */}
+                        <div className="file_upload" onClick={startRecording} title="Record Voice Message" style={{ cursor: 'pointer' }}>
+                            <span className="material-icons text-success" style={{ fontSize: '1.5rem' }}>mic</span>
+                        </div>
+
+                        {/* File Upload Trigger */}
+                        <div className="file_upload" title="Upload Media/Files">
+                            <span className="material-icons text-danger" style={{ fontSize: '1.5rem' }}>insert_drive_file</span>
+                            <input type="file" name="file" id="file"
+                            multiple accept="image/*,video/*,audio/*,application/*,text/*" onChange={handleChangeMedia} />
+                        </div>
+
+                        <button type="submit" className="material-icons" 
+                        disabled={(text || media.length > 0) ? false : true}>
+                            near_me
+                        </button>
+                    </form>
+                )
+            }
         </>
     )
 }

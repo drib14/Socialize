@@ -107,8 +107,8 @@ const LeftSide = () => {
                     : <>
                         {
                             message.users.map(user => {
-                                const isMutual = auth.user.following.some(item => (item._id || item) === user._id) && 
-                                                 auth.user.followers.some(item => (item._id || item) === user._id);
+                                const isMutual = auth.user.following.some(item => (item._id || item).toString() === user._id.toString()) && 
+                                                 auth.user.followers.some(item => (item._id || item).toString() === user._id.toString());
                                 const isOnline = online.includes(user._id);
                                 return (
                                     <div key={user._id} className={`message_user ${isActive(user)}`}

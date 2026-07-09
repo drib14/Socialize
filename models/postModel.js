@@ -8,7 +8,9 @@ const postSchema = new mongoose.Schema({
     likes: [{ type: mongoose.Types.ObjectId, ref: 'user' }],
     comments: [{ type: mongoose.Types.ObjectId, ref: 'comment' }],
     user: {type: mongoose.Types.ObjectId, ref: 'user'},
-    repostOf: {type: mongoose.Types.ObjectId, ref: 'post'}
+    repostOf: {type: mongoose.Types.ObjectId, ref: 'post'},
+    location: { type: String, default: '' },
+    mood: { type: String, default: '' }
 }, {
     timestamps: true
 })

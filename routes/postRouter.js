@@ -29,4 +29,8 @@ router.get('/getSavePosts', auth, postCtrl.getSavePosts)
 
 router.post('/upload_media', auth, postCtrl.uploadMedia)
 
+router.get('/location_key', auth, (req, res) => {
+    res.json({ key: process.env.LOCATIONIQ_ACCESS_TOKEN })
+})
+
 module.exports = router

@@ -54,10 +54,26 @@ const messageReducer = (state = initialState, action) => {
                 data: [...state.data, action.payload]
             };
         case MESS_TYPES.UPDATE_MESSAGES:
-            return {
-                ...state,
-                data: EditData(state.data, action.payload._id, action.payload)
-            };
+            if (action.payload.messages) {
+                return {
+                    ...state,
+                    data: EditData(state.data, action.payload._id, action.payload)
+                };
+            } else {
+                return {
+                    ...state,
+                    data: state.data.map(item => {
+                        const hasMessage = item.messages.some(m => m._id === action.payload._id);
+                        if (hasMessage) {
+                            return {
+                                ...item,
+                                messages: item.messages.map(m => m._id === action.payload._id ? action.payload : m)
+                            };
+                        }
+                        return item;
+                    })
+                };
+            }
         case MESS_TYPES.DELETE_MESSAGES:
             return {
                 ...state,
