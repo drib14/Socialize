@@ -22,6 +22,7 @@ const CallModal = () => {
     const otherVideo = useRef()
     const [tracks, setTracks] = useState(null)
     const [newCall, setNewCall] = useState(null)
+    const audioRef = useRef()
 
     // Set Time
     useEffect(() => {
@@ -102,7 +103,12 @@ const CallModal = () => {
     const playStream = (tag, stream) => {
         let video = tag;
         video.srcObject = stream;
-        video.play()
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log("Video play interrupted: ", error);
+            });
+        }
     }
 
     // Answer Call
@@ -163,24 +169,30 @@ const CallModal = () => {
     },[socket, tracks, dispatch, call, addCallMessage, answer, total, newCall])
 
     // Play - Pause Audio
-    const playAudio = (newAudio) => {
-        newAudio.play()
-    }
-
-    const pauseAudio = (newAudio) => {
-        newAudio.pause()
-        newAudio.currentTime = 0
-    }
+    useEffect(() => {
+        audioRef.current = new Audio(RingRing)
+        audioRef.current.loop = true
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause()
+                audioRef.current.currentTime = 0
+            }
+        }
+    }, [])
 
     useEffect(() => {
-        let newAudio = new Audio(RingRing)
+        if (!audioRef.current) return;
         if(answer){
-            pauseAudio(newAudio)
+            audioRef.current.pause()
+            audioRef.current.currentTime = 0
         }else{
-            playAudio(newAudio)
+            const playPromise = audioRef.current.play()
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Ringtone play interrupted: ", error);
+                });
+            }
         }
-
-        return () => pauseAudio(newAudio)
     },[answer])
 
 

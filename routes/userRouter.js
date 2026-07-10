@@ -14,6 +14,6 @@ router.patch('/user/:id/unfollow', auth, userCtrl.unfollow)
 
 router.get('/suggestionsUser', auth, userCtrl.suggestionsUser)
 
-
+router.get('/user_by_username/:username', auth, userCtrl.getUserByUsername)
 
 module.exports = router

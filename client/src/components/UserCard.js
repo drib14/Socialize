@@ -86,7 +86,7 @@ const UserCard = ({children, user, border, handleClose, setShowFollowers, setSho
                     <div className="position-relative">
                         <Avatar src={user.avatar} size="big-avatar" />
                         {
-                            online.includes(user._id) && isMutualFollower(user._id) ? (
+                            ((online.includes(user._id) && isMutualFollower(user._id)) || user._id === auth.user._id) ? (
                                 <span className="position-absolute" style={{
                                     width: '12px',
                                     height: '12px',
@@ -98,7 +98,7 @@ const UserCard = ({children, user, border, handleClose, setShowFollowers, setSho
                                     boxShadow: '0 0 0 2px rgba(43,138,62,0.2)'
                                 }} />
                             ) : (
-                                !online.includes(user._id) && isMutualFollower(user._id) && user.lastActive && (
+                                user._id !== auth.user._id && !online.includes(user._id) && isMutualFollower(user._id) && user.lastActive && (
                                     <span className="position-absolute d-flex align-items-center justify-content-center text-white font-weight-bold" style={{
                                         minWidth: '18px',
                                         height: '18px',

@@ -95,6 +95,15 @@ const userCtrl = {
             return res.status(500).json({msg: err.message})
         }
     },
+    getUserByUsername: async (req, res) => {
+        try {
+            const user = await Users.findOne({ username: req.params.username }).select('-password')
+            if(!user) return res.status(404).json({msg: "User does not exist."})
+            res.json({user})
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
+        }
+    }
 }
 
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import Avatar from '../Avatar'
 import { useSelector, useDispatch } from 'react-redux'
 import { deleteMessages, updateMessage, reactMessage, addMessage } from '../../redux/actions/messageAction'
@@ -8,6 +8,173 @@ import { GLOBALTYPES } from '../../redux/actions/globalTypes'
 import Modal from 'react-modal'
 
 Modal.setAppElement('#root')
+
+// Customized Audio Bubble Component
+const CustomAudioPlayer = ({ url }) => {
+    const audioRef = useRef(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [currentTime, setCurrentTime] = useState(0);
+
+    useEffect(() => {
+        audioRef.current = new Audio(url);
+        const audio = audioRef.current;
+        
+        const setAudioData = () => {
+            setDuration(audio.duration);
+        };
+        const setAudioTime = () => {
+            setCurrentTime(audio.currentTime);
+            setProgress((audio.currentTime / audio.duration) * 100 || 0);
+        };
+        const handleEnded = () => {
+            setIsPlaying(false);
+            setProgress(0);
+            setCurrentTime(0);
+        };
+
+        audio.addEventListener('loadedmetadata', setAudioData);
+        audio.addEventListener('timeupdate', setAudioTime);
+        audio.addEventListener('ended', handleEnded);
+
+        return () => {
+            audio.pause();
+            audio.removeEventListener('loadedmetadata', setAudioData);
+            audio.removeEventListener('timeupdate', setAudioTime);
+            audio.removeEventListener('ended', handleEnded);
+        };
+    }, [url]);
+
+    const togglePlay = () => {
+        if (!audioRef.current) return;
+        if (isPlaying) {
+            audioRef.current.pause();
+            setIsPlaying(false);
+        } else {
+            audioRef.current.play().catch(e => console.log(e));
+            setIsPlaying(true);
+        }
+    };
+
+    const handleProgressChange = (e) => {
+        if (!audioRef.current || !duration) return;
+        const newTime = (e.target.value / 100) * duration;
+        audioRef.current.currentTime = newTime;
+        setProgress(e.target.value);
+    };
+
+    const formatTime = (time) => {
+        if (isNaN(time)) return '0:00';
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    };
+
+    return (
+        <div className="custom_audio_player p-2 mb-2 d-flex align-items-center" 
+             style={{ 
+                 background: 'var(--bg-body)', 
+                 borderRadius: '20px', 
+                 minWidth: '250px', 
+                 gap: '12px', 
+                 border: '1px solid var(--border-color)',
+                 boxShadow: 'var(--shadow-sm)'
+             }}>
+            <button onClick={togglePlay} className="btn d-flex align-items-center justify-content-center"
+                    type="button"
+                    style={{ 
+                        width: '36px', 
+                        height: '36px', 
+                        borderRadius: '50%', 
+                        background: 'var(--primary-color)', 
+                        color: 'white', 
+                        border: 'none',
+                        boxShadow: 'var(--shadow-sm)',
+                        padding: 0
+                    }}>
+                <span className="material-icons text-white" style={{ fontSize: '1.4rem' }}>
+                    {isPlaying ? 'pause' : 'play_arrow'}
+                </span>
+            </button>
+            
+            <div className="d-flex flex-column" style={{ flex: 1, gap: '2px', minWidth: '130px' }}>
+                <input 
+                    type="range" 
+                    min="0" 
+                    max="100" 
+                    value={progress} 
+                    onChange={handleProgressChange}
+                    style={{ 
+                        width: '100%', 
+                        height: '4px', 
+                        borderRadius: '2px', 
+                        background: 'var(--border-color)', 
+                        outline: 'none',
+                        cursor: 'pointer'
+                    }} 
+                />
+                <div className="d-flex justify-content-between" style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                    <span>{formatTime(currentTime)}</span>
+                    <span>{formatTime(duration)}</span>
+                </div>
+            </div>
+
+            <span className="material-icons text-muted mr-1" style={{ fontSize: '1.20rem' }}>mic</span>
+        </div>
+    );
+};
+
+// Customized Document Bubble Component
+const CustomFileBubble = ({ url }) => {
+    const fileName = typeof url === 'string' ? url.substring(url.lastIndexOf('/') + 1) : "attachment.file";
+    const ext = fileName.includes('.') ? fileName.substring(fileName.lastIndexOf('.') + 1).toUpperCase() : 'FILE';
+    const displayName = fileName.length > 18 ? fileName.substring(0, 10) + '...' + fileName.substring(fileName.lastIndexOf('.')) : fileName;
+
+    return (
+        <div className="custom_file_bubble d-flex align-items-center p-2 mb-2" 
+             style={{ 
+                 background: 'var(--bg-body)', 
+                 border: '1px solid var(--border-color)', 
+                 borderRadius: '16px', 
+                 minWidth: '240px', 
+                 maxWidth: '280px',
+                 gap: '12px', 
+                 boxShadow: 'var(--shadow-sm)'
+             }}>
+            <div className="d-flex align-items-center justify-content-center text-white" 
+                 style={{ 
+                     width: '42px', 
+                     height: '42px', 
+                     borderRadius: '12px', 
+                     background: 'var(--primary-color)', 
+                     fontWeight: 'bold',
+                     fontSize: '0.7rem'
+                 }}>
+                {ext.substring(0, 4)}
+            </div>
+            <div className="text-left overflow-hidden" style={{ flex: 1 }}>
+                <div className="font-weight-bold text-truncate" style={{ fontSize: '0.85rem', color: 'var(--text-main)' }} title={fileName}>
+                    {displayName}
+                </div>
+                <small className="text-muted" style={{ fontSize: '0.7rem' }}>Document File</small>
+            </div>
+            <a href={url} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-center mr-1" 
+               style={{ 
+                   width: '30px', 
+                   height: '30px', 
+                   borderRadius: '50%', 
+                   background: 'var(--bg-card)', 
+                   boxShadow: 'var(--shadow-sm)',
+                   color: 'var(--primary-color)',
+                   textDecoration: 'none'
+               }}
+               title="Download file">
+                <span className="material-icons" style={{ fontSize: '1.1rem' }}>download</span>
+            </a>
+        </div>
+    );
+};
 
 const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
     const { auth, socket, message } = useSelector(state => state)
@@ -58,9 +225,21 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
         if (!item || !item.url) return null;
         
         const url = item.url;
-        const isVideo = typeof url === 'string' && (url.match(/\.(mp4|webm|ogg|quicktime)/i) || url.includes('/video/upload/') || url.match(/video/i));
-        const isImage = typeof url === 'string' && (url.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) || url.includes('/image/upload/') || (!url.match(/video/i) && !url.match(/\.(mp3|wav|ogg|m4a|aac)/i) && !url.includes('voice_')));
-        const isAudio = typeof url === 'string' && (url.match(/\.(mp3|wav|ogg|m4a|aac)/i) || url.includes('voice_'));
+        const isAudio = typeof url === 'string' && (
+            url.match(/\.(mp3|wav|ogg|m4a|aac)/i) || 
+            url.includes('voice_')
+        );
+
+        const isVideo = typeof url === 'string' && !isAudio && (
+            url.match(/\.(mp4|webm|ogv|mov|quicktime)/i) || 
+            url.includes('/video/upload/') || 
+            url.match(/video/i)
+        );
+
+        const isImage = typeof url === 'string' && !isAudio && !isVideo && (
+            url.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) || 
+            url.includes('/image/upload/')
+        );
 
         if (isImage) {
             return (
@@ -83,37 +262,14 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
         }
 
         if (isAudio) {
-            return (
-                <div key={index} className="chat_audio_bubble p-2 mb-2 d-flex align-items-center" 
-                     style={{ background: 'var(--bg-body)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', minWidth: '240px', gap: '8px', boxShadow: 'var(--shadow-sm)' }}>
-                    <span className="material-icons text-success" style={{ fontSize: '2rem' }}>mic</span>
-                    <audio src={url} controls style={{ height: '32px', maxWidth: '200px' }} />
-                </div>
-            );
+            return <CustomAudioPlayer key={index} url={url} />;
         }
 
         // Generic File
-        const fileName = typeof url === 'string' ? url.substring(url.lastIndexOf('/') + 1) : "file";
-        const displayName = fileName.length > 20 ? fileName.substring(0, 15) + '...' + fileName.substring(fileName.lastIndexOf('.')) : fileName;
-        
-        return (
-            <div key={index} className="chat_file_bubble d-flex align-items-center p-3 mb-2" 
-                 style={{ background: 'var(--bg-body)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', maxWidth: '280px', gap: '12px', boxShadow: 'var(--shadow-sm)' }}>
-                <span className="material-icons text-primary" style={{ fontSize: '2.5rem' }}>insert_drive_file</span>
-                <div className="text-left overflow-hidden" style={{ flex: 1 }}>
-                    <div className="font-weight-bold text-truncate" style={{ fontSize: '0.9rem', color: 'var(--text-main)' }} title={fileName}>
-                        {displayName}
-                    </div>
-                    <small className="text-muted" style={{ fontSize: '0.75rem' }}>Attachment</small>
-                </div>
-                <a href={url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-clay" 
-                   style={{ padding: '6px', borderRadius: '50%', minWidth: 'auto', background: 'var(--bg-card)' }}
-                   title="Download file">
-                    <span className="material-icons" style={{ fontSize: '1.1rem', color: 'var(--primary-color)' }}>download</span>
-                </a>
-            </div>
-        );
+        return <CustomFileBubble key={index} url={url} />;
     };
+
+    const isOwn = msg.sender === auth.user._id;
 
     return (
         <>
@@ -122,13 +278,14 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
                 <span>{user.fullname}</span>
             </div>
 
-            <div className="you_content">
-                {/* Floating Actions on Hover - exactly 3 icons */}
+            <div className="you_content" style={{ position: 'relative' }}>
+                {/* Floating Actions on Hover - exactly 3 icons placed at the side */}
                 <div className="message_action_bar position-absolute d-flex align-items-center" 
                      style={{ 
-                         top: '-28px', 
-                         right: msg.sender === auth.user._id ? '0' : 'auto', 
-                         left: msg.sender !== auth.user._id ? '0' : 'auto', 
+                         top: '50%', 
+                         transform: 'translateY(-50%)',
+                         right: isOwn ? 'calc(100% + 8px)' : 'auto', 
+                         left: !isOwn ? 'calc(100% + 8px)' : 'auto', 
                          background: 'var(--bg-card)', 
                          border: '1px solid var(--border-color)', 
                          borderRadius: '16px', 
@@ -159,9 +316,9 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
                              showReactions && (
                                  <div className="position-absolute d-flex flex-wrap p-2" 
                                       style={{ 
-                                          top: '24px', 
-                                          right: msg.sender === auth.user._id ? '0' : 'auto',
-                                          left: msg.sender !== auth.user._id ? '0' : 'auto', 
+                                          bottom: '28px', 
+                                          right: isOwn ? '0' : 'auto',
+                                          left: !isOwn ? '0' : 'auto', 
                                           background: 'var(--bg-card)', 
                                           border: '1px solid var(--border-color)', 
                                           borderRadius: '8px', 
@@ -198,9 +355,9 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
                              showDropdown && (
                                  <div className="position-absolute d-flex flex-column py-1" 
                                       style={{ 
-                                          top: '24px', 
-                                          right: msg.sender === auth.user._id ? '0' : 'auto',
-                                          left: msg.sender !== auth.user._id ? '0' : 'auto', 
+                                          bottom: '28px', 
+                                          right: isOwn ? '0' : 'auto',
+                                          left: !isOwn ? '0' : 'auto', 
                                           background: 'var(--bg-card)', 
                                           border: '1px solid var(--border-color)', 
                                           borderRadius: '8px', 
@@ -217,7 +374,7 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
                                           <span className="material-icons" style={{ fontSize: '1rem' }}>reply</span> Reply
                                       </div>
                                       {
-                                          msg.sender === auth.user._id && (
+                                          isOwn && (
                                               <>
                                                   <div className="dropdown-item py-1 px-3 d-flex align-items-center" style={{ cursor: 'pointer', gap: '8px', fontSize: '0.85rem', color: 'var(--text-main)' }}
                                                        onClick={() => {

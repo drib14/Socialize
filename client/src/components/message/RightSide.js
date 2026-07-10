@@ -277,7 +277,7 @@ const RightSide = () => {
             </div>
 
             <div className="chat_container" 
-            style={{height: media.length > 0 ? 'calc(100% - 180px)' : ''}} >
+            style={{height: media.length > 0 ? 'calc(100% - 220px)' : ''}} >
                 <div className="chat_display" ref={refDisplay}>
                     <button style={{marginTop: '-25px', opacity: 0}} ref={pageEnd}>
                         Load more
@@ -314,20 +314,76 @@ const RightSide = () => {
                 </div>
             </div>
 
-            <div className="show_media" style={{display: media.length > 0 ? 'grid' : 'none'}} >
+            <div className="show_media" style={{
+                display: media.length > 0 ? 'flex' : 'none',
+                flexWrap: 'wrap',
+                gap: '8px',
+                padding: '8px',
+                background: 'var(--bg-input)',
+                borderTop: '1px solid var(--border-color)',
+                borderBottom: '1px solid var(--border-color)',
+                margin: 0,
+                alignItems: 'center',
+                overflowX: 'auto',
+                height: 'auto',
+                maxHeight: '90px'
+            }}>
                 {
-                    media.map((item, index) => (
-                        <div key={index} id="file_media">
-                            {
-                                item.type && typeof item.type === 'string' && item.type.match(/video/i)
-                                ? videoShow(URL.createObjectURL(item), theme)
-                                : (item.type && typeof item.type === 'string' && item.type.match(/image/i)
-                                   ? imageShow(URL.createObjectURL(item), theme)
-                                   : <div className="d-flex align-items-center justify-content-center h-100" style={{background: '#eee'}}><span className="material-icons text-primary">insert_drive_file</span></div>)
-                            }
-                            <span onClick={() => handleDeleteMedia(index)} >&times;</span>
-                        </div>
-                    ))
+                    media.map((item, index) => {
+                        const isVideo = item.type && typeof item.type === 'string' && item.type.match(/video/i);
+                        const isImage = item.type && typeof item.type === 'string' && item.type.match(/image/i);
+                        const isAudio = item.type && typeof item.type === 'string' && item.type.match(/audio/i);
+                        const fileName = item.name || "File";
+                        const ext = fileName.includes('.') ? fileName.substring(fileName.lastIndexOf('.') + 1).toUpperCase() : 'FILE';
+
+                        return (
+                            <div key={index} className="position-relative" style={{ 
+                                width: '68px', 
+                                height: '68px', 
+                                borderRadius: '8px', 
+                                border: '1px solid var(--border-color)',
+                                overflow: 'hidden',
+                                background: 'var(--bg-card)',
+                                boxShadow: 'var(--shadow-sm)'
+                            }}>
+                                {
+                                    isImage && <img src={URL.createObjectURL(item)} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                }
+                                {
+                                    isVideo && <video src={URL.createObjectURL(item)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                }
+                                {
+                                    !isImage && !isVideo && (
+                                        <div className="d-flex flex-column align-items-center justify-content-center h-100 p-1" style={{ gap: '2px' }}>
+                                            <span className="material-icons text-primary" style={{ fontSize: '1.2rem' }}>
+                                                {isAudio ? 'audiotrack' : 'insert_drive_file'}
+                                            </span>
+                                            <small className="text-truncate font-weight-bold" style={{ fontSize: '0.6rem', maxWidth: '60px', color: 'var(--text-main)' }}>
+                                                {ext}
+                                            </small>
+                                        </div>
+                                    )
+                                }
+                                <span onClick={() => handleDeleteMedia(index)} 
+                                      className="d-flex align-items-center justify-content-center text-white"
+                                      style={{ 
+                                          position: 'absolute', 
+                                          top: '2px', 
+                                          right: '2px', 
+                                          background: '#ef4444', 
+                                          width: '16px', 
+                                          height: '16px', 
+                                          borderRadius: '50%', 
+                                          cursor: 'pointer',
+                                          fontSize: '10px',
+                                          fontWeight: 'bold',
+                                          zIndex: 10
+                                      }}>
+                                    &times;
+                                </span>
+                            </div>
+                        );
+                    })
                 }
             </div>
 

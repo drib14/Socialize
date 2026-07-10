@@ -38,12 +38,21 @@ const Menu = () => {
                     <span className="nav-link position-relative" id="navbarDropdown"
                         role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 
-                        <span className="material-icons"
-                            style={{ color: notify.data.length > 0 ? '#2b8a3e' : '' }}>
-                            favorite
+                        <span className="material-icons">
+                            notifications
                         </span>
 
-                        <span className="notify_length">{notify.data.length}</span>
+                        {
+                            notify.data.length > 0 &&
+                            <span className="position-absolute" style={{
+                                width: '8px',
+                                height: '8px',
+                                background: '#ef4444',
+                                borderRadius: '50%',
+                                top: '6px',
+                                right: '6px'
+                            }} />
+                        }
 
                     </span>
 

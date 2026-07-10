@@ -72,7 +72,7 @@ const CardHeader = ({post}) => {
                 <div className="position-relative">
                     <Avatar src={post.user.avatar} size="big-avatar" />
                     {
-                        online.includes(post.user._id) && isMutualFollower(post.user._id) ? (
+                        ((online.includes(post.user._id) && isMutualFollower(post.user._id)) || post.user._id === auth.user._id) ? (
                             <span className="position-absolute" style={{
                                 width: '12px',
                                 height: '12px',
@@ -84,7 +84,7 @@ const CardHeader = ({post}) => {
                                 boxShadow: '0 0 0 2px rgba(43,138,62,0.2)'
                             }} />
                         ) : (
-                            !online.includes(post.user._id) && isMutualFollower(post.user._id) && post.user.lastActive && (
+                            post.user._id !== auth.user._id && !online.includes(post.user._id) && isMutualFollower(post.user._id) && post.user.lastActive && (
                                 <span className="position-absolute d-flex align-items-center justify-content-center text-white font-weight-bold" style={{
                                     minWidth: '18px',
                                     height: '18px',
@@ -120,6 +120,13 @@ const CardHeader = ({post}) => {
                                 <span className="text-primary d-flex align-items-center" style={{ fontSize: '0.75rem', gap: '2px' }}>
                                     <span className="material-icons" style={{ fontSize: '0.9rem' }}>place</span>
                                     {post.location}
+                                </span>
+                            )
+                        }
+                        {
+                            post.mood && (
+                                <span className="text-success" style={{ fontSize: '0.75rem', fontWeight: '500' }}>
+                                    • {post.mood}
                                 </span>
                             )
                         }
