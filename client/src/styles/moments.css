@@ -1,0 +1,497 @@
+/* -------- Socialize Moments Styling ---------- */
+
+.moments-wrapper {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.moments-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.moments-container {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+}
+
+.moments-container::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Webkit */
+}
+
+/* Individual Moment Cards */
+.moment-card {
+    position: relative;
+    width: 110px;
+    height: 175px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+}
+
+.moment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+
+.moment-card-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: transform 0.5s ease;
+}
+
+.moment-card:hover .moment-card-media {
+    transform: scale(1.06);
+}
+
+.moment-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.7) 100%);
+    z-index: 1;
+}
+
+/* Avatar Indicator Rings */
+.moment-card-avatar {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5px;
+    background: var(--bg-card);
+}
+
+.moment-card-avatar.unviewed {
+    background: linear-gradient(45deg, #10b981, #84cc16, #3b82f6);
+}
+
+.moment-card-avatar.viewed {
+    background: #cbd5e1; /* Gray border for viewed */
+}
+
+.moment-card-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--bg-card);
+}
+
+.moment-card-name {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 2;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    text-align: center;
+}
+
+/* Create Moment Card - Custom Styling */
+.create-moment-card {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.create-moment-top {
+    height: 60%;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.create-moment-top img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.create-moment-bottom {
+    height: 40%;
+    background: var(--bg-card);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
+.create-moment-btn {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    border: 3px solid var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    z-index: 3;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.create-moment-card:hover .create-moment-btn {
+    background: var(--primary-hover);
+    transform: translateX(-50%) scale(1.05);
+}
+
+.create-moment-text {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-top: 14px;
+    text-align: center;
+}
+
+/* Moments Fullscreen Viewer */
+.moment-viewer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.95);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+
+.moment-viewer-content {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    height: 100%;
+    max-height: 820px;
+    background: #000000;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 576px) {
+    .moment-viewer-content {
+        max-width: 100%;
+        height: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+}
+
+.viewer-media-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+}
+
+.viewer-media {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Top Progress Indicators */
+.viewer-progress-container {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+}
+
+.viewer-progress-segment {
+    flex: 1;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.viewer-progress-fill {
+    height: 100%;
+    background: #ffffff;
+    width: 0%;
+}
+
+.viewer-progress-fill.completed {
+    width: 100%;
+}
+
+.viewer-progress-fill.active {
+    /* Set dynamically in JS */
+    width: 0%;
+}
+
+/* Viewer Header */
+.viewer-header {
+    position: absolute;
+    top: 24px;
+    left: 12px;
+    right: 12px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.viewer-user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.viewer-username {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.viewer-time {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.viewer-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+}
+
+.viewer-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    opacity: 0.8;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.viewer-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Nav touch overlays */
+.viewer-nav-overlay {
+    position: absolute;
+    top: 80px;
+    bottom: 80px;
+    width: 25%;
+    z-index: 8;
+    cursor: pointer;
+}
+
+.viewer-nav-overlay.left {
+    left: 0;
+}
+
+.viewer-nav-overlay.right {
+    right: 0;
+}
+
+/* Viewer Caption */
+.viewer-caption-box {
+    position: absolute;
+    bottom: 24px;
+    left: 16px;
+    right: 16px;
+    z-index: 10;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: white;
+    text-align: center;
+    font-size: 0.9rem;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+/* Floating arrows for desktop navigation */
+.desktop-nav-arrow {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.desktop-nav-arrow:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.desktop-nav-arrow.left {
+    left: -70px;
+}
+
+.desktop-nav-arrow.right {
+    right: -70px;
+}
+
+@media (max-width: 620px) {
+    .desktop-nav-arrow {
+        display: none; /* Hide on mobile screens */
+    }
+}
+
+/* Modal styling for Create Moment */
+.create-moment-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.create-moment-modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 480px;
+    padding: 24px;
+    outline: none;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.moment-upload-zone {
+    width: 100%;
+    height: 240px;
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: var(--bg-body);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    padding: 12px;
+}
+
+.moment-upload-zone:hover {
+    border-color: var(--primary-color);
+    background: var(--primary-light);
+}
+
+.moment-preview-container {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+}
+
+.moment-preview-media {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.moment-remove-preview {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+}
+
+.moment-remove-preview:hover {
+    background: rgba(220, 38, 38, 0.8);
+}

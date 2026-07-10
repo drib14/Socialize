@@ -4,6 +4,7 @@ import Status from '../components/home/Status'
 import Posts from '../components/home/Posts'
 import LeftSideBar from '../components/home/LeftSideBar'
 import RightSideBar from '../components/home/RightSideBar'
+import MomentsBar from '../components/home/MomentsBar'
 
 import { useSelector } from 'react-redux'
 import PostSkeleton from '../components/skeletons/PostSkeleton'
@@ -34,6 +35,7 @@ const Home = () => {
             </div>
 
             <div className="col-12 col-md-6 col-lg-6">
+                <MomentsBar />
                 <Status />
 
                 {

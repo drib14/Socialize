@@ -11,6 +11,7 @@
 @import url("./message.css");
 @import url("./icons.css");
 @import url("./call_modal.css");
+@import url("./moments.css");
 
 :root {
   --primary-color: #10b981; /* Leaf Green / Emerald */

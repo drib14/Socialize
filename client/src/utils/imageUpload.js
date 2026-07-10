@@ -4,8 +4,8 @@ export const checkImage = (file) => {
     let err = ""
     if(!file) return err = "File does not exist."
 
-    if(file.size > 1024 * 1024 * 5) // 5mb to support larger files
-    err = "The largest image size is 5mb."
+    if(file.size > 1024 * 1024 * 30) // 30mb to support larger files
+    err = "The largest image size is 30mb."
 
     if(file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/webp')
     err = "Image format is incorrect."

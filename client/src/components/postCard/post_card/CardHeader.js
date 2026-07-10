@@ -10,6 +10,7 @@ dayjs.extend(relativeTime)
 import { deletePost } from '../../../redux/actions/postAction'
 import { BASE_URL } from '../../../utils/config'
 import { customConfirm } from '../../../utils/customAlert'
+import { getMoodIcon } from '../../../utils/moods'
 
 const CardHeader = ({post}) => {
     const { auth, socket, online } = useSelector(state => state)
@@ -128,8 +129,8 @@ const CardHeader = ({post}) => {
                         }
                         {
                             post.mood && (
-                                <span className="text-success" style={{ fontSize: '0.75rem', fontWeight: '500' }}>
-                                    • {post.mood}
+                                <span className="text-success d-flex align-items-center" style={{ fontSize: '0.75rem', fontWeight: '500', gap: '3px' }}>
+                                    • {getMoodIcon(post.mood) && <i className={getMoodIcon(post.mood)}></i>} {post.mood}
                                 </span>
                             )
                         }

@@ -8,6 +8,7 @@ import Modal from 'react-modal'
 import axios from 'axios'
 import { getDataAPI } from '../utils/fetchData'
 import Avatar from './Avatar'
+import { PREDEFINED_MOODS, getMoodIcon } from '../utils/moods'
 
 Modal.setAppElement('#root')
 
@@ -56,8 +57,8 @@ const StatusModal = () => {
         files.forEach(file => {
             if(!file) return err = "File does not exist."
 
-            if(file.size > 1024 * 1024 * 5){
-                return err = "The image/video largest is 5mb."
+            if(file.size > 1024 * 1024 * 30){
+                return err = "The image/video largest is 30mb."
             }
 
             return newImages.push(file)
@@ -132,23 +133,9 @@ const StatusModal = () => {
         setShowLocationInput(false);
     };
 
-    // Fetch Mood Cards dynamically
-    const fetchMoods = async () => {
-        try {
-            const res = await axios.get('https://api.emojisworld.fr/v1/search?q=face');
-            if (res.data && Array.isArray(res.data.results)) {
-                setDynamicMoods(res.data.results.slice(0, 18));
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
+    // Use Predefined Mood Cards
     const toggleMoodCards = () => {
         setShowMoodCards(!showMoodCards);
-        if (!showMoodCards && dynamicMoods.length === 0) {
-            fetchMoods();
-        }
     };
 
     // Mentions & Tagging
@@ -322,6 +309,7 @@ const StatusModal = () => {
                         mood && (
                             <div className="d-flex align-items-center mb-2 px-2 py-1" 
                                  style={{ background: 'var(--bg-body)', borderRadius: '12px', border: '1px solid var(--border-color)', width: 'fit-content', gap: '6px' }}>
+                                {getMoodIcon(mood) && <i className={getMoodIcon(mood)}></i>}
                                 <small style={{ color: 'var(--text-main)', fontSize: '0.8rem' }}>{mood}</small>
                                 <span className="material-icons text-danger" style={{ fontSize: '1rem', cursor: 'pointer' }} onClick={() => setMood('')}>close</span>
                             </div>
@@ -374,42 +362,35 @@ const StatusModal = () => {
                         showMoodCards && !mood && (
                             <div className="mb-2 p-2" style={{ background: 'var(--bg-body)', borderRadius: '12px', border: '1px solid var(--border-color)', maxHeight: '180px', overflowY: 'auto' }}>
                                 <small className="text-muted d-block mb-2 font-weight-bold">Select Mood</small>
-                                {
-                                    dynamicMoods.length === 0 ? (
-                                        <small className="text-muted">Loading moods...</small>
-                                    ) : (
-                                        <div className="d-flex flex-wrap" style={{ gap: '8px' }}>
-                                            {dynamicMoods.map((item, index) => {
-                                                const shortName = item.name.split(' ')[0] || 'mood';
-                                                return (
-                                                    <div 
-                                                        key={index}
-                                                        onClick={() => {
-                                                            setMood(`Feeling ${item.emoji} ${shortName}`);
-                                                            setShowMoodCards(false);
-                                                        }}
-                                                        className="p-2 d-flex align-items-center justify-content-center"
-                                                        style={{ 
-                                                            background: 'var(--bg-card)', 
-                                                            border: '1px solid var(--border-color)', 
-                                                            borderRadius: '8px', 
-                                                            cursor: 'pointer',
-                                                            fontSize: '1rem',
-                                                            boxShadow: 'var(--shadow-sm)',
-                                                            gap: '6px',
-                                                            minWidth: '70px',
-                                                            flex: '1 0 25%'
-                                                        }}
-                                                        title={item.name}
-                                                    >
-                                                        <span>{item.emoji}</span>
-                                                        <small className="text-truncate" style={{ fontSize: '0.75rem', color: 'var(--text-main)', maxWidth: '50px' }}>{shortName}</small>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    )
-                                }
+                                <div className="d-flex flex-wrap" style={{ gap: '8px' }}>
+                                    {PREDEFINED_MOODS.map((item, index) => {
+                                        return (
+                                            <div 
+                                                key={index}
+                                                onClick={() => {
+                                                    setMood(`Feeling ${item.name}`);
+                                                    setShowMoodCards(false);
+                                                }}
+                                                className="p-2 d-flex align-items-center justify-content-center"
+                                                style={{ 
+                                                    background: 'var(--bg-card)', 
+                                                    border: '1px solid var(--border-color)', 
+                                                    borderRadius: '8px', 
+                                                    cursor: 'pointer',
+                                                    fontSize: '0.9rem',
+                                                    boxShadow: 'var(--shadow-sm)',
+                                                    gap: '6px',
+                                                    minWidth: '80px',
+                                                    flex: '1 0 22%'
+                                                }}
+                                                title={`Feeling ${item.name}`}
+                                            >
+                                                <i className={item.icon}></i>
+                                                <small className="text-truncate" style={{ fontSize: '0.75rem', color: 'var(--text-main)' }}>{item.name}</small>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         )
                     }

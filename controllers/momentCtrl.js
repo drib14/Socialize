@@ -1,0 +1,91 @@
+const Moments = require('../models/momentModel')
+
+const momentCtrl = {
+    createMoment: async (req, res) => {
+        try {
+            const { media, resource_type, caption } = req.body
+            if (!media) return res.status(400).json({ msg: "Please add your media." })
+
+            const newMoment = new Moments({
+                user: req.user._id,
+                media,
+                resource_type: resource_type || 'image',
+                caption: caption || ''
+            })
+
+            await newMoment.save()
+            const populated = await newMoment.populate('user', 'username fullname avatar')
+
+            res.json({
+                msg: 'Moment Created!',
+                newMoment: populated
+            })
+        } catch (err) {
+            return res.status(500).json({ msg: err.message })
+        }
+    },
+    getMoments: async (req, res) => {
+        try {
+            const myAndFollowingIds = [...req.user.following, req.user._id]
+
+            // Fetch active moments for self and followed users
+            const activeMoments = await Moments.find({
+                user: { $in: myAndFollowingIds }
+            }).populate('user', 'username fullname avatar').sort('-createdAt')
+
+            // Group by user id
+            const grouped = {}
+            activeMoments.forEach(moment => {
+                if (!moment.user) return;
+                const userId = moment.user._id.toString()
+                if (!grouped[userId]) {
+                    grouped[userId] = {
+                        user: moment.user,
+                        moments: []
+                    }
+                }
+                grouped[userId].moments.push(moment)
+            })
+
+            let result = Object.values(grouped)
+
+            // Prioritize the current user's moments at index 0
+            const myIdStr = req.user._id.toString()
+            const myIndex = result.findIndex(item => item.user._id.toString() === myIdStr)
+            if (myIndex > -1) {
+                const myMoments = result.splice(myIndex, 1)[0]
+                result.unshift(myMoments)
+            }
+
+            res.json({ moments: result })
+        } catch (err) {
+            return res.status(500).json({ msg: err.message })
+        }
+    },
+    viewMoment: async (req, res) => {
+        try {
+            await Moments.findOneAndUpdate(
+                { _id: req.params.id },
+                { $addToSet: { views: req.user._id } },
+                { new: true }
+            )
+            res.json({ msg: 'Moment marked as viewed.' })
+        } catch (err) {
+            return res.status(500).json({ msg: err.message })
+        }
+    },
+    deleteMoment: async (req, res) => {
+        try {
+            const moment = await Moments.findOneAndDelete({
+                _id: req.params.id,
+                user: req.user._id
+            })
+            if (!moment) return res.status(400).json({ msg: "Moment not found or unauthorized." })
+            res.json({ msg: 'Moment deleted.' })
+        } catch (err) {
+            return res.status(500).json({ msg: err.message })
+        }
+    }
+}
+
+module.exports = momentCtrl
