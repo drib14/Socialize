@@ -79,61 +79,133 @@ const CustomAudioPlayer = ({ url }) => {
         <div className="custom_audio_player p-2 mb-2 d-flex align-items-center" 
              style={{ 
                  background: 'var(--bg-body)', 
-                 borderRadius: '20px', 
-                 minWidth: '250px', 
+                 borderRadius: '24px',
+                 minWidth: '280px',
+                 maxWidth: '320px',
                  gap: '12px', 
                  border: '1px solid var(--border-color)',
-                 boxShadow: 'var(--shadow-sm)'
+                 boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
              }}>
-            <button onClick={togglePlay} className="btn d-flex align-items-center justify-content-center"
+
+            {/* Play/Pause Button */}
+            <button onClick={togglePlay} className="btn d-flex align-items-center justify-content-center flex-shrink-0"
                     type="button"
                     style={{ 
-                        width: '36px', 
-                        height: '36px', 
+                        width: '40px',
+                        height: '40px',
                         borderRadius: '50%', 
-                        background: 'var(--primary-color)', 
-                        color: 'white', 
+                        background: isPlaying ? 'var(--primary-color)' : '#f0f2f5',
+                        color: isPlaying ? 'white' : 'var(--primary-color)',
                         border: 'none',
-                        boxShadow: 'var(--shadow-sm)',
+                        boxShadow: isPlaying ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
+                        transition: 'all 0.2s ease',
                         padding: 0
                     }}>
-                <span className="material-icons text-white" style={{ fontSize: '1.4rem' }}>
+                <span className="material-icons" style={{ fontSize: '1.8rem', marginLeft: !isPlaying ? '2px' : '0' }}>
                     {isPlaying ? 'pause' : 'play_arrow'}
                 </span>
             </button>
             
-            <div className="d-flex flex-column" style={{ flex: 1, gap: '2px', minWidth: '130px' }}>
-                <input 
-                    type="range" 
-                    min="0" 
-                    max="100" 
-                    value={progress} 
-                    onChange={handleProgressChange}
-                    style={{ 
-                        width: '100%', 
-                        height: '4px', 
-                        borderRadius: '2px', 
-                        background: 'var(--border-color)', 
-                        outline: 'none',
-                        cursor: 'pointer'
-                    }} 
-                />
-                <div className="d-flex justify-content-between" style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+            {/* Waveform Progress / Timer */}
+            <div className="d-flex flex-column justify-content-center" style={{ flex: 1, gap: '4px' }}>
+                <div className="d-flex align-items-center" style={{ position: 'relative', height: '24px' }}>
+                    {/* Simulated Waveform Background */}
+                    <div className="d-flex align-items-center justify-content-between w-100 h-100 px-1" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none', opacity: 0.3 }}>
+                        {Array.from({ length: 25 }).map((_, i) => (
+                            <div key={i} style={{
+                                width: '3px',
+                                height: `${Math.max(10, Math.sin(i) * 10 + 14)}px`,
+                                background: 'var(--primary-color)',
+                                borderRadius: '2px',
+                                transition: 'height 0.2s ease'
+                            }} />
+                        ))}
+                    </div>
+
+                    {/* Simulated Waveform Foreground (Played) */}
+                    <div className="d-flex align-items-center justify-content-between h-100 px-1" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none', overflow: 'hidden', width: `${progress}%`, zIndex: 1 }}>
+                        <div className="d-flex align-items-center justify-content-between w-100" style={{ minWidth: '100%', position: 'absolute', top: 0, left: 0, padding: '0 4px', height: '100%' }}>
+                            {Array.from({ length: 25 }).map((_, i) => (
+                                <div key={i} style={{
+                                    width: '3px',
+                                    height: `${Math.max(10, Math.sin(i) * 10 + 14)}px`,
+                                    background: 'var(--primary-color)',
+                                    borderRadius: '2px'
+                                }} />
+                            ))}
+                        </div>
+                    </div>
+
+                    <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={progress}
+                        onChange={handleProgressChange}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            opacity: 0,
+                            cursor: 'pointer',
+                            zIndex: 2,
+                            position: 'relative'
+                        }}
+                    />
+                </div>
+
+                <div className="d-flex justify-content-between align-items-center" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '500' }}>
                     <span>{formatTime(currentTime)}</span>
-                    <span>{formatTime(duration)}</span>
+                    <div className="d-flex align-items-center gap-1">
+                        {isPlaying && <span className="material-icons" style={{ fontSize: '1rem', color: '#2ecc71' }}>graphic_eq</span>}
+                        <span>{formatTime(duration)}</span>
+                    </div>
                 </div>
             </div>
 
-            <span className="material-icons text-muted mr-1" style={{ fontSize: '1.20rem' }}>mic</span>
+            {/* Profile Avatar placeholder or Icon */}
+            <div className="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style={{ width: '36px', height: '36px', background: 'var(--bg-input)' }}>
+                <span className="material-icons text-muted" style={{ fontSize: '1.2rem' }}>mic</span>
+            </div>
         </div>
     );
 };
 
+const formatBytes = (bytes, decimals = 2) => {
+    if (!+bytes) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+};
+
 // Customized Document Bubble Component
-const CustomFileBubble = ({ url }) => {
+const CustomFileBubble = ({ item }) => {
+    const url = item.url || '';
+    const size = item.size ? formatBytes(item.size) : '';
     const fileName = typeof url === 'string' ? url.substring(url.lastIndexOf('/') + 1) : "attachment.file";
     const ext = fileName.includes('.') ? fileName.substring(fileName.lastIndexOf('.') + 1).toUpperCase() : 'FILE';
     const displayName = fileName.length > 18 ? fileName.substring(0, 10) + '...' + fileName.substring(fileName.lastIndexOf('.')) : fileName;
+
+    let bgCol = 'var(--primary-color)';
+    let iconName = 'insert_drive_file';
+
+    if (ext === 'PDF') {
+        bgCol = '#e74c3c';
+        iconName = 'picture_as_pdf';
+    } else if (ext === 'DOC' || ext === 'DOCX') {
+        bgCol = '#3498db';
+        iconName = 'description';
+    } else if (ext === 'XLS' || ext === 'XLSX' || ext === 'CSV') {
+        bgCol = '#2ecc71';
+        iconName = 'table_view';
+    } else if (ext === 'PPT' || ext === 'PPTX') {
+        bgCol = '#f39c12';
+        iconName = 'slideshow';
+    } else if (ext === 'TXT') {
+        bgCol = '#95a5a6';
+        iconName = 'article';
+    }
 
     return (
         <div className="custom_file_bubble d-flex align-items-center p-2 mb-2" 
@@ -151,17 +223,27 @@ const CustomFileBubble = ({ url }) => {
                      width: '42px', 
                      height: '42px', 
                      borderRadius: '12px', 
-                     background: 'var(--primary-color)', 
+                     background: bgCol,
                      fontWeight: 'bold',
-                     fontSize: '0.7rem'
+                     fontSize: '0.7rem',
+                     flexDirection: 'column'
                  }}>
-                {ext.substring(0, 4)}
+                 <span className="material-icons" style={{ fontSize: '1.2rem' }}>{iconName}</span>
+                 <span style={{ fontSize: '0.5rem', marginTop: '-2px' }}>{ext.substring(0, 4)}</span>
             </div>
             <div className="text-left overflow-hidden" style={{ flex: 1 }}>
                 <div className="font-weight-bold text-truncate" style={{ fontSize: '0.85rem', color: 'var(--text-main)' }} title={fileName}>
                     {displayName}
                 </div>
-                <small className="text-muted" style={{ fontSize: '0.7rem' }}>Document File</small>
+                <div className="d-flex align-items-center text-muted" style={{ fontSize: '0.7rem', gap: '4px' }}>
+                    <span>Document File</span>
+                    {size && (
+                        <>
+                            <span>•</span>
+                            <span>{size}</span>
+                        </>
+                    )}
+                </div>
             </div>
             <a href={url} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-center mr-1" 
                style={{ 
@@ -170,7 +252,7 @@ const CustomFileBubble = ({ url }) => {
                    borderRadius: '50%', 
                    background: 'var(--bg-card)', 
                    boxShadow: 'var(--shadow-sm)',
-                   color: 'var(--primary-color)',
+                   color: bgCol,
                    textDecoration: 'none'
                }}
                title="Download file">
@@ -276,7 +358,7 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
         }
 
         // Generic File
-        return <CustomFileBubble key={index} url={url} />;
+        return <CustomFileBubble key={index} item={item} />;
     };
 
     const isOwn = msg.sender === auth.user._id;
