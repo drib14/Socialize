@@ -183,9 +183,22 @@ const formatBytes = (bytes, decimals = 2) => {
 const CustomFileBubble = ({ item }) => {
     const url = item.url || '';
     const size = item.size ? formatBytes(item.size) : '';
+    const mimeType = item.resource_type || '';
+    
+    let ext = 'FILE';
     const fileName = typeof url === 'string' ? url.substring(url.lastIndexOf('/') + 1) : "attachment.file";
-    const ext = fileName.includes('.') ? fileName.substring(fileName.lastIndexOf('.') + 1).toUpperCase() : 'FILE';
-    const displayName = fileName.length > 18 ? fileName.substring(0, 10) + '...' + fileName.substring(fileName.lastIndexOf('.')) : fileName;
+    if (fileName.includes('.')) {
+        ext = fileName.substring(fileName.lastIndexOf('.') + 1).toUpperCase();
+    } else if (typeof mimeType === 'string' && mimeType.includes('/')) {
+        const sub = mimeType.substring(mimeType.lastIndexOf('/') + 1).toUpperCase();
+        if (sub.includes('WORD') || sub.includes('DOCUMENT')) ext = 'DOCX';
+        else if (sub.includes('EXCEL') || sub.includes('SHEET')) ext = 'XLSX';
+        else if (sub.includes('PRESENTATION') || sub.includes('POWERPOINT')) ext = 'PPTX';
+        else if (sub.includes('PLAIN')) ext = 'TXT';
+        else ext = sub;
+    }
+    
+    const displayName = fileName.length > 18 ? fileName.substring(0, 10) + '...' + (fileName.includes('.') ? fileName.substring(fileName.lastIndexOf('.')) : '') : fileName;
 
     let bgCol = 'var(--primary-color)';
     let iconName = 'insert_drive_file';
@@ -310,28 +323,67 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
     const renderMediaOrFile = (item, index) => {
         if (!item || !item.url) return null;
         
-        const url = item.url;
-        const mimeType = item.resource_type || '';
+        const url = typeof item.url === 'string' ? item.url : '';
+        const mimeType = typeof item.resource_type === 'string' ? item.resource_type.toLowerCase() : '';
 
-        const isAudio = typeof mimeType === 'string' && mimeType.startsWith('audio') || (
-            typeof url === 'string' && (
-                url.match(/\.(mp3|wav|ogg|m4a|aac)/i) || 
-                url.includes('voice_')
-            )
+        // --- 1. DOCUMENT detection (checked FIRST to prevent Cloudinary /image/upload/ false positives) ---
+        const docExtensions = /\.(pdf|docx?|xlsx?|csv|pptx?|txt|rtf|odt|ods|odp|pages|numbers|key|zip|rar|7z|gz|tar|epub|md)$/i;
+        const isDocument = (
+            // By MIME type (browser stores full MIME like "application/pdf", "application/vnd.openxmlformats-officedocument...")
+            mimeType.startsWith('application/') && !mimeType.includes('octet-stream') ||
+            mimeType.startsWith('text/') && !mimeType.startsWith('text/html') ||
+            mimeType.includes('pdf') ||
+            mimeType.includes('word') ||
+            mimeType.includes('document') ||
+            mimeType.includes('excel') ||
+            mimeType.includes('sheet') ||
+            mimeType.includes('presentation') ||
+            mimeType.includes('powerpoint') ||
+            mimeType.includes('zip') ||
+            mimeType.includes('rar') ||
+            mimeType.includes('compressed') ||
+            mimeType.includes('archive') ||
+            // By file extension in the URL
+            url.match(docExtensions)
         );
 
-        const isVideo = typeof url === 'string' && !isAudio && (
-            (typeof mimeType === 'string' && mimeType.startsWith('video')) ||
-            url.match(/\.(mp4|webm|ogv|mov|quicktime)/i) || 
-            url.includes('/video/upload/') || 
-            url.match(/video/i)
+        // --- 2. AUDIO detection ---
+        const isAudio = !isDocument && (
+            mimeType.startsWith('audio') ||
+            url.match(/\.(mp3|wav|ogg|m4a|aac|flac|wma)$/i) ||
+            url.includes('voice_')
         );
 
-        const isImage = typeof url === 'string' && !isAudio && !isVideo && (
-            (typeof mimeType === 'string' && mimeType.startsWith('image')) ||
-            url.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) || 
+        // --- 3. VIDEO detection ---
+        const isVideo = !isDocument && !isAudio && (
+            mimeType.startsWith('video') ||
+            url.match(/\.(mp4|webm|ogv|mov|avi|mkv)$/i) ||
+            url.includes('/video/upload/')
+        );
+
+        // --- 4. IMAGE detection (only if nothing else matched) ---
+        const isImage = !isDocument && !isAudio && !isVideo && (
+            mimeType.startsWith('image') ||
+            url.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp|ico|tiff)$/i) ||
             url.includes('/image/upload/')
         );
+
+        // --- RENDER by priority ---
+        if (isDocument) {
+            return <CustomFileBubble key={index} item={item} />;
+        }
+
+        if (isAudio) {
+            return <CustomAudioPlayer key={index} url={url} />;
+        }
+
+        if (isVideo) {
+            return (
+                <div key={index} className="chat_media_container position-relative mb-2" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', maxWidth: '320px', boxShadow: 'var(--shadow-sm)' }}>
+                    <video src={url} controls className="w-100" style={{ display: 'block', borderRadius: 'var(--radius-md)' }} />
+                </div>
+            );
+        }
 
         if (isImage) {
             return (
@@ -345,19 +397,7 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
             );
         }
 
-        if (isVideo) {
-            return (
-                <div key={index} className="chat_media_container position-relative mb-2" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', maxWidth: '320px', boxShadow: 'var(--shadow-sm)' }}>
-                    <video src={url} controls className="w-100" style={{ display: 'block', borderRadius: 'var(--radius-md)' }} />
-                </div>
-            );
-        }
-
-        if (isAudio) {
-            return <CustomAudioPlayer key={index} url={url} />;
-        }
-
-        // Generic File
+        // --- FALLBACK: unknown type → show as downloadable file bubble ---
         return <CustomFileBubble key={index} item={item} />;
     };
 
