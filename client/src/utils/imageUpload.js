@@ -33,7 +33,8 @@ export const imageUpload = async (images, token) => {
             imgArr.push({ 
                 public_id: res.data.public_id, 
                 url: res.data.secure_url,
-                resource_type: item.type 
+                resource_type: item.type,
+                size: item.size
             });
         } catch (err) {
             console.error("Upload error:", err);

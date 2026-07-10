@@ -34,6 +34,8 @@ const RightSide = () => {
     const [recording, setRecording] = useState(false)
     const [mediaRecorder, setMediaRecorder] = useState(null)
     const [replyMessage, setReplyMessage] = useState(null)
+    const [recordingTime, setRecordingTime] = useState(0)
+    const timerRef = useRef(null)
 
     useEffect(() => {
         const newData = message.data.find(item => item._id === id)
@@ -209,6 +211,11 @@ const RightSide = () => {
             };
             
             recorder.onstop = async () => {
+                clearInterval(timerRef.current);
+                setRecordingTime(0);
+
+                if (chunks.length === 0) return; // Prevent uploading if cancelled
+
                 const audioBlob = new Blob(chunks, { type: 'audio/mp3' });
                 const audioFile = new File([audioBlob], `voice_${Date.now()}.mp3`, { type: 'audio/mp3' });
                 
@@ -234,6 +241,10 @@ const RightSide = () => {
             recorder.start();
             setMediaRecorder(recorder);
             setRecording(true);
+            setRecordingTime(0);
+            timerRef.current = setInterval(() => {
+                setRecordingTime(prev => prev + 1);
+            }, 1000);
         } catch (err) {
             dispatch({ type: GLOBALTYPES.ALERT, payload: { error: "Microphone access denied or unavailable." } });
         }
@@ -244,16 +255,26 @@ const RightSide = () => {
             mediaRecorder.stop();
             mediaRecorder.stream.getTracks().forEach(track => track.stop());
             setRecording(false);
+            clearInterval(timerRef.current);
         }
     };
 
     const cancelRecording = () => {
         if (mediaRecorder) {
-            mediaRecorder.ondataavailable = null;
+            // override onstop before calling stop to discard chunks so it is not sent
+            mediaRecorder.onstop = null;
             mediaRecorder.stop();
             mediaRecorder.stream.getTracks().forEach(track => track.stop());
             setRecording(false);
+            clearInterval(timerRef.current);
+            setRecordingTime(0);
         }
+    };
+
+    const formatRecordTime = (time) => {
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     };
 
     return (
@@ -412,13 +433,59 @@ const RightSide = () => {
             {
                 recording ? (
                     <div className="chat_input d-flex align-items-center justify-content-between py-2 px-3" style={{ background: 'var(--bg-card)', borderTop: '1px solid var(--border-color)', gap: '16px' }}>
-                        <div className="d-flex align-items-center" style={{ gap: '8px', color: '#ef4444' }}>
-                            <span className="material-icons animated flash infinite" style={{ animation: 'blink 1s infinite' }}>mic</span>
-                            <small className="font-weight-bold">Recording Voice Message...</small>
-                        </div>
                         <div className="d-flex align-items-center" style={{ gap: '12px' }}>
-                            <button className="btn btn-sm btn-outline-danger py-1 px-3" style={{ borderRadius: '16px' }} onClick={cancelRecording}>Cancel</button>
-                            <button className="btn btn-sm btn-clay py-1 px-3 text-white" style={{ borderRadius: '16px', background: 'var(--primary-color)' }} onClick={stopRecording}>Done</button>
+                            {/* Blinking Red Dot */}
+                            <div style={{
+                                width: '10px',
+                                height: '10px',
+                                background: '#ef4444',
+                                borderRadius: '50%',
+                                animation: 'blink 1.5s infinite'
+                            }} />
+                            <small className="font-weight-bold" style={{ fontSize: '0.95rem' }}>{formatRecordTime(recordingTime)}</small>
+
+                            {/* Animated CSS Waveform */}
+                            <div className="d-flex align-items-center" style={{ gap: '2px', marginLeft: '10px' }}>
+                                {Array.from({ length: 15 }).map((_, i) => (
+                                    <div key={i} style={{
+                                        width: '2px',
+                                        height: '14px',
+                                        background: 'var(--primary-color)',
+                                        borderRadius: '2px',
+                                        animation: `waveform-animation 1.2s infinite ease-in-out ${i * 0.1}s`
+                                    }} />
+                                ))}
+                                <style>
+                                    {`
+                                        @keyframes waveform-animation {
+                                            0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+                                            50% { transform: scaleY(1); opacity: 1; }
+                                        }
+                                        @keyframes blink {
+                                            0%, 100% { opacity: 1; }
+                                            50% { opacity: 0.3; }
+                                        }
+                                    `}
+                                </style>
+                            </div>
+                        </div>
+                        <div className="d-flex align-items-center" style={{ gap: '16px' }}>
+                            <span className="material-icons text-danger" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={cancelRecording} title="Cancel Recording">
+                                delete
+                            </span>
+                            <div onClick={stopRecording} className="d-flex align-items-center justify-content-center"
+                                 style={{
+                                     width: '36px',
+                                     height: '36px',
+                                     borderRadius: '50%',
+                                     background: 'var(--primary-color)',
+                                     color: 'white',
+                                     cursor: 'pointer',
+                                     boxShadow: 'var(--shadow-sm)'
+                                 }}
+                                 title="Send Voice Message">
+                                <span className="material-icons" style={{ fontSize: '1.2rem', transform: 'rotate(-45deg)', marginLeft: '2px', marginBottom: '2px' }}>send</span>
+                            </div>
                         </div>
                     </div>
                 ) : (
