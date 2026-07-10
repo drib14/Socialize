@@ -2,8 +2,11 @@ import React from 'react'
 import Avatar from '../../Avatar'
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import moment from 'moment'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { GLOBALTYPES } from '../../../redux/actions/globalTypes'
+
+dayjs.extend(relativeTime)
 import { deletePost } from '../../../redux/actions/postAction'
 import { BASE_URL } from '../../../utils/config'
 import { customConfirm } from '../../../utils/customAlert'
@@ -132,7 +135,7 @@ const CardHeader = ({post}) => {
                         }
                     </div>
                     <small className="text-muted d-block" style={{ fontSize: '0.75rem', marginTop: '2px' }}>
-                        {moment(post.createdAt).fromNow()}
+                        {dayjs(post.createdAt).fromNow()}
                     </small>
                 </div>
             </div>

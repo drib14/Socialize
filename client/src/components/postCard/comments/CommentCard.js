@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import Avatar from '../../Avatar'
 import { Link } from 'react-router-dom'
-import moment from 'moment'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+dayjs.extend(relativeTime)
 
 import LikeButton from '../../LikeButton'
 import { useSelector, useDispatch } from 'react-redux'
@@ -113,7 +116,7 @@ const CommentCard = ({children, comment, post, commentId}) => {
 
                     <div style={{cursor: 'pointer'}}>
                         <small className="text-muted mr-3">
-                            {moment(comment.createdAt).fromNow()}
+                            {dayjs(comment.createdAt).fromNow()}
                         </small>
 
                         <small className="font-weight-bold mr-3">

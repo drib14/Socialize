@@ -4,8 +4,11 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { customConfirm } from '../utils/customAlert'
 import Avatar from './Avatar'
-import moment from 'moment'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { isReadNotify, NOTIFY_TYPES, deleteAllNotifies } from '../redux/actions/notifyAction'
+
+dayjs.extend(relativeTime)
 
 const NotifyModal = () => {
     const { auth, notify } = useSelector(state => state)
@@ -83,7 +86,7 @@ const NotifyModal = () => {
                                 
                             </Link>
                             <small className="text-muted d-flex justify-content-between px-2 mt-1">
-                                {moment(msg.createdAt).fromNow()}
+                                {dayjs(msg.createdAt).fromNow()}
                                 {
                                     !msg.isRead && <i className="fas fa-circle text-primary" />
                                 }

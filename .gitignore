@@ -1,3 +1,12 @@
-node_modules
+node_modules/
 .env
 .eslintcache
+*.log
+backend.log
+frontend.log
+client/frontend.log
+client/build/
+client/dist/
+scratch_*
+.DS_Store
+.agents/
