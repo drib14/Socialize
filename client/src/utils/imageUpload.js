@@ -30,7 +30,11 @@ export const imageUpload = async (images, token) => {
             
             const res = await postDataAPI('upload_media', { file: base64Data }, token);
             
-            imgArr.push({ public_id: res.data.public_id, url: res.data.secure_url });
+            imgArr.push({ 
+                public_id: res.data.public_id, 
+                url: res.data.secure_url,
+                resource_type: item.type 
+            });
         } catch (err) {
             console.error("Upload error:", err);
             throw new Error(err.response?.data?.msg || err.message || "Failed to upload media.");

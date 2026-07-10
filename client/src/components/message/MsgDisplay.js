@@ -34,6 +34,10 @@ const CustomAudioPlayer = ({ url }) => {
             setCurrentTime(0);
         };
 
+        if (audio.readyState >= 1) {
+            setDuration(audio.duration);
+        }
+
         audio.addEventListener('loadedmetadata', setAudioData);
         audio.addEventListener('timeupdate', setAudioTime);
         audio.addEventListener('ended', handleEnded);
@@ -225,18 +229,24 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
         if (!item || !item.url) return null;
         
         const url = item.url;
-        const isAudio = typeof url === 'string' && (
-            url.match(/\.(mp3|wav|ogg|m4a|aac)/i) || 
-            url.includes('voice_')
+        const mimeType = item.resource_type || '';
+
+        const isAudio = typeof mimeType === 'string' && mimeType.startsWith('audio') || (
+            typeof url === 'string' && (
+                url.match(/\.(mp3|wav|ogg|m4a|aac)/i) || 
+                url.includes('voice_')
+            )
         );
 
         const isVideo = typeof url === 'string' && !isAudio && (
+            (typeof mimeType === 'string' && mimeType.startsWith('video')) ||
             url.match(/\.(mp4|webm|ogv|mov|quicktime)/i) || 
             url.includes('/video/upload/') || 
             url.match(/video/i)
         );
 
         const isImage = typeof url === 'string' && !isAudio && !isVideo && (
+            (typeof mimeType === 'string' && mimeType.startsWith('image')) ||
             url.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) || 
             url.includes('/image/upload/')
         );
