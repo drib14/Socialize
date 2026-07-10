@@ -1,4 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url("./auth.css");
+@import url("./loading.css");
+@import url("./header.css");
+@import url("./avatar.css");
+@import url("./profile.css");
+@import url("./home.css");
+@import url("./status_modal.css");
+@import url("./comments.css");
+@import url("./post_thumb.css");
+@import url("./message.css");
+@import url("./icons.css");
+@import url("./call_modal.css");
 
 :root {
   --primary-color: #10b981; /* Leaf Green / Emerald */
@@ -252,19 +264,7 @@ img[src*="loading.gif"] {
   100% { transform: rotate(360deg); }
 }
 
-/* -------- IMPORTS ---------- */
-@import url("./auth.css");
-@import url("./loading.css");
-@import url("./header.css");
-@import url("./avatar.css");
-@import url("./profile.css");
-@import url("./home.css");
-@import url("./status_modal.css");
-@import url("./comments.css");
-@import url("./post_thumb.css");
-@import url("./message.css");
-@import url("./icons.css");
-@import url("./call_modal.css");
+
 
 /* --------- Responsive ------ */
 @media (max-width: 766px){
