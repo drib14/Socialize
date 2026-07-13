@@ -9,14 +9,12 @@ const Register = () => {
     const navigate = useNavigate()
 
     const initialState = {
-        fullname: '', username: '', email: '', password: '', cf_password: '', gender: 'male'
+        fullname: '', username: '', email: '', password: ''
     }
     const [userData, setUserData] = useState(initialState)
-    const { fullname, username, email, password, cf_password } = userData
+    const { fullname, username, email, password } = userData
 
     const [typePass, setTypePass] = useState(false)
-    const [typeCfPass, setTypeCfPass] = useState(false)
-    const [step, setStep] = useState(1)
 
     useEffect(() => {
         if (auth.token) navigate("/")
@@ -32,16 +30,7 @@ const Register = () => {
         dispatch(register(userData))
     }
 
-    // Password criteria flags
-    const lengthValid = password.length >= 8
-    const numValid = /\d/.test(password)
-    const upperValid = /[A-Z]/.test(password)
-    const specialValid = /[!@#$%^&*(),.?":{}|<>_]/.test(password)
-    const matchesConfirm = password && password === cf_password
 
-    const isStep1Valid = () => {
-        return fullname.trim() && username.trim() && email.trim()
-    }
 
     return (
         <div className="auth_page d-flex align-items-center justify-content-center" style={{ minHeight: '100vh', background: 'var(--bg-body)' }}>
