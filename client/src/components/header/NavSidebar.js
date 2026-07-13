@@ -92,6 +92,12 @@ const NavSidebar = () => {
                         <span className="link_text">Explore</span>
                     </Link>
 
+                    <Link to="/reels" className={`nav_sidebar_link d-flex align-items-center py-2 px-3 rounded text-decoration-none ${isActive('/reels')}`}
+                          style={{ color: 'var(--text-main)', transition: 'background 0.2s', gap: '15px' }}>
+                        <i className="fas fa-video" style={{ fontSize: '1.25rem' }} />
+                        <span className="link_text">Reels</span>
+                    </Link>
+
                     <Link to="/message" className={`nav_sidebar_link d-flex align-items-center py-2 px-3 rounded text-decoration-none ${isActive('/message')}`}
                           style={{ color: 'var(--text-main)', transition: 'background 0.2s', gap: '15px' }}>
                         <div className="position-relative">

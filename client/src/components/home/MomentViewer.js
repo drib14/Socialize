@@ -161,6 +161,24 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
         setSendingReply(false);
     };
 
+    const handleEmojiReaction = async (emoji) => {
+        setSendingReply(true);
+        try {
+            const msg = {
+                sender: auth.user,
+                recipient: user._id,
+                text: `${emoji} reacted to your story`,
+                media: activeMoment.media ? [{ url: activeMoment.media }] : [],
+                createdAt: new Date().toISOString()
+            };
+            await dispatch(addMessage({ msg, auth, socket }));
+            setIsPaused(false);
+        } catch (err) {
+            console.error(err);
+        }
+        setSendingReply(false);
+    };
+
     // Share story to DM handler
     const handleShareStoryToDM = async (contactId) => {
         const msg = {
@@ -359,56 +377,89 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
                     }
                 </div>
 
-                {/* Story Reply Input Bar (for other users' stories) */}
+                {/* Story Reply & Quick Emoji Reaction Input Bar */}
                 {
                     auth.user._id !== user._id && (
-                        <div className="viewer-reply-bar" style={{
+                        <div style={{
                             display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            padding: '10px 16px',
-                            background: 'rgba(0,0,0,0.5)',
-                            backdropFilter: 'blur(10px)',
+                            flexDirection: 'column',
+                            background: 'rgba(0,0,0,0.85)',
+                            backdropFilter: 'blur(16px)',
                             borderBottomLeftRadius: '20px',
                             borderBottomRightRadius: '20px',
+                            borderTop: '1px solid rgba(255,255,255,0.1)'
                         }}>
-                            <input
-                                type="text"
-                                placeholder={`Reply to @${user.username}...`}
-                                value={replyText}
-                                onChange={e => setReplyText(e.target.value)}
-                                onKeyDown={e => {
-                                    if (e.key === 'Enter' && replyText.trim()) handleStoryReply();
-                                }}
-                                onFocus={() => setIsPaused(true)}
-                                onBlur={() => { if (!replyText.trim()) setIsPaused(false); }}
-                                style={{
-                                    flex: 1,
-                                    background: 'rgba(255,255,255,0.15)',
-                                    border: '1px solid rgba(255,255,255,0.25)',
-                                    borderRadius: '24px',
-                                    padding: '10px 16px',
-                                    color: '#fff',
-                                    fontSize: '0.88rem',
-                                    outline: 'none',
-                                }}
-                            />
-                            <button
-                                disabled={!replyText.trim() || sendingReply}
-                                onClick={handleStoryReply}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    color: replyText.trim() ? '#3b82f6' : 'rgba(255,255,255,0.4)',
-                                    cursor: replyText.trim() ? 'pointer' : 'default',
-                                    fontSize: '1.2rem',
-                                    fontWeight: 'bold',
-                                    padding: '6px',
-                                    transition: 'color 0.2s',
-                                }}
-                            >
-                                <i className="fas fa-paper-plane" />
-                            </button>
+                            {/* Quick Emoji Reactions */}
+                            <div className="viewer-emoji-reactions" style={{
+                                display: 'flex',
+                                justifyContent: 'space-around',
+                                padding: '12px 16px 6px',
+                            }}>
+                                {['❤️', '😂', '😮', '😢', '👏', '🔥'].map(emoji => (
+                                    <button
+                                        key={emoji}
+                                        onClick={() => handleEmojiReaction(emoji)}
+                                        disabled={sendingReply}
+                                        style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            fontSize: '1.5rem',
+                                            cursor: 'pointer',
+                                            transition: 'transform 0.1s',
+                                        }}
+                                        onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(1.3)' }}
+                                        onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
+                                    >
+                                        {emoji}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Text Input */}
+                            <div className="viewer-reply-bar" style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                padding: '6px 16px 14px',
+                            }}>
+                                <input
+                                    type="text"
+                                    placeholder={`Reply to @${user.username}...`}
+                                    value={replyText}
+                                    onChange={e => setReplyText(e.target.value)}
+                                    onKeyDown={e => {
+                                        if (e.key === 'Enter' && replyText.trim()) handleStoryReply();
+                                    }}
+                                    onFocus={() => setIsPaused(true)}
+                                    onBlur={() => { if (!replyText.trim()) setIsPaused(false); }}
+                                    style={{
+                                        flex: 1,
+                                        background: 'rgba(255,255,255,0.15)',
+                                        border: '1px solid rgba(255,255,255,0.25)',
+                                        borderRadius: '24px',
+                                        padding: '10px 16px',
+                                        color: '#fff',
+                                        fontSize: '0.88rem',
+                                        outline: 'none',
+                                    }}
+                                />
+                                <button
+                                    disabled={!replyText.trim() || sendingReply}
+                                    onClick={handleStoryReply}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        color: replyText.trim() ? '#0095f6' : 'rgba(255,255,255,0.4)',
+                                        cursor: replyText.trim() ? 'pointer' : 'default',
+                                        fontSize: '1.2rem',
+                                        fontWeight: 'bold',
+                                        padding: '6px',
+                                        transition: 'color 0.2s',
+                                    }}
+                                >
+                                    <i className="fas fa-paper-plane" />
+                                </button>
+                            </div>
                         </div>
                     )
                 }

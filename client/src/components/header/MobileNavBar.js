@@ -70,6 +70,10 @@ const MobileNavBar = () => {
                     <i className="fas fa-search" style={{ fontSize: '1.25rem' }} />
                 </Link>
 
+                <Link to="/reels" className={`text-decoration-none ${isActive('/reels')}`} style={{ color: pathname === '/reels' ? 'var(--primary-color)' : 'var(--text-main)' }}>
+                    <i className="fas fa-video" style={{ fontSize: '1.25rem' }} />
+                </Link>
+
                 <div onClick={() => dispatch({ type: GLOBALTYPES.STATUS, payload: true })}
                      className="cursor-pointer" style={{ color: 'var(--text-main)', cursor: 'pointer' }}>
                     <i className="far fa-plus-square" style={{ fontSize: '1.35rem' }} />

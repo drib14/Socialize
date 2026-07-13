@@ -241,6 +241,48 @@ const postCtrl = {
             return res.status(500).json({ msg: err.message })
         }
     },
+    getReelsPosts: async (req, res) => {
+        try {
+            const myBlocked = req.user.blockedUsers || []
+            const usersWhoBlockedMe = await Users.find({ blockedUsers: req.user._id }).select('_id')
+            const excludeUsers = [...myBlocked, ...usersWhoBlockedMe.map(u => u._id)]
+
+            const query = {
+                $or: [
+                    { "images.url": { $regex: /video/i } },
+                    { "images.url": { $regex: /\.mp4|\.mov|\.webm|\.avi/i } }
+                ],
+                user: { $nin: excludeUsers }
+            }
+
+            const features = new APIfeatures(Posts.find(query), req.query).paginating()
+
+            const posts = await features.query.sort('-createdAt')
+            .populate("user likes views", "avatar username fullname followers lastActive")
+            .populate({
+                path: "comments",
+                populate: {
+                    path: "user likes",
+                    select: "-password"
+                }
+            })
+            .populate({
+                path: "repostOf",
+                populate: {
+                    path: "user likes",
+                    select: "avatar username fullname lastActive"
+                }
+            })
+
+            res.json({
+                msg: 'Success!',
+                result: posts.length,
+                posts
+            })
+        } catch (err) {
+            return res.status(500).json({ msg: err.message })
+        }
+    },
     getPost: async (req, res) => {
         try {
             const post = await Posts.findById(req.params.id)
@@ -299,18 +341,31 @@ const postCtrl = {
             const newArr = [...req.user.following, req.user._id, ...excludeUsers]
             const num  = req.query.num || 9
 
-            const posts = await Posts.find({
-                user: { $nin: newArr },
-                visibility: 'public'
-            }).limit(Number(num)).sort('-createdAt')
-            .populate("user likes views", "avatar username fullname followers lastActive")
-            .populate({
-                path: "comments",
-                populate: {
-                    path: "user likes",
-                    select: "-password"
+            // Calculate engagement score: likes + 2 * comments, sorting by engagement score then date
+            const excludeIds = newArr.map(id => new mongoose.Types.ObjectId(id))
+            const rawPosts = await Posts.aggregate([
+                { $match: { user: { $nin: excludeIds }, visibility: 'public' } },
+                { $addFields: { 
+                    likesCount: { $size: { $ifNull: [ "$likes", [] ] } },
+                    commentsCount: { $size: { $ifNull: [ "$comments", [] ] } }
+                }},
+                { $addFields: {
+                    engagementScore: { $add: [ "$likesCount", { $multiply: [ "$commentsCount", 2 ] } ] }
+                }},
+                { $sort: { engagementScore: -1, createdAt: -1 } },
+                { $limit: Number(num) }
+            ])
+
+            const posts = await Posts.populate(rawPosts, [
+                { path: "user likes views", select: "avatar username fullname followers lastActive" },
+                { 
+                    path: "comments", 
+                    populate: { 
+                        path: "user likes", 
+                        select: "-password" 
+                    } 
                 }
-            })
+            ])
 
             return res.json({
                 msg: 'Success!',

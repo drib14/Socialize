@@ -335,37 +335,13 @@ const StatusModal = () => {
                                 {auth.user.fullname}
                             </span>
                             <div className="mt-1 d-flex align-items-center" style={{ gap: '6px' }}>
-                                <i className={
-                                    visibility === 'followers' ? 'fas fa-users text-muted' :
-                                    visibility === 'private' ? 'fas fa-lock text-muted' :
-                                    'fas fa-globe text-muted'
-                                } style={{ fontSize: '0.8rem' }}></i>
-                                <select 
-                                    value={visibility} 
-                                    onChange={(e) => setVisibility(e.target.value)}
-                                    className="custom-select custom-select-sm"
-                                    style={{ 
-                                        width: 'auto', 
-                                        borderRadius: '12px', 
-                                        fontSize: '0.75rem', 
-                                        padding: '2px 8px', 
-                                        height: '24px', 
-                                        cursor: 'pointer',
-                                        background: 'var(--bg-input)',
-                                        color: 'var(--text-main)',
-                                        borderColor: 'var(--border-color)'
-                                    }}
-                                >
-                                    <option value="public">Public</option>
-                                    <option value="followers">Followers Only</option>
-                                    <option value="private">Only Me</option>
-                                </select>
+                                <small style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>@{auth.user.username}</small>
                             </div>
                         </div>
                     </div>
 
                     <textarea name="content" value={content}
-                    placeholder={`${auth.user.username}, what are you thinking?`}
+                    placeholder="Write a caption..."
                     onChange={handleTextareaChange}
                     autoFocus
                     ref={textareaRef}
@@ -453,59 +429,6 @@ const StatusModal = () => {
                         )
                     }
 
-                    {/* Poll Creator Block */}
-                    {
-                        showPoll && (
-                            <div className="p-3 mb-2 text-left" style={{
-                                background: 'var(--bg-body)',
-                                borderRadius: '12px',
-                                border: '1px solid var(--border-color)',
-                            }}>
-                                <div className="d-flex justify-content-between align-items-center mb-2">
-                                    <small className="text-muted font-weight-bold">Create Poll</small>
-                                    <span className="material-icons text-danger" style={{ fontSize: '1.2rem', cursor: 'pointer' }} 
-                                          onClick={() => {
-                                              setShowPoll(false);
-                                              setPollQuestion('');
-                                              setPollOptions(['', '']);
-                                          }}>close</span>
-                                </div>
-                                <input type="text" className="form-control form-control-sm mb-2" 
-                                       placeholder="Ask a question..." value={pollQuestion}
-                                       onChange={e => setPollQuestion(e.target.value)}
-                                       style={{ background: 'var(--bg-card)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '8px' }} />
-                                
-                                <div className="d-flex flex-column" style={{ gap: '8px' }}>
-                                    {pollOptions.map((option, index) => (
-                                        <div key={index} className="d-flex align-items-center">
-                                            <input type="text" className="form-control form-control-sm"
-                                                   placeholder={`Option ${index + 1}`} value={option}
-                                                   onChange={e => {
-                                                       const newOptions = [...pollOptions]
-                                                       newOptions[index] = e.target.value
-                                                       setPollOptions(newOptions)
-                                                   }}
-                                                   style={{ background: 'var(--bg-card)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '8px' }} />
-                                            {pollOptions.length > 2 && (
-                                                <span className="material-icons text-danger ml-2" style={{ cursor: 'pointer', fontSize: '1.2rem' }}
-                                                      onClick={() => {
-                                                          const newOptions = pollOptions.filter((_, idx) => idx !== index)
-                                                          setPollOptions(newOptions)
-                                                      }}>remove_circle_outline</span>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                                {pollOptions.length < 4 && (
-                                    <button type="button" className="btn btn-sm btn-outline-info mt-2" style={{ borderRadius: '20px', fontSize: '0.75rem' }}
-                                            onClick={() => setPollOptions([...pollOptions, ''])}>
-                                        + Add Option
-                                    </button>
-                                )}
-                            </div>
-                        )
-                    }
-
                     {/* Location Badge */}
                     {
                         location && (
@@ -514,18 +437,6 @@ const StatusModal = () => {
                                 <span className="material-icons text-primary" style={{ fontSize: '1rem' }}>place</span>
                                 <small style={{ color: 'var(--text-main)', fontSize: '0.8rem' }}>{location}</small>
                                 <span className="material-icons text-danger" style={{ fontSize: '1rem', cursor: 'pointer' }} onClick={() => setLocation('')}>close</span>
-                            </div>
-                        )
-                    }
-
-                    {/* Mood Badge */}
-                    {
-                        mood && (
-                            <div className="d-flex align-items-center mb-2 px-2 py-1" 
-                                 style={{ background: 'var(--bg-body)', borderRadius: '12px', border: '1px solid var(--border-color)', width: 'fit-content', gap: '6px' }}>
-                                {getMoodIcon(mood) && <i className={getMoodIcon(mood)}></i>}
-                                <small style={{ color: 'var(--text-main)', fontSize: '0.8rem' }}>{mood}</small>
-                                <span className="material-icons text-danger" style={{ fontSize: '1rem', cursor: 'pointer' }} onClick={() => setMood('')}>close</span>
                             </div>
                         )
                     }
@@ -567,44 +478,6 @@ const StatusModal = () => {
                                         </div>
                                     )
                                 }
-                            </div>
-                        )
-                    }
-
-                    {/* Dynamic Mood Selection Cards */}
-                    {
-                        showMoodCards && !mood && (
-                            <div className="mb-2 p-2" style={{ background: 'var(--bg-body)', borderRadius: '12px', border: '1px solid var(--border-color)', maxHeight: '180px', overflowY: 'auto' }}>
-                                <small className="text-muted d-block mb-2 font-weight-bold">Select Mood</small>
-                                <div className="d-flex flex-wrap" style={{ gap: '8px' }}>
-                                    {PREDEFINED_MOODS.map((item, index) => {
-                                        return (
-                                            <div 
-                                                key={index}
-                                                onClick={() => {
-                                                    setMood(`Feeling ${item.name}`);
-                                                    setShowMoodCards(false);
-                                                }}
-                                                className="p-2 d-flex align-items-center justify-content-center"
-                                                style={{ 
-                                                    background: 'var(--bg-card)', 
-                                                    border: '1px solid var(--border-color)', 
-                                                    borderRadius: '8px', 
-                                                    cursor: 'pointer',
-                                                    fontSize: '0.9rem',
-                                                    boxShadow: 'var(--shadow-sm)',
-                                                    gap: '6px',
-                                                    minWidth: '80px',
-                                                    flex: '1 0 22%'
-                                                }}
-                                                title={`Feeling ${item.name}`}
-                                            >
-                                                <i className={item.icon}></i>
-                                                <small className="text-truncate" style={{ fontSize: '0.75rem', color: 'var(--text-main)' }}>{item.name}</small>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
                             </div>
                         )
                     }
@@ -677,12 +550,8 @@ const StatusModal = () => {
                                         <span className="material-icons text-primary" style={{ fontSize: '1.4rem', verticalAlign: 'middle' }}>place</span>
                                     </div>
 
-                                    <div className="file_upload mr-2" onClick={() => setShowPoll(!showPoll)} title="Create Poll" style={{ cursor: 'pointer' }}>
-                                        <span className="material-icons text-info" style={{ fontSize: '1.4rem', verticalAlign: 'middle' }}>poll</span>
-                                    </div>
-
-                                    <div className="file_upload" onClick={toggleMoodCards} title="Add Mood" style={{ cursor: 'pointer' }}>
-                                        <span className="material-icons text-warning" style={{ fontSize: '1.4rem', verticalAlign: 'middle' }}>sentiment_satisfied_alt</span>
+                                    <div className="file_upload" onClick={() => setShowLocationInput(!showLocationInput)} title="Add Location" style={{ cursor: 'pointer' }}>
+                                        <span className="material-icons text-primary" style={{ fontSize: '1.4rem', verticalAlign: 'middle' }}>place</span>
                                     </div>
                                 </>
                             }
@@ -692,14 +561,17 @@ const StatusModal = () => {
                 </div>
 
                 <div className="status_footer mt-3">
-                    <button className="btn btn-success w-100" type="submit" style={{ 
-                        borderRadius: '12px', 
+                    <button className="btn btn-primary w-100" type="submit" 
+                    disabled={images.length === 0 && !(status && status.repostOf)}
+                    style={{ 
+                        borderRadius: '4px', 
                         padding: '10px 0', 
                         fontWeight: 'bold', 
                         fontSize: '0.95rem',
-                        boxShadow: '0 4px 12px rgba(43,138,62,0.15)'
+                        background: '#0095f6',
+                        border: 'none'
                     }}>
-                        Post
+                        Share
                     </button>
                 </div>
 
