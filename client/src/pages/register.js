@@ -57,34 +57,31 @@ const Register = () => {
                 {
                     step === 1 ? (
                         <>
-                            <div className="input_group">
+                            <div className={`input_group ${alert.fullname ? 'has-error' : ''}`}>
                                 <span className="material-icons text-muted">person</span>
                                 <input type="text" className="form-control" name="fullname"
                                     placeholder="Full Name"
-                                    onChange={handleChangeInput} value={fullname}
-                                    style={{ background: `${alert.fullname ? '#fd2d6a14' : ''}` }} required />
+                                    onChange={handleChangeInput} value={fullname} required />
                             </div>
                             <small className="form-text text-danger mb-3 mt-n3">
                                 {alert.fullname ? alert.fullname : ''}
                             </small>
 
-                            <div className="input_group">
+                            <div className={`input_group ${alert.username ? 'has-error' : ''}`}>
                                 <span className="material-icons text-muted">alternate_email</span>
                                 <input type="text" className="form-control" name="username"
                                     placeholder="Username"
-                                    onChange={handleChangeInput} value={username.toLowerCase().replace(/ /g, '')}
-                                    style={{ background: `${alert.username ? '#fd2d6a14' : ''}` }} required />
+                                    onChange={handleChangeInput} value={username.toLowerCase().replace(/ /g, '')} required />
                             </div>
                             <small className="form-text text-danger mb-3 mt-n3">
                                 {alert.username ? alert.username : ''}
                             </small>
 
-                            <div className="input_group">
+                            <div className={`input_group ${alert.email ? 'has-error' : ''}`}>
                                 <span className="material-icons text-muted">mail</span>
                                 <input type="email" className="form-control" name="email"
                                     placeholder="Email address"
-                                    onChange={handleChangeInput} value={email}
-                                    style={{ background: `${alert.email ? '#fd2d6a14' : ''}` }} required />
+                                    onChange={handleChangeInput} value={email} required />
                             </div>
                             <small className="form-text text-danger mb-3 mt-n3">
                                 {alert.email ? alert.email : ''}
@@ -119,32 +116,36 @@ const Register = () => {
                         </>
                     ) : (
                         <>
-                            <div className="input_group">
+                            <div className={`input_group ${alert.password ? 'has-error' : ''}`}>
                                 <span className="material-icons text-muted">lock</span>
                                 <input type={typePass ? "text" : "password"}
                                     className="form-control"
                                     placeholder="Password"
                                     onChange={handleChangeInput} value={password} name="password"
-                                    style={{ background: `${alert.password ? '#fd2d6a14' : ''}` }} required />
+                                    style={{ paddingRight: '80px !important' }} required />
 
-                                <span className="material-icons pass_toggle" onClick={() => setTypePass(!typePass)}>
-                                    {typePass ? 'visibility_off' : 'visibility'}
+                                <span className="d-flex align-items-center" onClick={() => setTypePass(!typePass)}
+                                      style={{ position: 'absolute', right: '14px', cursor: 'pointer', color: 'var(--primary-color)', fontWeight: 'bold', fontSize: '0.85rem', gap: '4px', zIndex: 10, userSelect: 'none' }}>
+                                    <span className="material-icons" style={{ fontSize: '1.1rem' }}>{typePass ? 'visibility_off' : 'visibility'}</span>
+                                    {typePass ? 'Hide' : 'Show'}
                                 </span>
                             </div>
                             <small className="form-text text-danger mb-3 mt-n3">
                                 {alert.password ? alert.password : ''}
                             </small>
 
-                            <div className="input_group">
+                            <div className={`input_group ${alert.cf_password ? 'has-error' : ''}`}>
                                 <span className="material-icons text-muted">lock_reset</span>
                                 <input type={typeCfPass ? "text" : "password"}
                                     className="form-control"
                                     placeholder="Confirm Password"
                                     onChange={handleChangeInput} value={cf_password} name="cf_password"
-                                    style={{ background: `${alert.cf_password ? '#fd2d6a14' : ''}` }} required />
+                                    style={{ paddingRight: '80px !important' }} required />
 
-                                <span className="material-icons pass_toggle" onClick={() => setTypeCfPass(!typeCfPass)}>
-                                    {typeCfPass ? 'visibility_off' : 'visibility'}
+                                <span className="d-flex align-items-center" onClick={() => setTypeCfPass(!typeCfPass)}
+                                      style={{ position: 'absolute', right: '14px', cursor: 'pointer', color: 'var(--primary-color)', fontWeight: 'bold', fontSize: '0.85rem', gap: '4px', zIndex: 10, userSelect: 'none' }}>
+                                    <span className="material-icons" style={{ fontSize: '1.1rem' }}>{typeCfPass ? 'visibility_off' : 'visibility'}</span>
+                                    {typeCfPass ? 'Hide' : 'Show'}
                                 </span>
                             </div>
                             <small className="form-text text-danger mb-3 mt-n3">

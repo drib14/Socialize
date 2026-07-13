@@ -52,10 +52,12 @@ const ResetPassword = () => {
                     <span className="material-icons text-muted">lock</span>
                     <input type={typePass ? "text" : "password"} className="form-control" 
                     name="password" placeholder="New Password"
-                    onChange={e => setPassword(e.target.value)} value={password} required />
+                    onChange={e => setPassword(e.target.value)} value={password} required style={{ paddingRight: '80px !important' }} />
                     
-                    <span className="material-icons pass_toggle" onClick={() => setTypePass(!typePass)}>
-                        {typePass ? 'visibility_off' : 'visibility'}
+                    <span className="d-flex align-items-center" onClick={() => setTypePass(!typePass)}
+                          style={{ position: 'absolute', right: '14px', cursor: 'pointer', color: 'var(--primary-color)', fontWeight: 'bold', fontSize: '0.85rem', gap: '4px', zIndex: 10, userSelect: 'none' }}>
+                        <span className="material-icons" style={{ fontSize: '1.1rem' }}>{typePass ? 'visibility_off' : 'visibility'}</span>
+                        {typePass ? 'Hide' : 'Show'}
                     </span>
                 </div>
 
@@ -63,10 +65,12 @@ const ResetPassword = () => {
                     <span className="material-icons text-muted">lock_reset</span>
                     <input type={typeCfPass ? "text" : "password"} className="form-control" 
                     name="cf_password" placeholder="Confirm New Password"
-                    onChange={e => setCfPassword(e.target.value)} value={cf_password} required />
+                    onChange={e => setCfPassword(e.target.value)} value={cf_password} required style={{ paddingRight: '80px !important' }} />
                     
-                    <span className="material-icons pass_toggle" onClick={() => setTypeCfPass(!typeCfPass)}>
-                        {typeCfPass ? 'visibility_off' : 'visibility'}
+                    <span className="d-flex align-items-center" onClick={() => setTypeCfPass(!typeCfPass)}
+                          style={{ position: 'absolute', right: '14px', cursor: 'pointer', color: 'var(--primary-color)', fontWeight: 'bold', fontSize: '0.85rem', gap: '4px', zIndex: 10, userSelect: 'none' }}>
+                        <span className="material-icons" style={{ fontSize: '1.1rem' }}>{typeCfPass ? 'visibility_off' : 'visibility'}</span>
+                        {typeCfPass ? 'Hide' : 'Show'}
                     </span>
                 </div>
 

@@ -13,7 +13,7 @@ if (fs.existsSync(src)) {
     targets.forEach(target => {
         const dest = path.join(__dirname, target);
         fs.copyFileSync(src, dest);
-        console.log(`Copied logo to ${target}`);
+        // console.log(`Copied logo to ${target}`);
     });
 } else {
     console.error(`Source logo not found at ${src}`);
