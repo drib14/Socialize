@@ -74,6 +74,27 @@ const CardHeader = ({post}) => {
         dispatch(pinPost({post, auth}))
     }
 
+    const getPostTypeIcon = (post) => {
+        if (post.repostOf) {
+            const hasContent = post.content && post.content.trim().length > 0;
+            if (hasContent) {
+                return <i className="fas fa-quote-right ml-2" style={{ fontSize: '0.78rem', color: '#ff9f43' }} title="Quote Repost"></i>;
+            }
+            return <i className="fas fa-retweet ml-2" style={{ fontSize: '0.78rem', color: '#00d2d3' }} title="Repost"></i>;
+        }
+        if (post.poll && post.poll.question) {
+            return <i className="fas fa-poll ml-2" style={{ fontSize: '0.78rem', color: '#9b5de5' }} title="Poll Post"></i>;
+        }
+        if (post.images && post.images.length > 0) {
+            const hasVideo = post.images.some(img => img.resource_type === 'video' || (typeof img.url === 'string' && img.url.match(/video/i)));
+            if (hasVideo) {
+                return <i className="fas fa-video ml-2" style={{ fontSize: '0.78rem', color: '#54a0ff' }} title="Video Post"></i>;
+            }
+            return <i className="fas fa-images ml-2" style={{ fontSize: '0.78rem', color: '#10ac84' }} title="Media Post"></i>;
+        }
+        return <i className="fas fa-file-alt ml-2" style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }} title="Text Post"></i>;
+    }
+
     const getVisibilityIcon = (visibility) => {
         if (visibility === 'followers') return <i className="fas fa-users text-muted ml-1" style={{ fontSize: '0.78rem' }} title="Followers Only"></i>;
         if (visibility === 'private') return <i className="fas fa-lock text-muted ml-1" style={{ fontSize: '0.78rem' }} title="Only Me"></i>;
@@ -149,6 +170,7 @@ const CardHeader = ({post}) => {
                         <span>{dayjs(post.createdAt).fromNow()}</span>
                         <span className="mx-1">•</span>
                         {getVisibilityIcon(post.visibility)}
+                        {getPostTypeIcon(post)}
                         {post.isPinned && (
                             <>
                                 <span className="mx-1">•</span>

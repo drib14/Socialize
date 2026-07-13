@@ -18,6 +18,7 @@ router.patch('/post/:id/unlike', auth, postCtrl.unLikePost)
 router.post('/post/:id/repost', auth, postCtrl.repostPost)
 
 router.get('/user_posts/:id', auth, postCtrl.getUserPosts)
+router.get('/user_tagged_posts/:id', auth, postCtrl.getTaggedPosts)
 
 router.get('/post_discover', auth, postCtrl.getPostsDicover)
 

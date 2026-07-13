@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import Avatar from '../Avatar'
 import EditProfile from './Info/EditProfile'
 import FollowBtn from '../FollowBtn'
@@ -9,12 +10,22 @@ import CreateMomentModal from '../home/CreateMomentModal'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
 
 const Info = ({id, auth, profile, dispatch}) => {
+    const { online } = useSelector(state => state)
     const [userData, setUserData] = useState([])
     const [onEdit, setOnEdit] = useState(false)
     const [onAddMoment, setOnAddMoment] = useState(false)
 
     const [showFollowers, setShowFollowers] = useState(false)
     const [showFollowing, setShowFollowing] = useState(false)
+    const [postsCount, setPostsCount] = useState(0)
+
+    useEffect(() => {
+        profile.posts.forEach(data => {
+            if (data._id === id) {
+                setPostsCount(data.posts.length)
+            }
+        })
+    }, [profile.posts, id])
 
     useEffect(() => {
         if(id === auth.user._id){
@@ -40,7 +51,23 @@ const Info = ({id, auth, profile, dispatch}) => {
             {
                 userData.map(user => (
                     <div className="info_container" key={user._id}>
-                        <Avatar src={user.avatar} size="supper-avatar" />
+                        <div className="position-relative" style={{ width: 'fit-content' }}>
+                            <Avatar src={user.avatar} size="supper-avatar" />
+                            {
+                                (online.includes(user._id) || user._id === auth.user._id) && (
+                                    <span className="position-absolute" style={{
+                                        width: '16px',
+                                        height: '16px',
+                                        background: '#2b8a3e',
+                                        border: '3px solid var(--bg-card)',
+                                        borderRadius: '50%',
+                                        bottom: '8px',
+                                        right: '8px',
+                                        boxShadow: '0 0 0 2px rgba(43,138,62,0.2)'
+                                    }} />
+                                )
+                            }
+                        </div>
 
                         <div className="info_content">
                             <div className="info_content_title">
@@ -74,11 +101,14 @@ const Info = ({id, auth, profile, dispatch}) => {
                             </div>
 
                             <div className="follow_btn">
-                                <span className="mr-4" onClick={() => setShowFollowers(true)}>
-                                    {user.followers.length} Followers
+                                <span className="mr-4" style={{ cursor: 'default' }}>
+                                    <strong>{postsCount}</strong> Posts
                                 </span>
-                                <span className="ml-4" onClick={() => setShowFollowing(true)}>
-                                    {user.following.length} Following
+                                <span className="mr-4" onClick={() => setShowFollowers(true)} style={{ cursor: 'pointer' }}>
+                                    <strong>{user.followers.length}</strong> Followers
+                                </span>
+                                <span className="ml-4" onClick={() => setShowFollowing(true)} style={{ cursor: 'pointer' }}>
+                                    <strong>{user.following.length}</strong> Following
                                 </span>
                             </div>
 

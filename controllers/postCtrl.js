@@ -197,6 +197,50 @@ const postCtrl = {
             return res.status(500).json({msg: err.message})
         }
     },
+    getTaggedPosts: async (req, res) => {
+        try {
+            const targetId = req.params.id
+            const targetUser = await Users.findById(targetId)
+            if (!targetUser) return res.status(404).json({ msg: "User not found." })
+
+            const usernameRegex = new RegExp(`@${targetUser.username}\\b`, 'i')
+
+            const myBlocked = req.user.blockedUsers || []
+            const targetUserBlocked = targetUser.blockedUsers || []
+
+            let query = {
+                content: { $regex: usernameRegex },
+                user: { $nin: [...myBlocked, ...targetUserBlocked] }
+            }
+
+            const posts = await Posts.find(query)
+                .sort("-createdAt")
+                .populate("user likes views", "avatar username fullname followers")
+                .populate({
+                    path: "repostOf",
+                    populate: {
+                        path: "user likes",
+                        select: "avatar username fullname"
+                    }
+                })
+
+            const filteredPosts = posts.filter(post => {
+                const authorId = post.user._id.toString()
+                if (authorId === req.user._id.toString()) return true
+                if (post.visibility === 'public') return true
+                if (post.visibility === 'private') return false
+                const isFollowing = post.user.followers.some(id => (id._id || id).toString() === req.user._id.toString())
+                return isFollowing
+            })
+
+            res.json({
+                posts: filteredPosts,
+                result: filteredPosts.length
+            })
+        } catch (err) {
+            return res.status(500).json({ msg: err.message })
+        }
+    },
     getPost: async (req, res) => {
         try {
             const post = await Posts.findById(req.params.id)

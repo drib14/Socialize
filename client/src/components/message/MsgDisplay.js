@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Avatar from '../Avatar'
 import { useSelector, useDispatch } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { deleteMessages, updateMessage, reactMessage, addMessage } from '../../redux/actions/messageAction'
 import Times from './Times'
 import { customConfirm } from '../../utils/customAlert'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
 import Modal from 'react-modal'
 import { renderTextWithIcons } from '../../utils/iconParser'
+import { getDataAPI } from '../../utils/fetchData'
 
 Modal.setAppElement('#root')
 
@@ -19,6 +21,70 @@ const getReactionColor = (iconName) => {
     if (iconName === 'local_fire_department') return '#ff4757'; // Fire Red
     if (iconName === 'lightbulb') return '#eccc68'; // Idea Gold
     return 'var(--text-secondary)';
+};
+
+const RichLinkPreview = ({ text, token }) => {
+    const [previewData, setPreviewData] = useState(null);
+    const [type, setType] = useState(null);
+
+    useEffect(() => {
+        let isMounted = true;
+        const postRegex = /\/post\/([a-f\d]{24})/i;
+
+        const postMatch = text.match(postRegex);
+
+        const fetchPreview = async () => {
+            try {
+                if (postMatch) {
+                    const postId = postMatch[1];
+                    const res = await getDataAPI(`post/${postId}`, token);
+                    if (isMounted && res.data && res.data.post) {
+                        setPreviewData(res.data.post);
+                        setType('post');
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        if (postMatch) {
+            fetchPreview();
+        }
+
+        return () => {
+            isMounted = false;
+        };
+    }, [text, token]);
+
+    if (!previewData) return null;
+
+    if (type === 'post') {
+        return (
+            <Link to={`/post/${previewData._id}`} className="d-block text-decoration-none p-2 mt-2" style={{
+                background: 'var(--bg-card)',
+                borderRadius: '12px',
+                border: '1px solid var(--border-color)',
+                maxWidth: '280px',
+                textAlign: 'left'
+            }}>
+                <div className="d-flex align-items-center mb-1">
+                    <Avatar src={previewData.user?.avatar} size="small-avatar" />
+                    <strong className="ml-2" style={{ fontSize: '0.8rem', color: 'var(--text-main)' }}>
+                        @{previewData.user?.username}
+                    </strong>
+                </div>
+                <p className="mb-0" style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                    {previewData.content}
+                </p>
+                {previewData.images && previewData.images.length > 0 && (
+                    <img src={previewData.images[0].url} alt="post preview" className="w-100 mt-2" style={{ maxHeight: '120px', objectFit: 'cover', borderRadius: '8px' }} />
+                )}
+            </Link>
+        );
+    }
+
+    return null;
 };
 
 // Customized Audio Bubble Component
@@ -610,9 +676,12 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
                             </div>
                         ) : (
                             msg.text && 
-                            <div className="chat_text" style={getBubbleStyle()}>
-                                {renderTextWithIcons(msg.text)}
-                            </div>
+                            <>
+                                <div className="chat_text" style={getBubbleStyle()}>
+                                    {renderTextWithIcons(msg.text)}
+                                </div>
+                                <RichLinkPreview text={msg.text} token={auth.token} />
+                            </>
                         )
                     }
                     {

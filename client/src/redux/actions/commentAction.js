@@ -59,7 +59,7 @@ export const updateComment = ({comment, post, content, auth}) => async (dispatch
     }
 }
 
-export const likeComment = ({comment, post, auth}) => async (dispatch) => {
+export const likeComment = ({comment, post, auth, socket}) => async (dispatch) => {
     const newComment = {...comment, likes: [...comment.likes, auth.user]}
 
     const newComments = EditData(post.comments, comment._id, newComment)
@@ -70,12 +70,24 @@ export const likeComment = ({comment, post, auth}) => async (dispatch) => {
 
     try {
         await patchDataAPI(`comment/${comment._id}/like`, null, auth.token)
+
+        if (comment.user._id !== auth.user._id) {
+            const msg = {
+                id: comment._id,
+                text: 'liked your comment.',
+                recipients: [comment.user._id],
+                url: `/post/${post._id}`,
+                content: comment.content,
+                image: post.images.length > 0 ? post.images[0].url : ''
+            }
+            dispatch(createNotify({msg, auth, socket}))
+        }
     } catch (err) {
         dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message} })
     }
 }
 
-export const unLikeComment = ({comment, post, auth}) => async (dispatch) => {
+export const unLikeComment = ({comment, post, auth, socket}) => async (dispatch) => {
 
     const newComment = {...comment, likes: DeleteData(comment.likes, auth.user._id)}
 
@@ -87,6 +99,16 @@ export const unLikeComment = ({comment, post, auth}) => async (dispatch) => {
 
     try {
         await patchDataAPI(`comment/${comment._id}/unlike`, null, auth.token)
+
+        if (comment.user._id !== auth.user._id) {
+            const msg = {
+                id: comment._id,
+                text: 'liked your comment.',
+                recipients: [comment.user._id],
+                url: `/post/${post._id}`,
+            }
+            dispatch(removeNotify({msg, auth, socket}))
+        }
     } catch (err) {
         dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message} })
     }

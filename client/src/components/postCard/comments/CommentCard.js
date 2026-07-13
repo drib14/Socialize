@@ -14,7 +14,7 @@ import InputComment from '../InputComment'
 import { renderTextWithIcons } from '../../../utils/iconParser'
 
 const CommentCard = ({children, comment, post, commentId}) => {
-    const { auth, theme } = useSelector(state => state)
+    const { auth, theme, socket } = useSelector(state => state)
     const dispatch = useDispatch()
 
     const [content, setContent] = useState('')
@@ -51,7 +51,7 @@ const CommentCard = ({children, comment, post, commentId}) => {
         setIsLike(true)
 
         setLoadLike(true)
-        await dispatch(likeComment({comment, post, auth}))
+        await dispatch(likeComment({comment, post, auth, socket}))
         setLoadLike(false)
     }
 
@@ -60,7 +60,7 @@ const CommentCard = ({children, comment, post, commentId}) => {
         setIsLike(false)
 
         setLoadLike(true)
-        await dispatch(unLikeComment({comment, post, auth}))
+        await dispatch(unLikeComment({comment, post, auth, socket}))
         setLoadLike(false)
     }
 

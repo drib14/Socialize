@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import Info from '../../components/profile/Info'
 import Posts from '../../components/profile/Posts'
+import Saved from '../../components/profile/Saved'
 
 import { useSelector, useDispatch } from 'react-redux'
 import ProfileSkeleton from '../../components/skeletons/ProfileSkeleton'
@@ -44,22 +45,21 @@ const Profile = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="profile_tab">
-                            <button className={tab === 'posts' ? 'active' : ''} onClick={() => setTab('posts')} title="Posts">
-                                <span className="material-icons">grid_on</span>
-                                Posts
+                        <div className="profile_tab" style={{ display: 'flex', justifyContent: 'center', borderTop: '1px solid var(--border-color)', gap: '20px', padding: '10px 0' }}>
+                            <button className={`btn d-flex align-items-center ${tab === 'posts' ? 'text-primary font-weight-bold' : 'text-secondary'}`} onClick={() => setTab('posts')} title="Posts" style={{ background: 'none', border: 'none', fontSize: '0.9rem', outline: 'none' }}>
+                                <i className="fas fa-th mr-1" /> Posts
                             </button>
-                            <button className={tab === 'reposts' ? 'active' : ''} onClick={() => setTab('reposts')} title="Reposts">
-                                <span className="material-icons">repeat</span>
-                                Reposts
+                            <button className={`btn d-flex align-items-center ${tab === 'reposts' ? 'text-primary font-weight-bold' : 'text-secondary'}`} onClick={() => setTab('reposts')} title="Reposts" style={{ background: 'none', border: 'none', fontSize: '0.9rem', outline: 'none' }}>
+                                <i className="fas fa-retweet mr-1" /> Reposts
                             </button>
-
-                            <div 
-                                className="tab_slider" 
-                                style={{
-                                    transform: `translateX(${tab === 'posts' ? '0' : 'calc(100% - 4px)'})`
-                                }}
-                            />
+                            {isMyProfile && (
+                                <button className={`btn d-flex align-items-center ${tab === 'saved' ? 'text-primary font-weight-bold' : 'text-secondary'}`} onClick={() => setTab('saved')} title="Saved" style={{ background: 'none', border: 'none', fontSize: '0.9rem', outline: 'none' }}>
+                                    <i className="far fa-bookmark mr-1" /> Saved
+                                </button>
+                            )}
+                            <button className={`btn d-flex align-items-center ${tab === 'tagged' ? 'text-primary font-weight-bold' : 'text-secondary'}`} onClick={() => setTab('tagged')} title="Tagged" style={{ background: 'none', border: 'none', fontSize: '0.9rem', outline: 'none' }}>
+                                <i className="fas fa-user-tag mr-1" /> Tagged
+                            </button>
                         </div>
 
                         {
@@ -67,10 +67,16 @@ const Profile = () => {
                             ? <ProfileSkeleton />
                             : <>
                                 {
-                                    tab === 'posts' && <Posts auth={auth} profile={profile} dispatch={dispatch} id={id} isRepostTab={false} />
+                                    tab === 'posts' && <Posts auth={auth} profile={profile} dispatch={dispatch} id={id} isRepostTab={false} isTaggedTab={false} />
                                 }
                                 {
-                                    tab === 'reposts' && <Posts auth={auth} profile={profile} dispatch={dispatch} id={id} isRepostTab={true} />
+                                    tab === 'reposts' && <Posts auth={auth} profile={profile} dispatch={dispatch} id={id} isRepostTab={true} isTaggedTab={false} />
+                                }
+                                {
+                                    tab === 'saved' && isMyProfile && <Saved auth={auth} dispatch={dispatch} />
+                                }
+                                {
+                                    tab === 'tagged' && <Posts auth={auth} profile={profile} dispatch={dispatch} id={id} isRepostTab={false} isTaggedTab={true} />
                                 }
                             </>
                         }
