@@ -242,3 +242,47 @@
     background-color: var(--border-color);
     border-radius: 3px;
 }
+
+/* Sidebar layout styles & responsive viewports */
+.nav_sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.02);
+}
+
+.nav_sidebar_link i {
+  color: var(--text-main);
+  width: 24px;
+  text-align: center;
+  font-size: 1.3rem;
+}
+
+.nav_sidebar_link:hover {
+  background-color: var(--bg-input);
+  text-decoration: none;
+}
+
+.nav_sidebar_link.active {
+  font-weight: 700 !important;
+}
+
+.nav_sidebar_link.active i {
+  color: var(--primary-color) !important;
+}
+
+@media (max-width: 1200px) and (min-width: 768px) {
+  .nav_sidebar {
+    width: 72px !important;
+    align-items: center;
+  }
+  .nav_sidebar .logo_text,
+  .nav_sidebar .link_text {
+    display: none !important;
+  }
+  .main-layout.logged-in {
+    margin-left: 72px !important;
+    width: calc(100% - 72px) !important;
+  }
+}

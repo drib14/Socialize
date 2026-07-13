@@ -366,19 +366,56 @@ img[src*="loading.gif"] {
 }
 
 /* --------- Layout Width Overrides --------- */
-.header {
-  padding: 0 40px !important;
+.main-layout {
+  width: 100%;
+  min-height: 100vh;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.home {
-  padding: 0 40px !important;
+.nav_sidebar_link {
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-@media (max-width: 768px) {
-  .header {
-    padding: 0 15px !important;
+.nav_sidebar_link:hover {
+  background-color: var(--bg-input);
+}
+
+.nav_sidebar_link.active {
+  font-weight: 700 !important;
+  color: var(--primary-color) !important;
+}
+
+.nav_sidebar_link.active i {
+  color: var(--primary-color) !important;
+}
+
+@media (min-width: 768px) {
+  .main-layout.logged-in {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+    padding: 20px;
   }
-  .home {
-    padding: 0 15px !important;
+}
+
+@media (max-width: 767px) {
+  .main-layout.logged-in {
+    margin-left: 0;
+    padding-top: 65px;
+    padding-bottom: 70px;
+  }
+  
+  .logo_text {
+    display: none;
+  }
+  
+  .link_text {
+    display: none;
   }
 }

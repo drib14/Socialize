@@ -11,7 +11,8 @@ import ForgotPassword from './pages/forgot_password'
 import ResetPassword from './pages/reset_password'
 
 import Alert from './components/alert/Alert'
-import Header from './components/header/Header'
+import NavSidebar from './components/header/NavSidebar'
+import MobileNavBar from './components/header/MobileNavBar'
 import StatusModal from './components/StatusModal'
 
 import { ToastContainer } from 'react-toastify'
@@ -93,8 +94,10 @@ function App() {
 
       <input type="checkbox" id="theme" checked={theme} readOnly />
       <div className={`App ${(status || modal) && 'mode'}`}>
-        <div className="main">
-          {auth.token && <Header />}
+        {auth.token && <NavSidebar />}
+        {auth.token && <MobileNavBar />}
+        
+        <div className={`main-layout ${auth.token ? 'logged-in' : ''}`}>
           {status && <StatusModal />}
           {auth.token && <SocketClient />}
           {call && <CallModal />}
@@ -122,7 +125,6 @@ function App() {
               </PrivateRouter>
             } />
           </Routes>
-          
         </div>
       </div>
     </Router>

@@ -29,14 +29,9 @@ const Home = () => {
     },[])
 
     return (
-        <div className="home row mx-0" style={{ width: '100%' }}>
-            <div className="col-md-3 col-lg-3 d-none d-md-block">
-                <LeftSideBar />
-            </div>
-
-            <div className="col-12 col-md-6 col-lg-6">
+        <div className="home row mx-0" style={{ width: '100%', justifyContent: 'center' }}>
+            <div className="col-12 col-md-7 col-lg-6">
                 <MomentsBar />
-                <Status />
 
                 {
                     homePosts.loading 
@@ -45,13 +40,12 @@ const Home = () => {
                         <PostSkeleton />
                       </>
                     : (homePosts.result === 0 && homePosts.posts.length === 0)
-                        ? <h2 className="text-center">No Post</h2>
+                        ? <h2 className="text-center" style={{ color: 'var(--text-secondary)', marginTop: '40px' }}>No posts found</h2>
                         : <Posts />
                 }
-                
             </div>
             
-            <div className="col-md-3 col-lg-3 d-none d-md-block">
+            <div className="col-md-4 col-lg-3 d-none d-md-block">
                 <RightSideBar />
             </div>
         </div>
