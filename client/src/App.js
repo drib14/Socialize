@@ -37,7 +37,7 @@ function App() {
   useEffect(() => {
     dispatch(refreshToken())
 
-    const socket = io()
+    const socket = io(import.meta.env.VITE_API_URL || '')
     dispatch({type: GLOBALTYPES.SOCKET, payload: socket})
     return () => socket.close()
   },[dispatch])
@@ -65,9 +65,18 @@ function App() {
 
  
   useEffect(() => {
-    const newPeer = new Peer(undefined, {
-      path: '/', secure: true
-    })
+    const backendUrl = import.meta.env.VITE_API_URL;
+    let peerConfig = { path: '/', secure: true };
+    if (backendUrl) {
+      try {
+        const urlObj = new URL(backendUrl);
+        peerConfig.host = urlObj.hostname;
+        peerConfig.port = urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80);
+      } catch (err) {
+        console.error('Invalid VITE_API_URL:', err);
+      }
+    }
+    const newPeer = new Peer(undefined, peerConfig)
     
     dispatch({ type: GLOBALTYPES.PEER, payload: newPeer })
   },[dispatch])

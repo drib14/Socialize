@@ -30,7 +30,9 @@ const authCtrl = {
             res.cookie('refreshtoken', refresh_token, {
                 httpOnly: true,
                 path: '/api/refresh_token',
-                maxAge: 30*24*60*60*1000 // 30days
+                maxAge: 30*24*60*60*1000, // 30days
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                secure: process.env.NODE_ENV === 'production' ? true : false
             })
 
             await newUser.save()
@@ -65,7 +67,9 @@ const authCtrl = {
             res.cookie('refreshtoken', refresh_token, {
                 httpOnly: true,
                 path: '/api/refresh_token',
-                maxAge: 30*24*60*60*1000 // 30days
+                maxAge: 30*24*60*60*1000, // 30days
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                secure: process.env.NODE_ENV === 'production' ? true : false
             })
 
             res.json({
@@ -82,7 +86,11 @@ const authCtrl = {
     },
     logout: async (req, res) => {
         try {
-            res.clearCookie('refreshtoken', {path: '/api/refresh_token'})
+            res.clearCookie('refreshtoken', {
+                path: '/api/refresh_token',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                secure: process.env.NODE_ENV === 'production' ? true : false
+            })
             return res.json({msg: "Logged out!"})
         } catch (err) {
             return res.status(500).json({msg: err.message})

@@ -19,13 +19,21 @@ const path = require('path')
 const app = express()
 app.use(express.json({ limit: '100mb' }))
 app.use(express.urlencoded({ limit: '100mb', extended: true }))
-app.use(cors())
+app.use(cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    credentials: true
+}))
 app.use(cookieParser())
 
 
 // Socket
 const http = require('http').createServer(app)
-const io = require('socket.io')(http)
+const io = require('socket.io')(http, {
+    cors: {
+        origin: process.env.CLIENT_URL || 'http://localhost:3000',
+        credentials: true
+    }
+})
 
 io.on('connection', socket => {
     SocketServer(socket)
