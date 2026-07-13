@@ -36,26 +36,31 @@ const LeftSideBar = () => {
                 <ul className="nav flex-column">
                     <li className={`nav-item rounded ${isActive('/saved') ? 'active-link' : ''}`} style={{ margin: '4px 0' }}>
                         <Link className="nav-link d-flex align-items-center py-3 px-4" to="/saved" style={{ color: isActive('/saved') ? 'var(--primary-color)' : 'var(--text-main)', fontWeight: isActive('/saved') ? '700' : '500', gap: '15px', transition: 'var(--transition)' }}>
-                            <span className="material-icons" style={{ fontSize: '24px' }}>bookmark</span>
-                            <span style={{ fontSize: '1rem' }}>Saved Posts</span>
+                            <i className={isActive('/saved') ? "fas fa-bookmark" : "far fa-bookmark"} style={{ fontSize: '20px' }}></i>
+                            <span style={{ fontSize: '0.95rem' }}>Saved Posts</span>
+                        </Link>
+                    </li>
+
+                    <li className={`nav-item rounded ${isActive('/moments_archive') ? 'active-link' : ''}`} style={{ margin: '4px 0' }}>
+                        <Link className="nav-link d-flex align-items-center py-3 px-4" to="/moments_archive" style={{ color: isActive('/moments_archive') ? 'var(--primary-color)' : 'var(--text-main)', fontWeight: isActive('/moments_archive') ? '700' : '500', gap: '15px', transition: 'var(--transition)' }}>
+                            <i className="fas fa-history" style={{ fontSize: '20px' }}></i>
+                            <span style={{ fontSize: '0.95rem' }}>Moments Archive</span>
                         </Link>
                     </li>
 
                     <li className="nav-item rounded" style={{ margin: '4px 0', cursor: 'pointer' }}
                         onClick={() => dispatch({ type: GLOBALTYPES.THEME, payload: !theme })}>
                         <div className="nav-link d-flex align-items-center py-3 px-4" style={{ color: 'var(--text-main)', fontWeight: '500', gap: '15px' }}>
-                            <span className="material-icons">
-                                {theme ? 'light_mode' : 'dark_mode'}
-                            </span>
-                            <span>{theme ? 'Light Mode' : 'Dark Mode'}</span>
+                            <i className={theme ? "fas fa-sun" : "fas fa-moon"} style={{ fontSize: '20px' }}></i>
+                            <span style={{ fontSize: '0.95rem' }}>{theme ? 'Light Mode' : 'Dark Mode'}</span>
                         </div>
                     </li>
 
                     <li className="nav-item rounded" style={{ margin: '4px 0', cursor: 'pointer' }}
                         onClick={() => dispatch(logout())}>
-                        <div className="nav-link d-flex align-items-center py-3 px-4 text-danger" style={{ fontWeight: '500', gap: '15px' }}>
-                            <span className="material-icons">logout</span>
-                            <span>Logout</span>
+                        <div className="nav-link d-flex align-items-center py-3 px-4 text-danger" style={{ fontWeight: '500', gap: '15px', cursor: 'pointer' }}>
+                            <i className="fas fa-sign-out-alt" style={{ fontSize: '20px' }}></i>
+                            <span style={{ fontSize: '0.95rem' }}>Logout</span>
                         </div>
                     </li>
                 </ul>

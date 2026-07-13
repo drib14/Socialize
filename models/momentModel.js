@@ -6,7 +6,7 @@ const momentSchema = new mongoose.Schema({
     resource_type: { type: String, enum: ['image', 'video'], default: 'image' },
     caption: { type: String, default: '' },
     views: [{ type: mongoose.Types.ObjectId, ref: 'user' }],
-    createdAt: { type: Date, default: Date.now, index: { expires: '24h' } } // 24-hour TTL index
+    createdAt: { type: Date, default: Date.now }
 })
 
 module.exports = mongoose.model('moment', momentSchema)

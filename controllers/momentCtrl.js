@@ -27,10 +27,12 @@ const momentCtrl = {
     getMoments: async (req, res) => {
         try {
             const myAndFollowingIds = [...req.user.following, req.user._id]
+            const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
 
             // Fetch active moments for self and followed users
             const activeMoments = await Moments.find({
-                user: { $in: myAndFollowingIds }
+                user: { $in: myAndFollowingIds },
+                createdAt: { $gte: twentyFourHoursAgo }
             }).populate('user', 'username fullname avatar').sort('-createdAt')
 
             // Group by user id
@@ -58,6 +60,20 @@ const momentCtrl = {
             }
 
             res.json({ moments: result })
+        } catch (err) {
+            return res.status(500).json({ msg: err.message })
+        }
+    },
+    getMomentsArchive: async (req, res) => {
+        try {
+            const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
+            // Fetch moments for the logged in user created more than 24 hours ago
+            const archivedMoments = await Moments.find({
+                user: req.user._id,
+                createdAt: { $lt: twentyFourHoursAgo }
+            }).populate('user', 'username fullname avatar').sort('-createdAt')
+
+            res.json({ archivedMoments })
         } catch (err) {
             return res.status(500).json({ msg: err.message })
         }

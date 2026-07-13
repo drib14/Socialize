@@ -1,4 +1,4 @@
-import React, { useState } from 'react>,StartLine:1,TargetContent:'
+import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { Link } from 'react-router-dom'
@@ -81,7 +81,7 @@ const NotifyModal = () => {
     }
 
     return (
-        <div style={{minWidth: '320px', padding: '5px'}}>
+        <div style={{minWidth: '320px', padding: '5px'}} onClick={(e) => e.stopPropagation()}>
             <div className="d-flex justify-content-between align-items-center px-3 mb-2">
                 <h3 style={{ color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: 'bold', margin: 0 }}>Notifications</h3>
                 {

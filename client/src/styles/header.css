@@ -55,13 +55,12 @@
 }
 
 .header .menu li {
-    opacity: 0.6;
+    opacity: 1 !important;
     transition: var(--transition);
     border-radius: var(--radius-md);
 }
 
 .header .menu li:hover {
-    opacity: 1;
     background-color: var(--bg-input);
 }
 
@@ -69,9 +68,9 @@
     opacity: 1;
 }
 
-.header .menu li.active .material-icons,
-.header .menu li.active i {
+.header .menu i {
     color: var(--primary-color) !important;
+    transition: var(--transition);
 }
 
 .header .menu .nav-link {

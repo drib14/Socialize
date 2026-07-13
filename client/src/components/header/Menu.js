@@ -9,9 +9,9 @@ import { getFollowRequests, acceptFollowRequest, declineFollowRequest } from '..
 
 const Menu = () => {
     const navLinks = [
-        { label: 'Home', icon: 'home', path: '/' },
-        { label: 'Message', icon: 'near_me', path: '/message' },
-        { label: 'Discover', icon: 'explore', path: '/discover' }
+        { label: 'Home', iconActive: 'fas fa-home', iconInactive: 'fas fa-home', path: '/' },
+        { label: 'Message', iconActive: 'fas fa-comments', iconInactive: 'far fa-comments', path: '/message' },
+        { label: 'Discover', iconActive: 'fas fa-compass', iconInactive: 'far fa-compass', path: '/discover' }
     ]
 
     const { auth, theme, notify } = useSelector(state => state)
@@ -47,18 +47,18 @@ const Menu = () => {
             <ul className="navbar-nav flex-row align-items-center">
                 {
                     navLinks.map((link, index) => (
-                        <li className={`nav-item px-2 ${isActive(link.path)}`} key={index}>
-                            <Link className="nav-link" to={link.path}>
-                                <span className="material-icons">{link.icon}</span>
+                        <li className={`nav-item px-2 ${isActive(link.path) ? 'active' : ''}`} key={index}>
+                            <Link className="nav-link d-flex align-items-center" to={link.path}>
+                                <i className={isActive(link.path) ? link.iconActive : link.iconInactive} style={{ fontSize: '1.25rem' }}></i>
                             </Link>
                         </li>
                     ))
                 }
 
                 <li className="nav-item dropdown px-2" style={{ opacity: 1 }}>
-                    <span className="nav-link position-relative" id="requestsDropdown"
+                    <span className="nav-link position-relative d-flex align-items-center" id="requestsDropdown"
                         role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style={{ cursor: 'pointer' }}>
-                        <span className="material-icons">group_add</span>
+                        <i className="fas fa-user-plus" style={{ fontSize: '1.25rem' }}></i>
                         {
                             requests.length > 0 &&
                             <span className="position-absolute d-flex align-items-center justify-content-center" style={{
@@ -111,12 +111,10 @@ const Menu = () => {
                 </li>
 
                 <li className="nav-item dropdown px-2" style={{ opacity: 1 }} >
-                    <span className="nav-link position-relative" id="navbarDropdown"
+                    <span className="nav-link position-relative d-flex align-items-center" id="navbarDropdown"
                         role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style={{ cursor: 'pointer' }}>
 
-                        <span className="material-icons">
-                            notifications
-                        </span>
+                        <i className={notify.data.length > 0 ? "fas fa-bell" : "far fa-bell"} style={{ fontSize: '1.25rem' }}></i>
 
                         {
                             notify.data.length > 0 &&
