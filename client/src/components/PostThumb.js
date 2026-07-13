@@ -37,7 +37,7 @@ const PostThumb = ({posts, result, handleUnSave}) => {
                                         }}
                                         title="Unsave post"
                                     >
-                                        <span className="material-icons" style={{ fontSize: '1.2rem' }}>bookmark_remove</span>
+                                        <i className="fas fa-bookmark text-danger" style={{ fontSize: '0.9rem' }}></i>
                                     </button>
                                 )
                             }

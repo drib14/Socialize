@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router-dom'
 import NotFound from '../components/NotFound'
 import { useSelector } from 'react-redux'
 import PostSkeleton from '../components/skeletons/PostSkeleton'
@@ -8,10 +8,16 @@ import ProfileSkeleton from '../components/skeletons/ProfileSkeleton'
 const pages = import.meta.glob('../pages/**/*.js')
 
 const PageRender = () => {
-    const { page, id } = useParams()
+    const { page: paramPage, id } = useParams()
     const { auth } = useSelector(state => state)
+    const location = useLocation()
 
     if (!auth.token) return <NotFound />
+
+    let page = paramPage
+    if (location.pathname.startsWith('/posts/tag/')) {
+        page = 'posts/tag'
+    }
 
     let pageName = ""
     if (id) {

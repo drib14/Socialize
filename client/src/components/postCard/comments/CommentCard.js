@@ -95,7 +95,7 @@ const CommentCard = ({children, comment, post, commentId}) => {
                             {comment.user.username}
                         </Link>
                         
-                        <div style={{ fontSize: '0.88rem', marginTop: '2px' }}>
+                        <div style={{ fontSize: '0.88rem', marginTop: '2px', color: 'var(--text-main)' }}>
                             {
                                 onEdit ? (
                                     <textarea className="form-control form-control-sm mt-1" rows="3" value={content}

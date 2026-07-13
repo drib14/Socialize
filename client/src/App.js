@@ -105,6 +105,12 @@ function App() {
             <Route path="/forgot_password" element={<ForgotPassword />} />
             <Route path="/reset_password/:token" element={<ResetPassword />} />
 
+            <Route path="/posts/tag/:id" element={
+              <PrivateRouter>
+                <PageRender />
+              </PrivateRouter>
+            } />
+
             <Route path="/:page" element={
               <PrivateRouter>
                 <PageRender />

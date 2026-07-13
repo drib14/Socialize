@@ -4,7 +4,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { getPost } from '../../redux/actions/postAction'
 import PostSkeleton from '../../components/skeletons/PostSkeleton'
 import PostCard from '../../components/PostCard'
-
+import LeftSideBar from '../../components/home/LeftSideBar'
+import RightSideBar from '../../components/home/RightSideBar'
 
 const Post = () => {
     const { id } = useParams()
@@ -23,17 +24,29 @@ const Post = () => {
     },[detailPost, dispatch, id, auth])
 
     return (
-        <div className="posts">
-            {
-                post.length === 0 &&
-                <PostSkeleton />
-            }
+        <div className="home row mx-0" style={{ width: '100%' }}>
+            <div className="col-md-3 col-lg-3 d-none d-md-block">
+                <LeftSideBar />
+            </div>
 
-            {
-                post.map(item => (
-                    <PostCard key={item._id} post={item} />
-                ))
-            }
+            <div className="col-12 col-md-6 col-lg-6">
+                <div className="posts">
+                    {
+                        post.length === 0 &&
+                        <PostSkeleton />
+                    }
+
+                    {
+                        post.map(item => (
+                            <PostCard key={item._id} post={item} />
+                        ))
+                    }
+                </div>
+            </div>
+
+            <div className="col-md-3 col-lg-3 d-none d-md-block">
+                <RightSideBar />
+            </div>
         </div>
     )
 }

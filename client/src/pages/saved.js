@@ -63,8 +63,8 @@ const Saved = () => {
 
             <div className="col-12 col-md-6 col-lg-6">
                 <div className="card p-3 mb-3 mt-3" style={{ borderRadius: 'var(--radius-lg)', background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-                    <h3 className="m-0 font-weight-bold text-center" style={{ color: 'var(--primary-color)' }}>
-                        <span className="material-icons mr-2" style={{ verticalAlign: 'middle', fontSize: '2rem' }}>bookmark</span>
+                    <h3 className="m-0 font-weight-bold text-center d-flex align-items-center justify-content-center" style={{ color: 'var(--primary-color)', gap: '8px' }}>
+                        <i className="fas fa-bookmark" style={{ fontSize: '1.6rem' }}></i>
                         Saved Posts
                     </h3>
                 </div>
@@ -77,7 +77,7 @@ const Saved = () => {
                       </>
                     : savePosts.length === 0
                         ? <div className="text-center text-muted my-5">
-                            <span className="material-icons" style={{ fontSize: '4rem', opacity: 0.5 }}>bookmark_border</span>
+                            <i className="far fa-bookmark mb-2" style={{ fontSize: '3.5rem', opacity: 0.4, display: 'block' }}></i>
                             <h4>No Saved Posts</h4>
                           </div>
                         : <>

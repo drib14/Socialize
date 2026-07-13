@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const iconColors = {
     'thumb_up': '#1877f2',
@@ -17,15 +18,19 @@ const iconColors = {
 export const renderTextWithIcons = (text) => {
     if (!text) return '';
     
-    // Match strings like :thumb_up: or :favorite:
-    const regex = /:([a-z0-9_]+):/g;
+    // Match icons (:icon:), mentions (@username), or hashtags (#tag)
+    const regex = /(:[a-z0-9_]+:)|(\s|^)(@[a-zA-Z0-9_]+|#[a-zA-Z0-9_]+)/g;
     const parts = text.split(regex);
     if (parts.length === 1) return text;
 
     return parts.map((part, index) => {
-        // odd indices match the captured group (the icon name)
-        if (index % 2 === 1) {
-            const color = iconColors[part] || 'var(--text-secondary)';
+        if (!part) return null;
+        const trimmed = part.trim();
+
+        // 1. Icon match
+        if (trimmed.startsWith(':') && trimmed.endsWith(':')) {
+            const iconName = trimmed.slice(1, -1);
+            const color = iconColors[iconName] || 'var(--text-secondary)';
             return (
                 <span 
                     key={index} 
@@ -39,10 +44,39 @@ export const renderTextWithIcons = (text) => {
                         color: color
                     }}
                 >
-                    {part}
+                    {iconName}
                 </span>
             );
         }
+
+        // 2. Mention match
+        if (trimmed.startsWith('@')) {
+            const username = trimmed.substring(1);
+            return (
+                <Link 
+                    key={index} 
+                    to={`/profile_by_username/${username}`} 
+                    style={{ color: '#10b981', fontWeight: '600', textDecoration: 'none' }}
+                >
+                    {part}
+                </Link>
+            );
+        }
+
+        // 3. Hashtag match
+        if (trimmed.startsWith('#')) {
+            const tag = trimmed.substring(1);
+            return (
+                <Link 
+                    key={index} 
+                    to={`/posts/tag/${tag}`} 
+                    style={{ color: '#10b981', fontWeight: '600', textDecoration: 'none' }}
+                >
+                    {part}
+                </Link>
+            );
+        }
+
         return part;
     });
 };
