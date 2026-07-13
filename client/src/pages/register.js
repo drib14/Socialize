@@ -44,7 +44,6 @@ const Register = () => {
     }
 
     return (
-    return (
         <div className="auth_page d-flex align-items-center justify-content-center" style={{ minHeight: '100vh', background: 'var(--bg-body)' }}>
             <div className="d-flex flex-column" style={{ maxWidth: '350px', width: '100%', gap: '10px' }}>
                 <form onSubmit={handleSubmit} style={{

@@ -245,34 +245,59 @@ const postCtrl = {
         try {
             const myBlocked = req.user.blockedUsers || []
             const usersWhoBlockedMe = await Users.find({ blockedUsers: req.user._id }).select('_id')
-            const excludeUsers = [...myBlocked, ...usersWhoBlockedMe.map(u => u._id)]
+            const excludeUsers = [...myBlocked.map(id => (id._id || id)), ...usersWhoBlockedMe.map(u => u._id)]
 
-            const query = {
-                $or: [
-                    { "images.url": { $regex: /video/i } },
-                    { "images.url": { $regex: /\.mp4|\.mov|\.webm|\.avi/i } }
-                ],
-                user: { $nin: excludeUsers }
-            }
+            const excludeIds = excludeUsers.map(id => new mongoose.Types.ObjectId(id))
+            const limitVal = Number(req.query.limit) || 9
+            const pageVal = Number(req.query.page) || 1
+            const skipVal = (pageVal - 1) * limitVal
 
-            const features = new APIfeatures(Posts.find(query), req.query).paginating()
+            const rawPosts = await Posts.aggregate([
+                { 
+                    $match: { 
+                        $or: [
+                            { "images.url": { $regex: /video/i } },
+                            { "images.url": { $regex: /\.mp4|\.mov|\.webm|\.avi/i } }
+                        ],
+                        user: { $nin: excludeIds }
+                    } 
+                },
+                { $addFields: { 
+                    likesCount: { $size: { $ifNull: [ "$likes", [] ] } },
+                    commentsCount: { $size: { $ifNull: [ "$comments", [] ] } },
+                    viewsCount: { $size: { $ifNull: [ "$views", [] ] } }
+                }},
+                { $addFields: {
+                    engagementScore: { 
+                        $add: [ 
+                            "$likesCount", 
+                            { $multiply: [ "$commentsCount", 2 ] }, 
+                            { $multiply: [ "$viewsCount", 0.5 ] } 
+                        ] 
+                    }
+                }},
+                { $sort: { engagementScore: -1, createdAt: -1 } },
+                { $skip: skipVal },
+                { $limit: limitVal }
+            ])
 
-            const posts = await features.query.sort('-createdAt')
-            .populate("user likes views", "avatar username fullname followers lastActive")
-            .populate({
-                path: "comments",
-                populate: {
-                    path: "user likes",
-                    select: "-password"
+            const posts = await Posts.populate(rawPosts, [
+                { path: "user likes views", select: "avatar username fullname followers lastActive" },
+                { 
+                    path: "comments", 
+                    populate: { 
+                        path: "user likes", 
+                        select: "-password" 
+                    } 
+                },
+                {
+                    path: "repostOf",
+                    populate: {
+                        path: "user likes",
+                        select: "avatar username fullname lastActive"
+                    }
                 }
-            })
-            .populate({
-                path: "repostOf",
-                populate: {
-                    path: "user likes",
-                    select: "avatar username fullname lastActive"
-                }
-            })
+            ])
 
             res.json({
                 msg: 'Success!',
