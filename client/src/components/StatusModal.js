@@ -474,35 +474,48 @@ const StatusModal = () => {
                         </div>
                     }
 
-                    <div className="input_images">
-                        {
-                            stream 
-                            ? <i className="fas fa-camera" onClick={handleCapture} />
-                            : <>
-                                <i className="fas fa-camera" onClick={handleStream} />
+                    <div className="input_images px-3 py-2 d-flex align-items-center justify-content-between" style={{
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '12px',
+                        background: 'rgba(0,0,0,0.01)',
+                        marginTop: '15px'
+                    }}>
+                        <span className="font-weight-bold" style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>Add to your post</span>
+                        <div className="d-flex align-items-center" style={{ gap: '15px' }}>
+                            {
+                                stream 
+                                ? <i className="fas fa-camera text-primary" onClick={handleCapture} style={{ fontSize: '1.3rem', cursor: 'pointer' }} />
+                                : <>
+                                    <i className="fas fa-camera text-secondary mr-2" onClick={handleStream} style={{ fontSize: '1.3rem', cursor: 'pointer' }} title="Capture Photo" />
 
-                                <div className="file_upload">
-                                    <i className="fas fa-image" />
-                                    <input type="file" name="file" id="file"
-                                    multiple accept="image/*,video/*" onChange={handleChangeImages} />
-                                </div>
+                                    <div className="file_upload mr-2">
+                                        <i className="fas fa-image text-success" style={{ fontSize: '1.3rem', cursor: 'pointer' }} title="Upload Media" />
+                                        <input type="file" name="file" id="file"
+                                        multiple accept="image/*,video/*" onChange={handleChangeImages} />
+                                    </div>
 
-                                <div className="file_upload" onClick={() => setShowLocationInput(!showLocationInput)} title="Add Location" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <span className="material-icons text-primary" style={{ fontSize: '1.4rem', verticalAlign: 'middle' }}>add_location_alt</span>
-                                </div>
+                                    <div className="file_upload mr-2" onClick={() => setShowLocationInput(!showLocationInput)} title="Add Location" style={{ cursor: 'pointer' }}>
+                                        <span className="material-icons text-primary" style={{ fontSize: '1.4rem', verticalAlign: 'middle' }}>place</span>
+                                    </div>
 
-                                <div className="file_upload" onClick={toggleMoodCards} title="Add Mood" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <span className="material-icons text-warning" style={{ fontSize: '1.4rem', verticalAlign: 'middle' }}>sentiment_satisfied_alt</span>
-                                </div>
-                            </>
-                        }
-                        
+                                    <div className="file_upload" onClick={toggleMoodCards} title="Add Mood" style={{ cursor: 'pointer' }}>
+                                        <span className="material-icons text-warning" style={{ fontSize: '1.4rem', verticalAlign: 'middle' }}>sentiment_satisfied_alt</span>
+                                    </div>
+                                </>
+                            }
+                        </div>
                     </div>
 
                 </div>
 
-                <div className="status_footer">
-                    <button className="btn btn-secondary w-100" type="submit" style={{ background: '#2b8a3e', borderColor: '#2b8a3e', color: 'white' }}>
+                <div className="status_footer mt-3">
+                    <button className="btn btn-success w-100" type="submit" style={{ 
+                        borderRadius: '12px', 
+                        padding: '10px 0', 
+                        fontWeight: 'bold', 
+                        fontSize: '0.95rem',
+                        boxShadow: '0 4px 12px rgba(43,138,62,0.15)'
+                    }}>
                         Post
                     </button>
                 </div>

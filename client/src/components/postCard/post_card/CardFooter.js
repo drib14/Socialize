@@ -79,49 +79,50 @@ const CardFooter = ({post}) => {
     }
 
     return (
-        <div className="card_footer">
-            <div className="card_icon_menu">
-                <div className="d-flex align-items-center" style={{ gap: '20px' }}>
-                    <LikeButton 
-                    isLike={isLike}
-                    handleLike={handleLike}
-                    handleUnLike={handleUnLike}
-                    />
+        <div className="card_footer p-3" style={{ borderTop: '1px solid var(--border-color)' }}>
+            <div className="card_icon_menu d-flex justify-content-between align-items-center mb-2">
+                <div className="d-flex align-items-center">
+                    <div className="mr-3">
+                        <LikeButton 
+                        isLike={isLike}
+                        handleLike={handleLike}
+                        handleUnLike={handleUnLike}
+                        />
+                    </div>
 
-                    <Link to={`/post/${post._id}`} className="text-secondary d-flex align-items-center">
-                        <FaRegComment style={{ fontSize: '24px', cursor: 'pointer' }} />
+                    <Link to={`/post/${post._id}`} className="text-secondary d-flex align-items-center mr-3" title="Comment">
+                        <FaRegComment style={{ fontSize: '22px', cursor: 'pointer', transition: 'color 0.2s' }} className="icon-hover" />
                     </Link>
 
-                    <FaRegPaperPlane className="text-secondary" 
+                    <FaRegPaperPlane className="text-secondary mr-3" 
                     title="Share"
-                    style={{ cursor: 'pointer', fontSize: '24px' }} 
+                    style={{ cursor: 'pointer', fontSize: '22px', transition: 'color 0.2s' }} 
                     onClick={() => setIsShare(!isShare)} />
 
                     <FaRetweet className="text-secondary" 
                     title="Repost"
-                    style={{ cursor: 'pointer', fontSize: '26px' }}
+                    style={{ cursor: 'pointer', fontSize: '24px', transition: 'color 0.2s' }}
                     onClick={handleRepost} />
                 </div>
 
                 {
                     saved 
-                    ?  <FaBookmark className="text-primary" style={{ cursor: 'pointer', fontSize: '24px' }}
+                    ?  <FaBookmark className="text-primary" style={{ cursor: 'pointer', fontSize: '22px' }}
                     onClick={handleUnSavePost} />
 
-                    :  <FaRegBookmark className="text-secondary" style={{ cursor: 'pointer', fontSize: '24px' }}
+                    :  <FaRegBookmark className="text-secondary" style={{ cursor: 'pointer', fontSize: '22px' }}
                     onClick={handleSavePost} />
                 }
-               
             </div>
 
-            <div className="d-flex justify-content-between">
-                <h6 style={{padding: '0 25px', cursor: 'pointer'}}>
-                    {post.likes.length} likes
-                </h6>
+            <div className="d-flex justify-content-between pt-2 px-1" style={{ fontSize: '0.85rem', borderTop: '1px solid var(--border-color)', opacity: 0.85 }}>
+                <span className="font-weight-bold" style={{ cursor: 'pointer', color: 'var(--text-main)' }}>
+                    {post.likes.length} {post.likes.length === 1 ? 'like' : 'likes'}
+                </span>
                 
-                <h6 style={{padding: '0 25px', cursor: 'pointer'}}>
-                    {post.comments.length} comments
-                </h6>
+                <span className="font-weight-bold" style={{ cursor: 'pointer', color: 'var(--text-main)' }}>
+                    {post.comments.length} {post.comments.length === 1 ? 'comment' : 'comments'}
+                </span>
             </div>
 
             {

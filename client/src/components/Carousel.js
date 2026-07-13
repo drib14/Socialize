@@ -20,18 +20,18 @@ const Carousel = ({images, id}) => {
                 
             </ol>
 
-            <div className="carousel-inner">
+            <div className="carousel-inner" style={{ borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.04)' }}>
                 {
                     images.map((img, index) => {
                         const url = img && typeof img === 'string' ? img : (img && img.url ? img.url : '');
                         if(!url) return null;
                         const isVideo = url.match(/video/i);
                         return (
-                            <div key={index} className={`carousel-item ${isActive(index)}`}>
+                            <div key={index} className={`carousel-item ${isActive(index)}`} style={{ background: '#000', maxHeight: '550px' }}>
                                 {
                                     isVideo
-                                    ? <video controls src={url} className="d-block w-100" alt="post media" />
-                                    : <img src={url} className="d-block w-100" alt="post media" />
+                                    ? <video controls src={url} className="d-block w-100" alt="post media" style={{ maxHeight: '550px', objectFit: 'contain' }} />
+                                    : <img src={url} className="d-block w-100" alt="post media" style={{ maxHeight: '550px', objectFit: 'cover' }} />
                                 }
                             </div>
                         )

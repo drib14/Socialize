@@ -61,7 +61,7 @@ const CardBody = ({post, theme}) => {
     const isShortText = post.images.length === 0 && post.content && post.content.length < 120;
 
     return (
-        <div className="card_body">
+        <div className="card_body px-3 pb-2">
             <style>{`
                 @keyframes heartBlast {
                     0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }

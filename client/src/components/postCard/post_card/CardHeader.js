@@ -70,10 +70,16 @@ const CardHeader = ({post}) => {
         navigator.clipboard.writeText(`${BASE_URL}/post/${post._id}`)
     }
 
+    const getVisibilityIcon = (visibility) => {
+        if (visibility === 'followers') return <span className="material-icons text-muted ml-1" style={{ fontSize: '0.85rem' }} title="Followers Only">people</span>;
+        if (visibility === 'private') return <span className="material-icons text-muted ml-1" style={{ fontSize: '0.85rem' }} title="Only Me">lock</span>;
+        return <span className="material-icons text-muted ml-1" style={{ fontSize: '0.85rem' }} title="Public">public</span>;
+    }
+
     return (
-        <div className="card_header">
-            <div className="d-flex align-items-center" style={{ gap: '12px' }}>
-                <div className="position-relative">
+        <div className="card_header d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid var(--border-color)' }}>
+            <div className="d-flex align-items-center">
+                <div className="position-relative mr-2">
                     <Avatar src={post.user.avatar} size="big-avatar" />
                     {
                         ((online.includes(post.user._id) && isMutualFollower(post.user._id)) || post.user._id === auth.user._id) ? (
@@ -110,57 +116,60 @@ const CardHeader = ({post}) => {
                 </div>
 
                 <div className="card_name">
-                    <h6 className="m-0">
+                    <h6 className="m-0" style={{ fontSize: '0.95rem', fontWeight: 600 }}>
                         <Link to={`/profile/${post.user._id}`} style={{ color: 'var(--text-main)', textDecoration: 'none' }}>
                             {post.user.fullname}
                         </Link>
                     </h6>
-                    <div className="d-flex align-items-center flex-wrap" style={{ gap: '6px' }}>
-                        <span className="text-muted" style={{ fontSize: '0.8rem', lineHeight: '1.2' }}>
+                    <div className="d-flex align-items-center flex-wrap mt-1">
+                        <span className="text-muted mr-2" style={{ fontSize: '0.8rem' }}>
                             @{post.user.username}
                         </span>
                         {
                             post.location && (
-                                <span className="text-primary d-flex align-items-center" style={{ fontSize: '0.75rem', gap: '2px' }}>
-                                    <span className="material-icons" style={{ fontSize: '0.9rem' }}>place</span>
+                                <span className="text-primary d-flex align-items-center mr-2" style={{ fontSize: '0.75rem' }}>
+                                    <span className="material-icons mr-1" style={{ fontSize: '0.85rem' }}>place</span>
                                     {post.location}
                                 </span>
                             )
                         }
                         {
                             post.mood && (
-                                <span className="text-success d-flex align-items-center" style={{ fontSize: '0.75rem', fontWeight: '500', gap: '3px' }}>
-                                    • {getMoodIcon(post.mood) && <i className={getMoodIcon(post.mood)}></i>} {post.mood}
+                                <span className="text-success d-flex align-items-center" style={{ fontSize: '0.75rem', fontWeight: '500' }}>
+                                    • {getMoodIcon(post.mood) && <i className={`${getMoodIcon(post.mood)} mr-1`}></i>} {post.mood}
                                 </span>
                             )
                         }
                     </div>
-                    <small className="text-muted d-block" style={{ fontSize: '0.75rem', marginTop: '2px' }}>
-                        {dayjs(post.createdAt).fromNow()}
+                    <small className="text-muted d-flex align-items-center mt-1" style={{ fontSize: '0.75rem' }}>
+                        <span>{dayjs(post.createdAt).fromNow()}</span>
+                        <span className="mx-1">•</span>
+                        {getVisibilityIcon(post.visibility)}
                     </small>
                 </div>
             </div>
 
             <div className="nav-item dropdown">
-                <span className="material-icons" id="moreLink" data-toggle="dropdown">
+                <span className="material-icons text-secondary" id="moreLink" data-toggle="dropdown" style={{ cursor: 'pointer' }}>
                     more_horiz
                 </span>
 
-                <div className="dropdown-menu">
+                <div className="dropdown-menu dropdown-menu-right" style={{ borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-md)' }}>
                     {
                         auth.user._id === post.user._id &&
                         <>
-                            <div className="dropdown-item" onClick={handleEditPost}>
-                                <span className="material-icons">create</span> Edit Post
+                            <div className="dropdown-item d-flex align-items-center py-2" onClick={handleEditPost} style={{ cursor: 'pointer' }}>
+                                <span className="material-icons mr-2" style={{ fontSize: '1.2rem' }}>create</span> Edit Post
                             </div>
-                            <div className="dropdown-item" onClick={handleDeletePost} >
-                                <span className="material-icons">delete_outline</span> Remove Post
+                            <div className="dropdown-item d-flex align-items-center py-2 text-danger" onClick={handleDeletePost} style={{ cursor: 'pointer' }}>
+                                <span className="material-icons mr-2" style={{ fontSize: '1.2rem' }}>delete_outline</span> Remove Post
                             </div>
+                            <div className="dropdown-divider"></div>
                         </>
                     }
 
-                    <div className="dropdown-item" onClick={handleCopyLink}>
-                        <span className="material-icons">content_copy</span> Copy Link
+                    <div className="dropdown-item d-flex align-items-center py-2" onClick={handleCopyLink} style={{ cursor: 'pointer' }}>
+                        <span className="material-icons mr-2" style={{ fontSize: '1.2rem' }}>content_copy</span> Copy Link
                     </div>
                 </div>
             </div>

@@ -11,7 +11,7 @@ const PostCard = ({post, theme}) => {
 
     if (isRepost && !post.repostOf) {
         return (
-            <div className="card my-3 p-4 text-center text-muted" style={{ borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-card)' }}>
+            <div className="card my-4 p-4 text-center text-muted" style={{ borderRadius: '16px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-card)', boxShadow: '0 10px 30px -5px rgba(0,0,0,0.05)' }}>
                 <i className="fas fa-exclamation-triangle mr-2 text-warning" />
                 This reposted content is no longer available.
             </div>
@@ -21,12 +21,25 @@ const PostCard = ({post, theme}) => {
     const displayPost = isRepost ? post.repostOf : post
 
     return (
-        <div className="card my-3" style={{ borderRadius: 'var(--radius-lg)' }}> 
+        <div className="card my-4" style={{ 
+            borderRadius: '16px',
+            border: '1px solid var(--border-color)',
+            background: 'var(--bg-card)',
+            boxShadow: '0 10px 30px -5px rgba(0, 0, 0, 0.04)',
+            overflow: 'hidden'
+        }}> 
             {
                 isRepost && 
-                <div className="px-4 pt-3 font-weight-bold" style={{fontSize: '0.9rem', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px'}}>
-                    <i className="fas fa-retweet text-success" style={{ fontSize: '18px' }} />
-                    <span>{post.user.username} reposted</span>
+                <div className="px-4 pt-3 pb-2 font-weight-bold" style={{
+                    fontSize: '0.85rem', 
+                    color: 'var(--text-secondary)', 
+                    borderBottom: '1px solid var(--border-color)', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    background: 'rgba(16, 185, 129, 0.03)'
+                }}>
+                    <i className="fas fa-retweet text-success mr-2" style={{ fontSize: '16px' }} />
+                    <span>@{post.user.username} reposted</span>
                 </div>
             }
             <CardHeader post={displayPost} />
