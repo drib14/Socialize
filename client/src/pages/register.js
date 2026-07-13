@@ -40,18 +40,18 @@ const Register = () => {
                     border: '1px solid var(--border-color)',
                     padding: '40px 30px',
                     textAlign: 'center',
-                    borderRadius: '1px',
+                    borderRadius: 'var(--radius-lg)',
                     width: '100%',
                     maxWidth: '100%'
                 }}>
                     <h2 className="mb-3 font-weight-bold logo_text" style={{ 
                         fontSize: '2.2rem', 
-                        background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
+                        color: 'var(--text-main)',
+
+
                         fontFamily: 'serif'
                     }}>
-                        Instagram
+                        Socialize
                     </h2>
 
                     <p className="text-muted font-weight-bold mb-3" style={{ fontSize: '0.85rem', lineHeight: '1.3' }}>

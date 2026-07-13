@@ -22,7 +22,7 @@ const ShareModal = ({url, theme}) => {
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: 'Instagram Post',
+                    title: 'Socialize Post',
                     url: url
                 })
             } catch (err) {

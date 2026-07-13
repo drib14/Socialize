@@ -17,8 +17,8 @@ const Loading = () => {
         }}>
             <div className="splash_container" style={{ textAlign: 'center' }}>
                 <img 
-                    src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" 
-                    alt="Instagram Logo" 
+                    src="/images/socialize-icon.svg"
+                    alt="Socialize Logo"
                     className="pulse"
                     style={{
                         width: '90px',
@@ -34,7 +34,7 @@ const Loading = () => {
                     background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
-                }}>Instagram</h2>
+                }}>Socialize</h2>
                 <div style={{
                     marginTop: '15px',
                     height: '4px',

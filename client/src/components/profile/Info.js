@@ -8,7 +8,7 @@ import Followers from './Info/Followers'
 import Following from './Info/Following'
 import CreateMomentModal from '../home/CreateMomentModal'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
-import Highlights from './Highlights'
+import Fleets from './Fleets'
 
 const Info = ({id, auth, profile, dispatch}) => {
     const { online } = useSelector(state => state)
@@ -126,7 +126,7 @@ const Info = ({id, auth, profile, dispatch}) => {
                             <p style={{ whiteSpace: 'pre-wrap', fontSize: '0.9rem' }}>{user.bio}</p>
                         </div>
 
-                        <Highlights userId={user._id} />
+                        <Fleets userId={user._id} />
 
                         {
                             onEdit && <EditProfile setOnEdit={setOnEdit} />

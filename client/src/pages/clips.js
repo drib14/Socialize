@@ -4,25 +4,25 @@ import { getDataAPI } from '../utils/fetchData'
 import { Link } from 'react-router-dom'
 import Avatar from '../components/Avatar'
 
-const Reels = () => {
+const Clips = () => {
     const { auth } = useSelector(state => state)
-    const [reels, setReels] = useState([])
+    const [clips, setClips] = useState([])
     const [loading, setLoading] = useState(true)
     const [muted, setMuted] = useState(true)
     const containerRef = useRef(null)
 
     useEffect(() => {
-        const fetchReels = async () => {
+        const fetchClips = async () => {
             try {
-                const res = await getDataAPI('reels_posts', auth.token)
-                setReels(res.data.posts || [])
+                const res = await getDataAPI('clips_posts', auth.token)
+                setClips(res.data.posts || [])
                 setLoading(false)
             } catch (err) {
                 console.error(err)
                 setLoading(false)
             }
         }
-        fetchReels()
+        fetchClips()
     }, [auth.token])
 
     if (loading) {
@@ -35,18 +35,18 @@ const Reels = () => {
         )
     }
 
-    if (reels.length === 0) {
+    if (clips.length === 0) {
         return (
             <div className="text-center" style={{ marginTop: '100px', color: 'var(--text-secondary)' }}>
                 <i className="fas fa-video mb-3" style={{ fontSize: '3rem', opacity: 0.5 }}></i>
-                <h3>No Reels Available</h3>
+                <h3>No Clips Available</h3>
                 <p>Upload a video to see it here.</p>
             </div>
         )
     }
 
     return (
-        <div ref={containerRef} className="reels-container" style={{
+        <div ref={containerRef} className="clips-container" style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -60,15 +60,15 @@ const Reels = () => {
             msOverflowStyle: 'none'
         }}>
             {
-                reels.map(post => (
-                    <ReelItem key={post._id} post={post} muted={muted} setMuted={setMuted} auth={auth} />
+                clips.map(post => (
+                    <ClipItem key={post._id} post={post} muted={muted} setMuted={setMuted} auth={auth} />
                 ))
             }
         </div>
     )
 }
 
-const ReelItem = ({ post, muted, setMuted, auth }) => {
+const ClipItem = ({ post, muted, setMuted, auth }) => {
     const videoRef = useRef(null)
     const [playing, setPlaying] = useState(false)
     const [liked, setLiked] = useState(post.likes.some(like => like._id === auth.user._id))
@@ -131,7 +131,7 @@ const ReelItem = ({ post, muted, setMuted, auth }) => {
         : ''
 
     return (
-        <div className="reel-item" style={{
+        <div className="clip-item" style={{
             scrollSnapAlign: 'start',
             width: '100%',
             height: 'calc(100vh - 120px)',
@@ -182,7 +182,7 @@ const ReelItem = ({ post, muted, setMuted, auth }) => {
             </button>
 
             {/* Bottom Overlay containing username, bio description, tag references */}
-            <div className="reel-details" style={{
+            <div className="clip-details" style={{
                 position: 'absolute',
                 bottom: '0',
                 left: '0',
@@ -252,4 +252,4 @@ const ReelItem = ({ post, muted, setMuted, auth }) => {
     )
 }
 
-export default Reels
+export default Clips

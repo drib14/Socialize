@@ -7,7 +7,7 @@ const ProfileSkeleton = () => {
     const { theme } = useSelector(state => state)
     
     return (
-        <SkeletonTheme baseColor={theme ? '#202020' : '#e0e0e0'} highlightColor={theme ? '#353535' : '#f5f5f5'}>
+        <SkeletonTheme baseColor={theme ? '#202020' : '#e0e0e0'} fleetColor={theme ? '#353535' : '#f5f5f5'}>
             <div className="info mb-4" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
                 <div className="info_container" style={{ display: 'flex', gap: '30px', padding: '20px' }}>
                     <Skeleton circle width={150} height={150} />

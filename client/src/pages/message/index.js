@@ -12,7 +12,7 @@ const Message = () => {
                 <div className="d-flex justify-content-center 
                 align-items-center flex-column h-100">
 
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram Logo" 
+                    <img src="/images/socialize-icon.svg" alt="Socialize Logo"
                     style={{
                         width: '90px', 
                         height: '90px'

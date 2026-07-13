@@ -36,7 +36,7 @@ const Login = () => {
                 <div className="d-none d-lg-block" style={{
                     width: '380px',
                     height: '580px',
-                    background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+                    color: 'var(--text-main)',
                     borderRadius: '36px',
                     padding: '12px',
                     boxShadow: 'var(--shadow-lg)'
@@ -55,7 +55,7 @@ const Login = () => {
                     }}>
                         <i className="fab fa-instagram text-white mb-3" style={{ fontSize: '4.5rem' }} />
                         <h4 className="text-white font-weight-bold text-center px-4" style={{ fontSize: '1.2rem', letterSpacing: '0.5px' }}>
-                            Instagram
+                            Socialize
                         </h4>
                         <p className="text-white-50 text-center px-4 mt-2" style={{ fontSize: '0.85rem' }}>
                             Connecting you to the people and things you love.
@@ -70,18 +70,18 @@ const Login = () => {
                         border: '1px solid var(--border-color)',
                         padding: '40px 30px',
                         textAlign: 'center',
-                        borderRadius: '1px',
+                        borderRadius: 'var(--radius-lg)',
                         width: '100%',
                         maxWidth: '100%'
                     }}>
                         <h2 className="mb-4 font-weight-bold logo_text" style={{ 
                             fontSize: '2.2rem', 
-                            background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
+                            color: 'var(--text-main)',
+
+
                             fontFamily: 'serif'
                         }}>
-                            Instagram
+                            Socialize
                         </h2>
 
                         <div className="form-group mb-2">

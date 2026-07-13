@@ -1,4 +1,4 @@
-const Moments = require('../models/momentModel')
+const Fleets = require('../models/momentModel')
 const Users = require('../models/userModel')
 
 const momentCtrl = {
@@ -7,7 +7,7 @@ const momentCtrl = {
             const { media, resource_type, caption, visibility, post, closeFriendsOnly, poll } = req.body
             if (!media && !post) return res.status(400).json({ msg: "Please add your media or share a post." })
 
-            const newMoment = new Moments({
+            const newMoment = new Fleets({
                 user: req.user._id,
                 media: media || '',
                 resource_type: resource_type || 'image',
@@ -32,13 +32,13 @@ const momentCtrl = {
             return res.status(500).json({ msg: err.message })
         }
     },
-    getMoments: async (req, res) => {
+    getFleets: async (req, res) => {
         try {
             const myAndFollowingIds = [...req.user.following, req.user._id]
             const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
 
             // Fetch active moments for self and followed users
-            const activeMoments = await Moments.find({
+            const activeFleets = await Fleets.find({
                 user: { $in: myAndFollowingIds },
                 createdAt: { $gte: twentyFourHoursAgo }
             }).populate('user', 'username fullname avatar closeFriends')
@@ -54,7 +54,7 @@ const momentCtrl = {
 
             // Group by user id under visibility gates & Close Friends gates
             const grouped = {}
-            activeMoments.forEach(moment => {
+            activeFleets.forEach(moment => {
                 if (!moment.user) return;
                 
                 const authorId = moment.user._id.toString();
@@ -86,8 +86,8 @@ const momentCtrl = {
             const myIdStr = req.user._id.toString()
             const myIndex = result.findIndex(item => item.user._id.toString() === myIdStr)
             if (myIndex > -1) {
-                const myMoments = result.splice(myIndex, 1)[0]
-                result.unshift(myMoments)
+                const myFleets = result.splice(myIndex, 1)[0]
+                result.unshift(myFleets)
             }
 
             res.json({ moments: result })
@@ -95,11 +95,11 @@ const momentCtrl = {
             return res.status(500).json({ msg: err.message })
         }
     },
-    getMomentsArchive: async (req, res) => {
+    getFleetsArchive: async (req, res) => {
         try {
             const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
             // Fetch moments for the logged in user created more than 24 hours ago
-            const archivedMoments = await Moments.find({
+            const archivedFleets = await Fleets.find({
                 user: req.user._id,
                 createdAt: { $lt: twentyFourHoursAgo }
             }).populate('user', 'username fullname avatar')
@@ -113,14 +113,14 @@ const momentCtrl = {
               })
               .sort('-createdAt')
 
-            res.json({ archivedMoments })
+            res.json({ archivedFleets })
         } catch (err) {
             return res.status(500).json({ msg: err.message })
         }
     },
     viewMoment: async (req, res) => {
         try {
-            await Moments.findOneAndUpdate(
+            await Fleets.findOneAndUpdate(
                 { _id: req.params.id },
                 { $addToSet: { views: req.user._id } },
                 { new: true }
@@ -132,7 +132,7 @@ const momentCtrl = {
     },
     deleteMoment: async (req, res) => {
         try {
-            const moment = await Moments.findOneAndDelete({
+            const moment = await Fleets.findOneAndDelete({
                 _id: req.params.id,
                 user: req.user._id
             })
@@ -145,14 +145,14 @@ const momentCtrl = {
     voteStoryPoll: async (req, res) => {
         try {
             const { optionId } = req.body
-            const moment = await Moments.findById(req.params.id)
+            const moment = await Fleets.findById(req.params.id)
             if(!moment) return res.status(400).json({msg: 'This story does not exist.'})
 
             // Check if user has already voted
             const hasVoted = moment.poll.options.some(opt => opt.votes.includes(req.user._id))
             if(hasVoted) return res.status(400).json({msg: 'You have already voted on this poll.'})
 
-            const updatedMoment = await Moments.findOneAndUpdate(
+            const updatedMoment = await Fleets.findOneAndUpdate(
                 { _id: req.params.id, "poll.options._id": optionId },
                 { $push: { "poll.options.$.votes": req.user._id } },
                 { new: true }

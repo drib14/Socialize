@@ -61,7 +61,7 @@ const RightSideBar = () => {
                 }
             </div>
 
-            {/* Online Friends Widget (Facebook/Instagram Style active dock) */}
+            {/* Online Friends Widget (Facebook/Socialize Style active dock) */}
             {
                 onlineFriends.length > 0 && (
                     <div className="card p-3 mb-4 shadow-sm" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px' }}>

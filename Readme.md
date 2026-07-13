@@ -1,7 +1,7 @@
 
 # V-NETWORK | Social Media Web App
 
-**_✨ A MERN Stack Clone of the social networking giant - Instagram_**
+**_✨ A MERN Stack Clone of the social networking giant - Socialize_**
 
 
 ![MERN](https://img.shields.io/badge/MERN-Stack-teal)
@@ -50,7 +50,7 @@
 2. Download your fork of the project locally on your machine or clone it using
 
    ```bash
-    git clone git@github.com:AssimUjjwal/V-Network.git
+    git clone git@github.com:AssimUjjwal/Socialize.git
    ```
 
 3. Navigate to the folder and run `npm install` for installing all packages & dependencies for the server/backend via npm.
