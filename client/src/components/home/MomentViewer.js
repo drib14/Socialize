@@ -1,17 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Modal from 'react-modal'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { viewMoment, deleteMoment } from '../../redux/actions/momentAction'
+import { addMessage } from '../../redux/actions/messageAction'
 import Avatar from '../Avatar'
+import { getDataAPI } from '../../utils/fetchData'
 
 dayjs.extend(relativeTime)
 
 const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
-    const { auth } = useSelector(state => state)
+    const { auth, socket } = useSelector(state => state)
     const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    // Story reply state
+    const [replyText, setReplyText] = useState('')
+    const [sendingReply, setSendingReply] = useState(false)
+
+    // Share/forward modal state
+    const [showShareModal, setShowShareModal] = useState(false)
+    const [shareContacts, setShareContacts] = useState([])
+    const [shareSearch, setShareSearch] = useState('')
 
     const { user, moments } = userMoments
     const [activeIndex, setActiveIndex] = useState(0)
@@ -128,6 +140,57 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
         return () => window.removeEventListener('keydown', handleKeyDown)
     }, [activeIndex, moments, onNextUser, onPrevUser])
 
+    // Story reply handler
+    const handleStoryReply = async () => {
+        if (!replyText.trim() || sendingReply) return;
+        setSendingReply(true);
+        try {
+            const msg = {
+                sender: auth.user,
+                recipient: user._id,
+                text: `Replied to your story: "${replyText.trim()}"`,
+                media: activeMoment.media ? [{ url: activeMoment.media }] : [],
+                createdAt: new Date().toISOString()
+            };
+            await dispatch(addMessage({ msg, auth, socket }));
+            setReplyText('');
+            setIsPaused(false);
+        } catch (err) {
+            console.error(err);
+        }
+        setSendingReply(false);
+    };
+
+    // Share story to DM handler
+    const handleShareStoryToDM = async (contactId) => {
+        const msg = {
+            sender: auth.user,
+            recipient: contactId,
+            text: `Shared a story from @${user.username}: ${window.location.origin}/moment/${activeMoment._id}`,
+            media: activeMoment.media ? [{ url: activeMoment.media }] : [],
+            createdAt: new Date().toISOString()
+        };
+        await dispatch(addMessage({ msg, auth, socket }));
+        setShowShareModal(false);
+    };
+
+    // Fetch contacts for share modal
+    const openShareModal = async () => {
+        setShowShareModal(true);
+        setIsPaused(true);
+        try {
+            const res = await getDataAPI('suggestionsUser', auth.token);
+            if (res.data && Array.isArray(res.data.users)) {
+                setShareContacts(res.data.users);
+            } else {
+                // Fallback: use following list
+                setShareContacts([]);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     if (!activeMoment) return null;
 
     return (
@@ -200,6 +263,13 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
                                 </button>
                             )
                         }
+                        {
+                            auth.user._id !== user._id && (
+                                <button className="viewer-btn mr-2" onClick={(e) => { e.stopPropagation(); openShareModal(); }} title="Share Story" style={{ border: 'none', background: 'transparent', color: '#fff', cursor: 'pointer' }}>
+                                    <i className="fas fa-paper-plane" style={{ fontSize: '1rem' }}></i>
+                                </button>
+                            )
+                        }
                         <button className="viewer-btn" onClick={onClose} title="Close">
                             <i className="fas fa-times" style={{ fontSize: '1.4rem' }}></i>
                         </button>
@@ -240,15 +310,108 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
                         )
                     }
 
+                    {/* Shared Post Card Overlay */}
+                    {
+                        activeMoment.post && activeMoment.post._id && (
+                            <div 
+                                className="viewer-shared-post-card"
+                                onClick={() => { onClose(); navigate(`/post/${activeMoment.post._id}`); }}
+                                style={{
+                                    position: 'absolute',
+                                    bottom: '80px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    width: '85%',
+                                    maxWidth: '340px',
+                                    background: 'rgba(255,255,255,0.95)',
+                                    backdropFilter: 'blur(12px)',
+                                    borderRadius: '16px',
+                                    padding: '14px',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+                                    zIndex: 20,
+                                    border: '1px solid rgba(255,255,255,0.3)'
+                                }}
+                            >
+                                <div className="d-flex align-items-center mb-2">
+                                    <Avatar src={activeMoment.post.user?.avatar} size="small-avatar" />
+                                    <strong className="ml-2" style={{ fontSize: '0.8rem', color: '#111' }}>
+                                        @{activeMoment.post.user?.username}
+                                    </strong>
+                                </div>
+                                <p className="mb-0" style={{ fontSize: '0.78rem', color: '#333', lineHeight: '1.4', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                                    {activeMoment.post.content || 'View post'}
+                                </p>
+                                <small style={{ color: '#888', fontSize: '0.7rem' }}>
+                                    <i className="fas fa-external-link-alt mr-1" />Tap to view post
+                                </small>
+                            </div>
+                        )
+                    }
+
                     {/* Caption Overlay */}
                     {
-                        activeMoment.caption && (
+                        activeMoment.caption && !activeMoment.post && (
                             <div className="viewer-caption-box">
                                 {activeMoment.caption}
                             </div>
                         )
                     }
                 </div>
+
+                {/* Story Reply Input Bar (for other users' stories) */}
+                {
+                    auth.user._id !== user._id && (
+                        <div className="viewer-reply-bar" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '10px 16px',
+                            background: 'rgba(0,0,0,0.5)',
+                            backdropFilter: 'blur(10px)',
+                            borderBottomLeftRadius: '20px',
+                            borderBottomRightRadius: '20px',
+                        }}>
+                            <input
+                                type="text"
+                                placeholder={`Reply to @${user.username}...`}
+                                value={replyText}
+                                onChange={e => setReplyText(e.target.value)}
+                                onKeyDown={e => {
+                                    if (e.key === 'Enter' && replyText.trim()) handleStoryReply();
+                                }}
+                                onFocus={() => setIsPaused(true)}
+                                onBlur={() => { if (!replyText.trim()) setIsPaused(false); }}
+                                style={{
+                                    flex: 1,
+                                    background: 'rgba(255,255,255,0.15)',
+                                    border: '1px solid rgba(255,255,255,0.25)',
+                                    borderRadius: '24px',
+                                    padding: '10px 16px',
+                                    color: '#fff',
+                                    fontSize: '0.88rem',
+                                    outline: 'none',
+                                }}
+                            />
+                            <button
+                                disabled={!replyText.trim() || sendingReply}
+                                onClick={handleStoryReply}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: replyText.trim() ? '#3b82f6' : 'rgba(255,255,255,0.4)',
+                                    cursor: replyText.trim() ? 'pointer' : 'default',
+                                    fontSize: '1.2rem',
+                                    fontWeight: 'bold',
+                                    padding: '6px',
+                                    transition: 'color 0.2s',
+                                }}
+                            >
+                                <i className="fas fa-paper-plane" />
+                            </button>
+                        </div>
+                    )
+                }
             </div>
 
             {/* Story Viewer list overlay */}
@@ -312,6 +475,61 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
                     </div>
                 )
             }
+
+            {/* Share Story to DM Modal */}
+            {showShareModal && (
+                <div className="position-absolute" style={{
+                    bottom: 0, left: 0, right: 0,
+                    background: 'rgba(255, 255, 255, 0.98)',
+                    backdropFilter: 'blur(10px)',
+                    borderTopLeftRadius: '20px',
+                    borderTopRightRadius: '20px',
+                    zIndex: 1000,
+                    padding: '20px',
+                    maxHeight: '60%',
+                    overflowY: 'auto',
+                    color: '#000',
+                    boxShadow: '0 -10px 25px rgba(0,0,0,0.2)'
+                }} onClick={(e) => e.stopPropagation()}>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h6 className="font-weight-bold mb-0" style={{ fontSize: '1rem', color: '#111' }}>Share Story</h6>
+                        <button className="btn btn-sm btn-light d-flex align-items-center justify-content-center" style={{ borderRadius: '50%', width: '30px', height: '30px', padding: 0 }}
+                                onClick={() => { setShowShareModal(false); setIsPaused(false); }}>
+                            <i className="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <input type="text" placeholder="Search contacts..." className="form-control form-control-sm mb-3"
+                           value={shareSearch} onChange={e => setShareSearch(e.target.value)}
+                           style={{ borderRadius: '20px', background: '#f0f0f0', border: 'none', padding: '8px 16px' }} />
+                    <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                        {(auth.user.following || [])
+                            .filter(f => {
+                                if (!shareSearch.trim()) return true;
+                                const name = (typeof f === 'object' ? (f.username || f.fullname || '') : '').toLowerCase();
+                                return name.includes(shareSearch.toLowerCase());
+                            })
+                            .map(contact => {
+                                const contactId = typeof contact === 'object' ? contact._id : contact;
+                                const contactObj = typeof contact === 'object' ? contact : { _id: contact, username: 'User', avatar: '' };
+                                return (
+                                    <div key={contactId} className="d-flex align-items-center justify-content-between mb-2">
+                                        <div className="d-flex align-items-center">
+                                            <Avatar src={contactObj.avatar} size="medium-avatar" />
+                                            <div className="ml-2">
+                                                <strong style={{ fontSize: '0.85rem', color: '#111' }}>@{contactObj.username || 'user'}</strong>
+                                            </div>
+                                        </div>
+                                        <button className="btn btn-sm btn-primary" style={{ borderRadius: '8px', fontSize: '0.75rem' }}
+                                                onClick={() => handleShareStoryToDM(contactId)}>
+                                            Send
+                                        </button>
+                                    </div>
+                                );
+                            })
+                        }
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

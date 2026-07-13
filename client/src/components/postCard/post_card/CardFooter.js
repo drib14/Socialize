@@ -158,6 +158,10 @@ const CardFooter = ({post, showComments, setShowComments}) => {
                             <div className="dropdown-item d-flex align-items-center py-2" onClick={handleQuoteRepost} style={{ cursor: 'pointer' }}>
                                 <i className="fas fa-edit mr-2 text-info" /> Quote Post
                             </div>
+                            <div className="dropdown-divider"></div>
+                            <div className="dropdown-item d-flex align-items-center py-2" onClick={handleShareToStory} style={{ cursor: 'pointer' }}>
+                                <i className="fas fa-bolt mr-2 text-warning" /> Share to Story
+                            </div>
                         </div>
                     </div>
                 </div>
