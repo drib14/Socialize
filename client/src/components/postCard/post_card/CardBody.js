@@ -13,6 +13,7 @@ dayjs.extend(relativeTime)
 const CardBody = ({post, theme}) => {
     const [readMore, setReadMore] = useState(false)
     const [showHeart, setShowHeart] = useState(false)
+    const [showTags, setShowTags] = useState(false)
 
     const dispatch = useDispatch()
     const { auth, socket } = useSelector(state => state)
@@ -120,7 +121,7 @@ const CardBody = ({post, theme}) => {
             {
                 post.images.length > 0 && (
                     <div className="position-relative" onClick={handleDoubleTap} style={{ cursor: 'pointer' }}>
-                        <Carousel images={post.images} id={post._id} />
+                        <Carousel images={post.images} id={post._id} altText={post.altText} />
                         {
                             showHeart && (
                                 <div style={{
@@ -134,6 +135,44 @@ const CardBody = ({post, theme}) => {
                                 }}>
                                     <span className="material-icons text-white" style={{ fontSize: '5rem', textShadow: '0 0 15px rgba(0,0,0,0.3)' }}>favorite</span>
                                 </div>
+                            )
+                        }
+
+                        {/* Tagged Users Indicator Overlay */}
+                        {
+                            post.taggedUsers && post.taggedUsers.length > 0 && (
+                                <>
+                                    <div 
+                                        className="position-absolute d-flex align-items-center justify-content-center"
+                                        style={{ bottom: '15px', left: '15px', zIndex: 25, background: 'rgba(0,0,0,0.6)', borderRadius: '50%', width: '32px', height: '32px', color: '#fff', cursor: 'pointer' }}
+                                        onClick={(e) => { e.stopPropagation(); setShowTags(!showTags); }}
+                                    >
+                                        <i className="fas fa-user-tag" style={{ fontSize: '0.85rem' }}></i>
+                                    </div>
+
+                                    {
+                                        showTags && (
+                                            <div className="position-absolute w-100 h-100 d-flex flex-column align-items-center justify-content-center" 
+                                                 style={{ top: 0, left: 0, background: 'rgba(0,0,0,0.45)', zIndex: 24, borderRadius: '12px' }}
+                                                 onClick={() => setShowTags(false)}
+                                            >
+                                                <div className="d-flex flex-wrap justify-content-center p-3" style={{ gap: '8px' }}>
+                                                    {post.taggedUsers.map(u => (
+                                                        <Link 
+                                                            key={u._id} 
+                                                            to={`/profile/${u._id}`}
+                                                            className="px-2 py-1"
+                                                            style={{ background: 'rgba(255,255,255,0.95)', color: '#000', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', border: '1px solid #ddd', textDecoration: 'none' }}
+                                                            onClick={e => e.stopPropagation()}
+                                                        >
+                                                            @{u.username || u}
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+                                </>
                             )
                         }
                     </div>
@@ -222,7 +261,7 @@ const CardBody = ({post, theme}) => {
                     </div>
                     {post.repostOf.images && post.repostOf.images.length > 0 && (
                         <div className="mt-2" style={{ maxHeight: '200px', overflow: 'hidden', borderRadius: '8px' }}>
-                            <Carousel images={post.repostOf.images} id={post.repostOf._id} />
+                            <Carousel images={post.repostOf.images} id={post.repostOf._id} altText={post.repostOf.altText} />
                         </div>
                     )}
                 </div>

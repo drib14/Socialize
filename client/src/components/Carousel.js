@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 
-const Carousel = ({images, id}) => {
+const Carousel = ({images, id, altText}) => {
     const isActive = index => {
         if(index === 0) return "active";
     }
@@ -30,8 +30,8 @@ const Carousel = ({images, id}) => {
                             <div key={index} className={`carousel-item ${isActive(index)}`} style={{ background: '#000', maxHeight: '550px' }}>
                                 {
                                     isVideo
-                                    ? <video controls src={url} className="d-block w-100" alt="post media" style={{ maxHeight: '550px', objectFit: 'contain' }} />
-                                    : <img src={url} className="d-block w-100" alt="post media" style={{ maxHeight: '550px', objectFit: 'cover' }} />
+                                    ? <video controls src={url} className="d-block w-100" style={{ maxHeight: '550px', objectFit: 'contain' }} />
+                                    : <img src={url} className="d-block w-100" alt={altText || "post media"} style={{ maxHeight: '550px', objectFit: 'cover' }} />
                                 }
                             </div>
                         )

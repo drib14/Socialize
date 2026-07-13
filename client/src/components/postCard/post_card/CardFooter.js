@@ -134,14 +134,18 @@ const CardFooter = ({post, showComments, setShowComments}) => {
                         />
                     </div>
 
-                    <Link to={`/post/${post._id}`} className="text-secondary d-flex align-items-center mr-3" title="Comment"
+                    <Link to={`/post/${post._id}`} className="text-secondary d-flex align-items-center mr-3" title={post.commentsDisabled ? "Comments Disabled" : "Comment"}
                     onClick={(e) => {
+                        if (post.commentsDisabled && (!post.comments || post.comments.length === 0)) {
+                            e.preventDefault();
+                            return;
+                        }
                         if (setShowComments) {
                             e.preventDefault();
                             setShowComments(!showComments);
                         }
                     }}>
-                        <FaRegComment style={{ fontSize: '22px', cursor: 'pointer', transition: 'color 0.2s', color: showComments ? 'var(--primary-color)' : '' }} className="icon-hover" />
+                        <FaRegComment style={{ fontSize: '22px', cursor: post.commentsDisabled && (!post.comments || post.comments.length === 0) ? 'default' : 'pointer', transition: 'color 0.2s', color: showComments ? 'var(--primary-color)' : '', opacity: post.commentsDisabled ? 0.4 : 1 }} className="icon-hover" />
                     </Link>
 
                     <FaRegPaperPlane className="text-secondary mr-3" 

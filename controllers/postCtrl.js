@@ -20,7 +20,7 @@ class APIfeatures {
 const postCtrl = {
     createPost: async (req, res) => {
         try {
-            const { content, images, location, altText, commentsDisabled, hideLikeCounts } = req.body
+            const { content, images, location, altText, commentsDisabled, hideLikeCounts, taggedUsers } = req.body
 
             if((!content || content.trim().length === 0) && (!images || images.length === 0))
             return res.status(400).json({msg: "Please add content or a photo."})
@@ -33,7 +33,8 @@ const postCtrl = {
                 tags: hashtags,
                 altText: altText || '',
                 commentsDisabled: commentsDisabled || false,
-                hideLikeCounts: hideLikeCounts || false
+                hideLikeCounts: hideLikeCounts || false,
+                taggedUsers: taggedUsers || []
             })
             await newPost.save()
 

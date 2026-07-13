@@ -53,7 +53,15 @@ const PostCard = ({post, theme}) => {
                 showComments && (
                     <div style={{ background: 'rgba(0,0,0,0.01)', borderTop: '1px solid var(--border-color)' }}>
                         <Comments post={displayPost} />
-                        <InputComment post={displayPost} />
+                        {
+                            displayPost.commentsDisabled ? (
+                                <div className="text-center py-3 text-muted small font-weight-bold" style={{ background: 'var(--bg-input)' }}>
+                                    Commenting has been disabled for this post.
+                                </div>
+                            ) : (
+                                <InputComment post={displayPost} />
+                            )
+                        }
                     </div>
                 )
             }

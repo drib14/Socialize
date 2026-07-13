@@ -13,13 +13,21 @@ export const POST_TYPES = {
 }
 
 
-export const createPost = ({content, images, auth, socket, location, mood, visibility, poll}) => async (dispatch) => {
+export const createPost = ({content, images, auth, socket, location, altText, commentsDisabled, hideLikeCounts, taggedUsers}) => async (dispatch) => {
     let media = []
     try {
         dispatch({ type: GLOBALTYPES.ALERT, payload: {loading: true} })
         if(images.length > 0) media = await imageUpload(images, auth.token)
 
-        const res = await postDataAPI('posts', { content, images: media, location, mood, visibility, poll }, auth.token)
+        const res = await postDataAPI('posts', { 
+            content, 
+            images: media, 
+            location, 
+            altText: altText || '', 
+            commentsDisabled: commentsDisabled || false, 
+            hideLikeCounts: hideLikeCounts || false, 
+            taggedUsers: taggedUsers || [] 
+        }, auth.token)
 
         dispatch({ 
             type: POST_TYPES.CREATE_POST, 
@@ -67,7 +75,7 @@ export const getPosts = (token) => async (dispatch) => {
     }
 }
 
-export const updatePost = ({content, images, auth, status, location, mood, visibility}) => async (dispatch) => {
+export const updatePost = ({content, images, auth, status, location, altText, commentsDisabled, hideLikeCounts, taggedUsers}) => async (dispatch) => {
     let media = []
     const imgNewUrl = images.filter(img => !img.url)
     const imgOldUrl = images.filter(img => img.url)
@@ -76,8 +84,10 @@ export const updatePost = ({content, images, auth, status, location, mood, visib
         && imgNewUrl.length === 0
         && imgOldUrl.length === status.images.length
         && status.location === location
-        && status.mood === mood
-        && status.visibility === visibility
+        && status.altText === altText
+        && status.commentsDisabled === commentsDisabled
+        && status.hideLikeCounts === hideLikeCounts
+        && JSON.stringify(status.taggedUsers) === JSON.stringify(taggedUsers)
     ) return;
 
     try {
@@ -85,7 +95,13 @@ export const updatePost = ({content, images, auth, status, location, mood, visib
         if(imgNewUrl.length > 0) media = await imageUpload(imgNewUrl, auth.token)
 
         const res = await patchDataAPI(`post/${status._id}`, { 
-            content, images: [...imgOldUrl, ...media], location, mood, visibility 
+            content, 
+            images: [...imgOldUrl, ...media], 
+            location, 
+            altText: altText || '', 
+            commentsDisabled: commentsDisabled || false, 
+            hideLikeCounts: hideLikeCounts || false, 
+            taggedUsers: taggedUsers || []
         }, auth.token)
 
         dispatch({ type: POST_TYPES.UPDATE_POST, payload: res.data.newPost })
