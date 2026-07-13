@@ -8,9 +8,14 @@ const PostThumb = ({posts, result, handleUnSave}) => {
     return (
         <div className="post_thumb">
             {
-                posts.map(post => (
-                    <Link key={post._id} to={`/post/${post._id}`}>
-                        <div className="post_thumb_display position-relative">
+                posts.map(post => {
+                    const isVideo = post.images && post.images.length > 0 && (
+                        (typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url).match(/video/i) || 
+                        post.images[0]?.resource_type === 'video'
+                    );
+                    return (
+                        <Link key={post._id} to={`/post/${post._id}`} className={isVideo ? 'grid-double' : ''}>
+                            <div className="post_thumb_display position-relative h-100">
                             
                             {
                                 handleUnSave && (
@@ -61,8 +66,9 @@ const PostThumb = ({posts, result, handleUnSave}) => {
                                 <i className="far fa-comment">{post.comments.length}</i>
                             </div>
                         </div>
-                    </Link>
-                ))
+                        </Link>
+                    );
+                })
             }
         </div>
     )

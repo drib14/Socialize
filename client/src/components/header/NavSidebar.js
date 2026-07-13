@@ -67,7 +67,7 @@ const NavSidebar = () => {
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent'
                         }}>
-                        Socialize
+                        Instagram
                     </h3>
                 </Link>
 

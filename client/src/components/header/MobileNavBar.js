@@ -37,7 +37,7 @@ const MobileNavBar = () => {
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent'
                         }}>
-                        Socialize
+                        Instagram
                     </h4>
                 </Link>
 

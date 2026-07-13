@@ -74,27 +74,15 @@ const EditProfile = ({setOnEdit}) => {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="mobile">Mobile</label>
-                    <input type="text" name="mobile" value={mobile}
-                    className="form-control" onChange={handleInput} />
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="address">Address</label>
-                    <input type="text" name="address" value={address}
-                    className="form-control" onChange={handleInput} />
-                </div>
-
-                <div className="form-group">
                     <label htmlFor="website">Website</label>
                     <input type="text" name="website" value={website}
-                    className="form-control" onChange={handleInput} />
+                    className="form-control" onChange={handleInput} style={{ borderRadius: '3px', background: 'var(--bg-input)' }} />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="story">Story</label>
-                    <textarea name="story" value={story} cols="30" rows="4"
-                    className="form-control" onChange={handleInput} />
+                    <label htmlFor="story">Bio</label>
+                    <textarea name="story" value={story} cols="30" rows="3"
+                    className="form-control" onChange={handleInput} style={{ borderRadius: '3px', background: 'var(--bg-input)' }} />
 
                     <small className="text-danger d-block text-right">
                         {story.length}/200
@@ -120,8 +108,8 @@ const EditProfile = ({setOnEdit}) => {
                     </select>
                 </div>
 
-                <button className="btn btn-info w-100" type="submit" title="Save">
-                    <span className="material-icons">save</span>
+                <button className="btn btn-primary w-100 py-2 font-weight-bold" type="submit" title="Save" style={{ background: '#0095f6', border: 'none', borderRadius: '4px' }}>
+                    Save Changes
                 </button>
             </form>
         </div>

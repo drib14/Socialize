@@ -44,166 +44,79 @@ const Register = () => {
     }
 
     return (
-        <div className="auth_page">
-            <form onSubmit={handleSubmit}>
-                <h3 className="text-uppercase text-center mb-3">Socialize</h3>
+    return (
+        <div className="auth_page d-flex align-items-center justify-content-center" style={{ minHeight: '100vh', background: 'var(--bg-body)' }}>
+            <div className="d-flex flex-column" style={{ maxWidth: '350px', width: '100%', gap: '10px' }}>
+                <form onSubmit={handleSubmit} style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
+                    padding: '40px 30px',
+                    textAlign: 'center',
+                    borderRadius: '1px',
+                    width: '100%',
+                    maxWidth: '100%'
+                }}>
+                    <h2 className="mb-3 font-weight-bold logo_text" style={{ 
+                        fontSize: '2.2rem', 
+                        background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        fontFamily: 'serif'
+                    }}>
+                        Instagram
+                    </h2>
 
-                {/* Steps Indicator Dots */}
-                <div className="steps_indicator">
-                    <span className={`step_dot ${step === 1 ? 'active' : ''}`} />
-                    <span className={`step_dot ${step === 2 ? 'active' : ''}`} />
-                </div>
+                    <p className="text-muted font-weight-bold mb-3" style={{ fontSize: '0.85rem', lineHeight: '1.3' }}>
+                        Sign up to see photos and videos from your friends.
+                    </p>
 
-                {
-                    step === 1 ? (
-                        <>
-                            <div className={`input_group ${alert.fullname ? 'has-error' : ''}`}>
-                                <span className="material-icons text-muted">person</span>
-                                <input type="text" className="form-control" name="fullname"
-                                    placeholder="Full Name"
-                                    onChange={handleChangeInput} value={fullname} required />
-                            </div>
-                            <small className="form-text text-danger mb-3 mt-n3">
-                                {alert.fullname ? alert.fullname : ''}
-                            </small>
+                    <div className="form-group mb-2">
+                        <input type="email" className="form-control" name="email"
+                            placeholder="Email address"
+                            onChange={handleChangeInput} value={email} required 
+                            style={{ borderRadius: '3px', background: 'var(--bg-input)', fontSize: '0.82rem', padding: '9px 12px' }} />
+                        <small className="text-danger">{alert.email ? alert.email : ''}</small>
+                    </div>
 
-                            <div className={`input_group ${alert.username ? 'has-error' : ''}`}>
-                                <span className="material-icons text-muted">alternate_email</span>
-                                <input type="text" className="form-control" name="username"
-                                    placeholder="Username"
-                                    onChange={handleChangeInput} value={username.toLowerCase().replace(/ /g, '')} required />
-                            </div>
-                            <small className="form-text text-danger mb-3 mt-n3">
-                                {alert.username ? alert.username : ''}
-                            </small>
+                    <div className="form-group mb-2">
+                        <input type="text" className="form-control" name="fullname"
+                            placeholder="Full Name"
+                            onChange={handleChangeInput} value={fullname} required 
+                            style={{ borderRadius: '3px', background: 'var(--bg-input)', fontSize: '0.82rem', padding: '9px 12px' }} />
+                        <small className="text-danger">{alert.fullname ? alert.fullname : ''}</small>
+                    </div>
 
-                            <div className={`input_group ${alert.email ? 'has-error' : ''}`}>
-                                <span className="material-icons text-muted">mail</span>
-                                <input type="email" className="form-control" name="email"
-                                    placeholder="Email address"
-                                    onChange={handleChangeInput} value={email} required />
-                            </div>
-                            <small className="form-text text-danger mb-3 mt-n3">
-                                {alert.email ? alert.email : ''}
-                            </small>
+                    <div className="form-group mb-2">
+                        <input type="text" className="form-control" name="username"
+                            placeholder="Username"
+                            onChange={handleChangeInput} value={username.toLowerCase().replace(/ /g, '')} required 
+                            style={{ borderRadius: '3px', background: 'var(--bg-input)', fontSize: '0.82rem', padding: '9px 12px' }} />
+                        <small className="text-danger">{alert.username ? alert.username : ''}</small>
+                    </div>
 
-                            <div className="gender_buttons_container d-flex gap-2 mb-4">
-                                <button type="button"
-                                    className={`gender_btn ${userData.gender === 'male' ? 'active-gender' : ''}`}
-                                    onClick={() => setUserData({ ...userData, gender: 'male' })} title="Male">
-                                    <i className="fas fa-mars" />
-                                </button>
+                    <div className="form-group mb-3 position-relative">
+                        <input type={typePass ? "text" : "password"}
+                            className="form-control"
+                            placeholder="Password"
+                            onChange={handleChangeInput} value={password} name="password" required 
+                            style={{ borderRadius: '3px', background: 'var(--bg-input)', fontSize: '0.82rem', padding: '9px 12px' }} />
+                        <span className="position-absolute" style={{ right: '12px', top: '10px', fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, color: 'var(--text-secondary)' }} onClick={() => setTypePass(!typePass)}>
+                            {typePass ? 'Hide' : 'Show'}
+                        </span>
+                        <small className="text-danger">{alert.password ? alert.password : ''}</small>
+                    </div>
 
-                                <button type="button"
-                                    className={`gender_btn ${userData.gender === 'female' ? 'active-gender' : ''}`}
-                                    onClick={() => setUserData({ ...userData, gender: 'female' })} title="Female">
-                                    <i className="fas fa-venus" />
-                                </button>
+                    <button type="submit" className="btn btn-primary w-100 py-1"
+                        disabled={!(fullname.trim() && username.trim() && email.trim() && password.length >= 6)}
+                        style={{ borderRadius: '4px', fontWeight: 'bold', background: '#0095f6', border: 'none', fontSize: '0.88rem' }} title="Register">
+                        Sign Up
+                    </button>
 
-                                <button type="button"
-                                    className={`gender_btn ${userData.gender === 'other' ? 'active-gender' : ''}`}
-                                    onClick={() => setUserData({ ...userData, gender: 'other' })} title="Other">
-                                    <i className="fas fa-genderless" />
-                                </button>
-                            </div>
-
-                            <button type="button" className="btn btn-success w-100 d-flex align-items-center justify-content-center py-2"
-                                disabled={!isStep1Valid()} onClick={() => setStep(2)}
-                                style={{ borderRadius: '12px', fontWeight: 'bold' }}>
-                                Next
-                                <span className="material-icons ml-2" style={{ fontSize: '1.25rem' }}>arrow_forward</span>
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <div className={`input_group ${alert.password ? 'has-error' : ''}`}>
-                                <span className="material-icons text-muted">lock</span>
-                                <input type={typePass ? "text" : "password"}
-                                    className="form-control"
-                                    placeholder="Password"
-                                    onChange={handleChangeInput} value={password} name="password" required />
-
-                                <span className="material-icons pass_toggle" onClick={() => setTypePass(!typePass)}>
-                                    {typePass ? 'visibility_off' : 'visibility'}
-                                </span>
-                            </div>
-                            <small className="form-text text-danger mb-3 mt-n3">
-                                {alert.password ? alert.password : ''}
-                            </small>
-
-                            <div className={`input_group ${alert.cf_password ? 'has-error' : ''}`}>
-                                <span className="material-icons text-muted">lock_reset</span>
-                                <input type={typeCfPass ? "text" : "password"}
-                                    className="form-control"
-                                    placeholder="Confirm Password"
-                                    onChange={handleChangeInput} value={cf_password} name="cf_password" required />
-
-                                <span className="material-icons pass_toggle" onClick={() => setTypeCfPass(!typeCfPass)}>
-                                    {typeCfPass ? 'visibility_off' : 'visibility'}
-                                </span>
-                            </div>
-                            <small className="form-text text-danger mb-3 mt-n3">
-                                {alert.cf_password ? alert.cf_password : ''}
-                            </small>
-
-                            {/* Password Requirements Checklist Drawer */}
-                            <div className="password_requirements mb-3">
-                                <ul style={{ paddingLeft: '4px' }}>
-                                    <li className={lengthValid ? 'valid' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <span className="material-icons" style={{ fontSize: '1.1rem' }}>
-                                            {lengthValid ? 'check_circle' : 'radio_button_unchecked'}
-                                        </span>
-                                        At least 8 characters
-                                    </li>
-                                    <li className={numValid ? 'valid' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <span className="material-icons" style={{ fontSize: '1.1rem' }}>
-                                            {numValid ? 'check_circle' : 'radio_button_unchecked'}
-                                        </span>
-                                        At least 1 number
-                                    </li>
-                                    <li className={upperValid ? 'valid' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <span className="material-icons" style={{ fontSize: '1.1rem' }}>
-                                            {upperValid ? 'check_circle' : 'radio_button_unchecked'}
-                                        </span>
-                                        At least 1 uppercase letter
-                                    </li>
-                                    <li className={specialValid ? 'valid' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <span className="material-icons" style={{ fontSize: '1.1rem' }}>
-                                            {specialValid ? 'check_circle' : 'radio_button_unchecked'}
-                                        </span>
-                                        At least 1 special character
-                                    </li>
-                                    <li className={matchesConfirm ? 'valid' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <span className="material-icons" style={{ fontSize: '1.1rem' }}>
-                                            {matchesConfirm ? 'check_circle' : 'radio_button_unchecked'}
-                                        </span>
-                                        Passwords match
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div className="d-flex align-items-center justify-content-between">
-                                <button type="button" className="btn btn-outline-secondary d-flex align-items-center justify-content-center py-2 px-3"
-                                    onClick={() => setStep(1)} style={{ borderRadius: '12px', fontWeight: 'bold' }}>
-                                    <span className="material-icons mr-2" style={{ fontSize: '1.25rem' }}>arrow_back</span>
-                                    Back
-                                </button>
-
-                                <button type="submit" className="btn btn-success flex-fill d-flex align-items-center justify-content-center py-2 ml-3"
-                                    disabled={!(lengthValid && numValid && upperValid && specialValid && matchesConfirm)}
-                                    style={{ borderRadius: '12px', fontWeight: 'bold' }} title="Register">
-                                    <span className="material-icons mr-2" style={{ fontSize: '1.25rem' }}>how_to_reg</span>
-                                    Register
-                                </button>
-                            </div>
-                        </>
-                    )
-                }
-
-                <p className="my-3 text-center">
-                    Already have an account? <Link to="/" style={{ color: "var(--primary-color)" }}>Login Now</Link>
-                </p>
-            </form>
+                    <p className="mt-4 mb-0" style={{ fontSize: '0.85rem' }}>
+                        Have an account? <Link to="/" style={{ color: "#0095f6", fontWeight: 'bold', textDecoration: 'none' }}>Log in</Link>
+                    </p>
+                </form>
+            </div>
         </div>
     )
 }
