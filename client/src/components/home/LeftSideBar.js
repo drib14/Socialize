@@ -41,6 +41,13 @@ const LeftSideBar = () => {
                         </Link>
                     </li>
 
+                    <li className={`nav-item rounded ${isActive('/close_friends') ? 'active-link' : ''}`} style={{ margin: '4px 0' }}>
+                        <Link className="nav-link d-flex align-items-center py-3 px-4" to="/close_friends" style={{ color: isActive('/close_friends') ? 'var(--primary-color)' : 'var(--text-main)', fontWeight: isActive('/close_friends') ? '700' : '500', gap: '15px', transition: 'var(--transition)' }}>
+                            <i className="fas fa-star" style={{ fontSize: '20px', color: '#00e575' }}></i>
+                            <span style={{ fontSize: '0.95rem' }}>Close Friends</span>
+                        </Link>
+                    </li>
+
                     <li className={`nav-item rounded ${isActive('/moments_archive') ? 'active-link' : ''}`} style={{ margin: '4px 0' }}>
                         <Link className="nav-link d-flex align-items-center py-3 px-4" to="/moments_archive" style={{ color: isActive('/moments_archive') ? 'var(--primary-color)' : 'var(--text-main)', fontWeight: isActive('/moments_archive') ? '700' : '500', gap: '15px', transition: 'var(--transition)' }}>
                             <i className="fas fa-history" style={{ fontSize: '20px' }}></i>

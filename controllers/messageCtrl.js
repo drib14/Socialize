@@ -19,29 +19,49 @@ class APIfeatures {
 const messageCtrl = {
     createMessage: async (req, res) => {
         try {
-            const { sender, recipient, text, media, call, replyTo } = req.body
+            const { conversationId, sender, recipient, text, media, call, replyTo, isGroup, groupRecipients, groupName } = req.body
 
-            if(!recipient || (!text.trim() && media.length === 0 && !call)) return;
+            if(!conversationId && !recipient && (!groupRecipients || groupRecipients.length === 0)) return res.status(400).json({msg: "Recipient is required."});
+            if(!text.trim() && (!media || media.length === 0) && !call) return res.status(400).json({msg: "Message body cannot be empty."});
 
-            const newConversation = await Conversations.findOneAndUpdate({
-                $or: [
-                    {recipients: [sender, recipient]},
-                    {recipients: [recipient, sender]}
-                ]
-            }, {
-                recipients: [sender, recipient],
-                text, media, call
-            }, { new: true, upsert: true })
+            let newConversation;
+            if (conversationId) {
+                newConversation = await Conversations.findByIdAndUpdate(conversationId, {
+                    text, media, call
+                }, { new: true });
+            } else if (isGroup && groupRecipients && groupRecipients.length > 0) {
+                const allRecipients = Array.from(new Set([sender, ...groupRecipients]));
+                newConversation = new Conversations({
+                    recipients: allRecipients,
+                    text, media, call,
+                    isGroup: true,
+                    name: groupName || 'Group Chat',
+                    admin: sender
+                });
+                await newConversation.save();
+            } else {
+                newConversation = await Conversations.findOneAndUpdate({
+                    isGroup: { $ne: true },
+                    $or: [
+                        {recipients: [sender, recipient]},
+                        {recipients: [recipient, sender]}
+                    ]
+                }, {
+                    recipients: [sender, recipient],
+                    text, media, call
+                }, { new: true, upsert: true });
+            }
 
             const newMessage = new Messages({
                 conversation: newConversation._id,
                 sender, call,
-                recipient, text, media, replyTo
+                recipient: isGroup ? undefined : recipient,
+                text, media, replyTo
             })
 
             await newMessage.save()
 
-            res.json({msg: 'Create Success!'})
+            res.json({ msg: 'Create Success!', conversation: newConversation, message: newMessage })
 
         } catch (err) {
             return res.status(500).json({msg: err.message})
@@ -67,12 +87,20 @@ const messageCtrl = {
     },
     getMessages: async (req, res) => {
         try {
-            const features = new APIfeatures(Messages.find({
-                $or: [
-                    {sender: req.user._id, recipient: req.params.id},
-                    {sender: req.params.id, recipient: req.user._id}
-                ]
-            }), req.query).paginating()
+            const isConversation = await Conversations.exists({ _id: req.params.id })
+            let query = {}
+            if (isConversation) {
+                query = { conversation: req.params.id }
+            } else {
+                query = {
+                    $or: [
+                        {sender: req.user._id, recipient: req.params.id},
+                        {sender: req.params.id, recipient: req.user._id}
+                    ]
+                }
+            }
+
+            const features = new APIfeatures(Messages.find(query), req.query).paginating()
 
             const messages = await features.query.sort('-createdAt')
             .populate('replyTo')

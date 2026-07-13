@@ -22,7 +22,7 @@ export const getMoments = (token) => async (dispatch) => {
     }
 }
 
-export const createMoment = ({ file, caption, visibility, post, auth }) => async (dispatch) => {
+export const createMoment = ({ file, caption, visibility, post, closeFriendsOnly, poll, auth }) => async (dispatch) => {
     try {
         dispatch({ type: GLOBALTYPES.ALERT, payload: { loading: true } })
 
@@ -41,6 +41,8 @@ export const createMoment = ({ file, caption, visibility, post, auth }) => async
             resource_type,
             caption,
             visibility,
+            closeFriendsOnly: closeFriendsOnly || false,
+            poll: poll || undefined,
             post
         }, auth.token)
 

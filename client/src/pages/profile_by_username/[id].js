@@ -29,7 +29,7 @@ const ProfileByUsername = () => {
 
     return (
         <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
-            <img src="/icon-web-01.png" alt="loading" className="loading-logo" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="loading" className="loading-logo" style={{ width: '80px', height: '80px' }} />
         </div>
     )
 }

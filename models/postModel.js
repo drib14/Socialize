@@ -11,19 +11,14 @@ const postSchema = new mongoose.Schema({
     comments: [{ type: mongoose.Types.ObjectId, ref: 'comment' }],
     user: {type: mongoose.Types.ObjectId, ref: 'user'},
     repostOf: {type: mongoose.Types.ObjectId, ref: 'post'},
-    visibility: { type: String, enum: ['public', 'followers', 'private'], default: 'public' },
     tags: [{ type: String, lowercase: true, trim: true }],
+    taggedUsers: [{ type: mongoose.Types.ObjectId, ref: 'user' }],
     location: { type: String, default: '' },
-    mood: { type: String, default: '' },
+    altText: { type: String, default: '' },
     views: [{ type: mongoose.Types.ObjectId, ref: 'user' }],
     isPinned: { type: Boolean, default: false },
-    poll: {
-        question: { type: String, default: '' },
-        options: [{
-            text: { type: String, required: true },
-            votes: [{ type: mongoose.Types.ObjectId, ref: 'user' }]
-        }]
-    }
+    commentsDisabled: { type: Boolean, default: false },
+    hideLikeCounts: { type: Boolean, default: false }
 }, {
     timestamps: true
 })
@@ -31,5 +26,6 @@ const postSchema = new mongoose.Schema({
 postSchema.index({ user: 1, createdAt: -1 })
 postSchema.index({ createdAt: -1 })
 postSchema.index({ tags: 1 })
+postSchema.index({ taggedUsers: 1 })
 
 module.exports = mongoose.model('post', postSchema)

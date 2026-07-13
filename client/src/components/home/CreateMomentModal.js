@@ -4,6 +4,8 @@ import Modal from 'react-modal'
 import { createMoment } from '../../redux/actions/momentAction'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
 
+Modal.setAppElement('#root')
+
 const CreateMomentModal = ({ isOpen, onClose }) => {
     const { auth } = useSelector(state => state)
     const dispatch = useDispatch()
@@ -11,7 +13,12 @@ const CreateMomentModal = ({ isOpen, onClose }) => {
     const [file, setFile] = useState(null)
     const [preview, setPreview] = useState('')
     const [caption, setCaption] = useState('')
-    const [visibility, setVisibility] = useState('followers')
+    const [closeFriendsOnly, setCloseFriendsOnly] = useState(false)
+
+    // Story poll state
+    const [hasPoll, setHasPoll] = useState(false)
+    const [pollQuestion, setPollQuestion] = useState('')
+    const [pollOptions, setPollOptions] = useState(['Yes', 'No'])
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0]
@@ -32,19 +39,41 @@ const CreateMomentModal = ({ isOpen, onClose }) => {
     const handleRemovePreview = () => {
         setFile(null)
         setPreview('')
+        setHasPoll(false)
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         if (!file) return;
 
-        dispatch(createMoment({ file, caption, visibility, auth }))
+        let pollData = undefined;
+        if (hasPoll && pollQuestion.trim()) {
+            pollData = {
+                question: pollQuestion.trim(),
+                options: [
+                    { text: pollOptions[0].trim() || 'Yes', votes: [] },
+                    { text: pollOptions[1].trim() || 'No', votes: [] }
+                ]
+            }
+        }
+
+        dispatch(createMoment({ 
+            file, 
+            caption, 
+            visibility: 'followers', 
+            closeFriendsOnly, 
+            poll: pollData, 
+            auth 
+        }))
         
         // Reset and close
         setFile(null)
         setPreview('')
         setCaption('')
-        setVisibility('followers')
+        setCloseFriendsOnly(false)
+        setHasPoll(false)
+        setPollQuestion('')
+        setPollOptions(['Yes', 'No'])
         onClose()
     }
 
@@ -54,10 +83,10 @@ const CreateMomentModal = ({ isOpen, onClose }) => {
             onRequestClose={onClose}
             className="create-moment-modal-content"
             overlayClassName="create-moment-modal-overlay"
-            contentLabel="Create Moment Modal"
+            contentLabel="Create Story Modal"
         >
             <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="m-0" style={{ fontWeight: 700, color: 'var(--text-main)' }}>Create Moment</h5>
+                <h5 className="m-0" style={{ fontWeight: 700, color: 'var(--text-main)' }}>Create Story</h5>
                 <span 
                     onClick={onClose} 
                     style={{ cursor: 'pointer', fontSize: '1.5rem', lineHeight: 1, color: 'var(--text-muted)' }}
@@ -105,14 +134,14 @@ const CreateMomentModal = ({ isOpen, onClose }) => {
                 {
                     preview && (
                         <>
-                            <div className="mb-3">
-                                <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-main)' }}>
-                                    Add Caption (Optional)
+                            <div className="form-group mb-3">
+                                <label className="form-label small font-weight-bold">
+                                    Add Caption
                                 </label>
                                 <input 
                                     type="text"
                                     className="form-control"
-                                    placeholder="Write something overlaying..."
+                                    placeholder="Write a caption..."
                                     value={caption}
                                     onChange={(e) => setCaption(e.target.value)}
                                     style={{ background: 'var(--bg-input)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
@@ -120,37 +149,60 @@ const CreateMomentModal = ({ isOpen, onClose }) => {
                                 />
                             </div>
 
-                            <div className="mb-3">
-                                <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-main)' }}>
-                                    Who can see this moment?
-                                </label>
-                                <div className="d-flex align-items-center" style={{ gap: '6px' }}>
-                                    <i className={
-                                        visibility === 'followers' ? 'fas fa-users text-muted' :
-                                        visibility === 'private' ? 'fas fa-lock text-muted' :
-                                        'fas fa-globe text-muted'
-                                    } style={{ fontSize: '0.88rem' }}></i>
-                                    <select 
-                                        value={visibility} 
-                                        onChange={(e) => setVisibility(e.target.value)}
-                                        className="custom-select custom-select-sm"
-                                        style={{ 
-                                            width: 'auto', 
-                                            borderRadius: '8px', 
-                                            fontSize: '0.8rem', 
-                                            padding: '4px 10px', 
-                                            height: '32px', 
-                                            cursor: 'pointer',
-                                            background: 'var(--bg-input)',
-                                            color: 'var(--text-main)',
-                                            borderColor: 'var(--border-color)'
-                                        }}
-                                    >
-                                        <option value="public">Public</option>
-                                        <option value="followers">Followers Only</option>
-                                        <option value="private">Only Me</option>
-                                    </select>
+                            {/* Story Poll sticker picker */}
+                            <div className="form-group mb-3 card p-2" style={{ border: '1px solid var(--border-color)', background: 'var(--bg-card)' }}>
+                                <div className="d-flex align-items-center justify-content-between mb-2">
+                                    <span className="small font-weight-bold">Add Interactive Poll sticker</span>
+                                    <input 
+                                        type="checkbox" 
+                                        checked={hasPoll} 
+                                        onChange={e => setHasPoll(e.target.checked)} 
+                                        style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                                    />
                                 </div>
+                                {hasPoll && (
+                                    <div className="d-flex flex-column gap-2" style={{ gap: '8px' }}>
+                                        <input 
+                                            type="text"
+                                            className="form-control form-control-sm"
+                                            placeholder="Ask a question..."
+                                            value={pollQuestion}
+                                            onChange={e => setPollQuestion(e.target.value)}
+                                            style={{ background: 'var(--bg-input)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
+                                        />
+                                        <div className="d-flex gap-2" style={{ gap: '8px' }}>
+                                            <input 
+                                                type="text"
+                                                className="form-control form-control-sm"
+                                                placeholder="Yes"
+                                                value={pollOptions[0]}
+                                                onChange={e => setPollOptions([e.target.value, pollOptions[1]])}
+                                                style={{ background: 'var(--bg-input)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
+                                            />
+                                            <input 
+                                                type="text"
+                                                className="form-control form-control-sm"
+                                                placeholder="No"
+                                                value={pollOptions[1]}
+                                                onChange={e => setPollOptions([pollOptions[0], e.target.value])}
+                                                style={{ background: 'var(--bg-input)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="form-group d-flex align-items-center mb-4">
+                                <input 
+                                    type="checkbox" 
+                                    id="closeFriendsOnly" 
+                                    checked={closeFriendsOnly}
+                                    onChange={(e) => setCloseFriendsOnly(e.target.checked)}
+                                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                                />
+                                <label htmlFor="closeFriendsOnly" className="m-0 ml-2 font-weight-bold" style={{ cursor: 'pointer', fontSize: '0.85rem', color: '#00e575' }}>
+                                    <i className="fas fa-star mr-1"></i> Share with Close Friends only
+                                </label>
                             </div>
                         </>
                     )
@@ -169,9 +221,9 @@ const CreateMomentModal = ({ isOpen, onClose }) => {
                         type="submit" 
                         className="btn btn-primary" 
                         disabled={!file}
-                        style={{ background: 'var(--primary-color)', borderColor: 'var(--primary-color)', borderRadius: '8px', fontSize: '0.85rem', color: 'white' }}
+                        style={{ background: '#0095f6', borderColor: '#0095f6', borderRadius: '8px', fontSize: '0.85rem', color: 'white', fontWeight: 600 }}
                     >
-                        Share to Moments
+                        Share to Story
                     </button>
                 </div>
             </form>

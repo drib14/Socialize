@@ -20,19 +20,20 @@ class APIfeatures {
 const postCtrl = {
     createPost: async (req, res) => {
         try {
-            const { content, images, location, mood, visibility, poll } = req.body
+            const { content, images, location, altText, commentsDisabled, hideLikeCounts } = req.body
 
-            if(content.trim().length === 0 && images.length === 0 && !poll)
-            return res.status(400).json({msg: "Please add content, a photo, or a poll."})
+            if((!content || content.trim().length === 0) && (!images || images.length === 0))
+            return res.status(400).json({msg: "Please add content or a photo."})
 
             const contentStr = content || ''
             const hashtags = contentStr.match(/#\w+/g)?.map(tag => tag.slice(1).toLowerCase()) || []
 
             const newPost = new Posts({
-                content, images, user: req.user._id, location, mood,
-                visibility: visibility || 'public',
+                content, images, user: req.user._id, location,
                 tags: hashtags,
-                poll: poll || undefined
+                altText: altText || '',
+                commentsDisabled: commentsDisabled || false,
+                hideLikeCounts: hideLikeCounts || false
             })
             await newPost.save()
 
@@ -56,7 +57,7 @@ const postCtrl = {
             const query = {
                 $or: [
                     { user: req.user._id },
-                    { user: { $in: req.user.following }, visibility: { $ne: 'private' } }
+                    { user: { $in: req.user.following } }
                 ],
                 user: { $nin: excludeUsers }
             }
@@ -92,16 +93,19 @@ const postCtrl = {
     },
     updatePost: async (req, res) => {
         try {
-            const { content, images, location, mood, visibility } = req.body
+            const { content, images, location, altText, commentsDisabled, hideLikeCounts, taggedUsers } = req.body
 
             const contentStr = content || ''
             const hashtags = contentStr.match(/#\w+/g)?.map(tag => tag.slice(1).toLowerCase()) || []
 
             const post = await Posts.findOneAndUpdate({_id: req.params.id, user: req.user._id}, {
-                content, images, location, mood,
-                visibility: visibility || 'public',
+                content, images, location,
+                altText: altText || '',
+                commentsDisabled: commentsDisabled || false,
+                hideLikeCounts: hideLikeCounts || false,
+                taggedUsers: taggedUsers || [],
                 tags: hashtags
-            }).populate("user likes", "avatar username fullname lastActive")
+            }, { new: true }).populate("user likes", "avatar username fullname lastActive")
             .populate({
                 path: "comments",
                 populate: {
@@ -114,10 +118,7 @@ const postCtrl = {
 
             res.json({
                 msg: "Updated Post!",
-                newPost: {
-                    ...post._doc,
-                    content, images, location, mood, visibility: visibility || 'public', tags: hashtags
-                }
+                newPost: post
             })
         } catch (err) {
             return res.status(500).json({msg: err.message})
@@ -166,17 +167,15 @@ const postCtrl = {
                 return res.json({ posts: [], result: 0 })
             }
 
-            let query = { user: targetId }
-            if (targetId.toString() !== req.user._id.toString()) {
+            // Check if profile is private and not followed by current user
+            if (targetUser.isPrivate && targetId.toString() !== req.user._id.toString()) {
                 const isFollowing = targetUser.followers.some(id => (id._id || id).toString() === req.user._id.toString())
-                if (isFollowing) {
-                    query.visibility = { $in: ['public', 'followers'] }
-                } else {
-                    query.visibility = 'public'
+                if (!isFollowing) {
+                    return res.status(403).json({ msg: "This account is private." })
                 }
             }
 
-            const features = new APIfeatures(Posts.find(query), req.query)
+            const features = new APIfeatures(Posts.find({ user: targetId }), req.query)
             .paginating()
             const posts = await features.query.sort("-isPinned -createdAt")
             .populate("user likes views", "avatar username fullname followers")
@@ -203,18 +202,18 @@ const postCtrl = {
             const targetUser = await Users.findById(targetId)
             if (!targetUser) return res.status(404).json({ msg: "User not found." })
 
-            const usernameRegex = new RegExp(`@${targetUser.username}\\b`, 'i')
-
             const myBlocked = req.user.blockedUsers || []
             const targetUserBlocked = targetUser.blockedUsers || []
 
-            let query = {
-                content: { $regex: usernameRegex },
-                user: { $nin: [...myBlocked, ...targetUserBlocked] }
+            // Query posts where targetId is in the taggedUsers array
+            const query = {
+                taggedUsers: targetId,
+                user: { $nin: [...myBlocked.map(id => (id._id || id)), ...targetUserBlocked.map(id => (id._id || id))] }
             }
 
-            const posts = await Posts.find(query)
-                .sort("-createdAt")
+            const features = new APIfeatures(Posts.find(query), req.query).paginating()
+
+            const posts = await features.query.sort("-createdAt")
                 .populate("user likes views", "avatar username fullname followers")
                 .populate({
                     path: "repostOf",
@@ -224,18 +223,9 @@ const postCtrl = {
                     }
                 })
 
-            const filteredPosts = posts.filter(post => {
-                const authorId = post.user._id.toString()
-                if (authorId === req.user._id.toString()) return true
-                if (post.visibility === 'public') return true
-                if (post.visibility === 'private') return false
-                const isFollowing = post.user.followers.some(id => (id._id || id).toString() === req.user._id.toString())
-                return isFollowing
-            })
-
             res.json({
-                posts: filteredPosts,
-                result: filteredPosts.length
+                posts,
+                result: posts.length
             })
         } catch (err) {
             return res.status(500).json({ msg: err.message })
@@ -697,7 +687,10 @@ const postCtrl = {
             const newPinState = !post.isPinned
 
             if(newPinState){
-                await Posts.updateMany({user: req.user._id}, {isPinned: false})
+                const pinnedCount = await Posts.countDocuments({ user: req.user._id, isPinned: true })
+                if (pinnedCount >= 3) {
+                    return res.status(400).json({ msg: "You can only pin up to 3 posts on your profile." })
+                }
             }
 
             const updatedPost = await Posts.findOneAndUpdate(

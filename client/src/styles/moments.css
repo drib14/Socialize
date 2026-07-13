@@ -90,11 +90,19 @@
 }
 
 .moment-card-avatar.unviewed {
-    background: linear-gradient(45deg, #10b981, #84cc16, #3b82f6);
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); /* Instagram default story gradient */
+}
+
+.moment-card-avatar.unviewed.close-friends {
+    background: #00e575; /* Close friends green ring */
 }
 
 .moment-card-avatar.viewed {
     background: #cbd5e1; /* Gray border for viewed */
+}
+
+.moment-card-avatar.viewed.close-friends {
+    background: #73e6a6; /* Muted close friends ring */
 }
 
 .moment-card-avatar img {

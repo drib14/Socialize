@@ -5,7 +5,7 @@ import { getDataAPI } from '../../utils/fetchData'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
 import { useNavigate, useParams } from 'react-router-dom'
 import { MESS_TYPES, getConversations } from '../../redux/actions/messageAction'
-
+import GroupDMModal from './GroupDMModal'
 
 const LeftSide = () => {
     const { auth, message, online } = useSelector(state => state)
@@ -13,6 +13,7 @@ const LeftSide = () => {
 
     const [search, setSearch] = useState('')
     const [searchUsers, setSearchUsers] = useState([])
+    const [showGroupModal, setShowGroupModal] = useState(false)
 
     const navigate = useNavigate()
     const { id } = useParams()
@@ -97,14 +98,23 @@ const LeftSide = () => {
 
     return (
         <>
-            <form className="message_header" onSubmit={handleSearch} style={{ borderBottom: '1px solid var(--border-color)', padding: '12px 16px' }}>
-                <input type="text" value={search}
-                placeholder="Search chats or search globally..."
-                onChange={handleSearchChange} 
-                style={{ borderRadius: '24px', background: 'var(--bg-input)', border: '1px solid var(--border-color)', padding: '10px 16px', fontSize: '0.85rem' }} />
+            <div className="message_header d-flex align-items-center justify-content-between" style={{ borderBottom: '1px solid var(--border-color)', padding: '12px 16px' }}>
+                <form onSubmit={handleSearch} style={{ flex: 1, marginRight: '10px' }}>
+                    <input type="text" value={search}
+                    placeholder="Search..."
+                    onChange={handleSearchChange} 
+                    style={{ width: '100%', borderRadius: '24px', background: 'var(--bg-input)', border: '1px solid var(--border-color)', padding: '8px 16px', fontSize: '0.85rem' }} />
+                    <button type="submit" style={{display: 'none'}}>Search</button>
+                </form>
+                <button className="btn btn-sm btn-light d-flex align-items-center justify-content-center" 
+                        onClick={() => setShowGroupModal(true)}
+                        style={{ borderRadius: '50%', width: '36px', height: '36px', padding: 0 }}
+                        title="New Group Chat">
+                    <i className="far fa-edit" style={{ fontSize: '1.1rem', color: 'var(--text-main)' }}></i>
+                </button>
+            </div>
 
-                <button type="submit" style={{display: 'none'}}>Search</button>
-            </form>
+            <GroupDMModal isOpen={showGroupModal} onClose={() => setShowGroupModal(false)} />
 
             <div className="message_chat_list" style={{ overflowY: 'auto' }}>
                 {

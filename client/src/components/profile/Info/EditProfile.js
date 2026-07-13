@@ -6,10 +6,10 @@ import { updateProfileUser } from '../../../redux/actions/profileAction'
 
 const EditProfile = ({setOnEdit}) => {
     const initState = {
-        fullname: '', mobile: '', address: '', website: '', story: '', gender: '', isPrivate: false
+        fullname: '', website: '', bio: '', pronouns: '', isPrivate: false
     }
     const [userData, setUserData] = useState(initState)
-    const { fullname, mobile, address, website, story, gender, isPrivate } = userData
+    const { fullname, website, bio, pronouns, isPrivate } = userData
 
     const [avatar, setAvatar] = useState('')
 
@@ -17,7 +17,15 @@ const EditProfile = ({setOnEdit}) => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        setUserData(auth.user)
+        if (auth.user) {
+            setUserData({
+                fullname: auth.user.fullname || '',
+                website: auth.user.website || '',
+                bio: auth.user.bio || '',
+                pronouns: auth.user.pronouns || '',
+                isPrivate: auth.user.isPrivate || false
+            })
+        }
     }, [auth.user])
 
 
@@ -74,38 +82,33 @@ const EditProfile = ({setOnEdit}) => {
                 </div>
 
                 <div className="form-group">
+                    <label htmlFor="pronouns">Pronouns</label>
+                    <input type="text" name="pronouns" value={pronouns} placeholder="e.g. she/her, they/them"
+                    className="form-control" onChange={handleInput} style={{ borderRadius: '3px', background: 'var(--bg-input)' }} />
+                </div>
+
+                <div className="form-group">
                     <label htmlFor="website">Website</label>
                     <input type="text" name="website" value={website}
                     className="form-control" onChange={handleInput} style={{ borderRadius: '3px', background: 'var(--bg-input)' }} />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="story">Bio</label>
-                    <textarea name="story" value={story} cols="30" rows="3"
+                    <label htmlFor="bio">Bio</label>
+                    <textarea name="bio" value={bio} cols="30" rows="3"
                     className="form-control" onChange={handleInput} style={{ borderRadius: '3px', background: 'var(--bg-input)' }} />
 
                     <small className="text-danger d-block text-right">
-                        {story.length}/200
+                        {bio ? bio.length : 0}/150
                     </small>
                 </div>
 
-                <div className="form-group d-flex align-items-center mb-3">
+                <div className="form-group d-flex align-items-center mb-4">
                     <input type="checkbox" name="isPrivate" id="isPrivate" checked={isPrivate}
                     onChange={handleInput} style={{ width: '20px', height: '20px', cursor: 'pointer' }} />
                     <label htmlFor="isPrivate" className="m-0 ml-2" style={{ cursor: 'pointer', fontWeight: 600 }}>
                         Private Account
                     </label>
-                </div>
-
-                <label htmlFor="gender">Gender</label>
-                <div className="input-group-prepend px-0 mb-4">
-                    <select name="gender" id="gender" value={gender}
-                    className="custom-select text-capitalize"
-                    onChange={handleInput}>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
                 </div>
 
                 <button className="btn btn-primary w-100 py-2 font-weight-bold" type="submit" title="Save" style={{ background: '#0095f6', border: 'none', borderRadius: '4px' }}>

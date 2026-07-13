@@ -427,7 +427,7 @@ const RightSide = () => {
                    {
                        loadMedia && 
                        <div className="chat_row you_message">
-                           <img src="/icon-web-01.png" alt="loading" className="loading-logo" />
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="loading" className="loading-logo" style={{ width: '40px', height: '40px' }} />
                        </div>
                    }
 

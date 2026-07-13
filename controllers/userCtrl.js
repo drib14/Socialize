@@ -80,11 +80,11 @@ const userCtrl = {
     },
     updateUser: async (req, res) => {
         try {
-            const { avatar, fullname, mobile, address, story, website, gender, isPrivate } = req.body
+            const { avatar, fullname, bio, website, pronouns, isPrivate } = req.body
             if(!fullname) return res.status(400).json({msg: "Please add your full name."})
 
             await Users.findOneAndUpdate({_id: req.user._id}, {
-                avatar, fullname, mobile, address, story, website, gender, isPrivate
+                avatar, fullname, bio, website, pronouns, isPrivate
             })
 
             res.json({msg: "Update Success!"})
@@ -338,6 +338,33 @@ const userCtrl = {
             }
 
             res.json({user: userObj})
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
+        }
+    },
+    addCloseFriend: async (req, res) => {
+        try {
+            const targetId = req.params.id
+            const user = await Users.findById(targetId)
+            if(!user) return res.status(404).json({msg: "User not found."})
+
+            const updatedUser = await Users.findOneAndUpdate({_id: req.user._id}, {
+                $addToSet: { closeFriends: targetId }
+            }, { new: true }).select('-password')
+
+            res.json({ msg: "Added to Close Friends!", user: updatedUser })
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
+        }
+    },
+    removeCloseFriend: async (req, res) => {
+        try {
+            const targetId = req.params.id
+            const updatedUser = await Users.findOneAndUpdate({_id: req.user._id}, {
+                $pull: { closeFriends: targetId }
+            }, { new: true }).select('-password')
+
+            res.json({ msg: "Removed from Close Friends!", user: updatedUser })
         } catch (err) {
             return res.status(500).json({msg: err.message})
         }

@@ -16,6 +16,8 @@ import online from './onlineReducer'
 import call from './callReducer'
 import peer from './peerReducer'
 import moments from './momentReducer'
+import savedCollections from './savedCollectionReducer'
+import highlights from './highlightReducer'
 
 
 export default combineReducers({
@@ -35,5 +37,7 @@ export default combineReducers({
     online,
     call,
     peer,
-    moments
+    moments,
+    savedCollections,
+    highlights
 })

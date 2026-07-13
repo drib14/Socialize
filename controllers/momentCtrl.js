@@ -1,9 +1,10 @@
 const Moments = require('../models/momentModel')
+const Users = require('../models/userModel')
 
 const momentCtrl = {
     createMoment: async (req, res) => {
         try {
-            const { media, resource_type, caption, visibility, post } = req.body
+            const { media, resource_type, caption, visibility, post, closeFriendsOnly, poll } = req.body
             if (!media && !post) return res.status(400).json({ msg: "Please add your media or share a post." })
 
             const newMoment = new Moments({
@@ -12,12 +13,14 @@ const momentCtrl = {
                 resource_type: resource_type || 'image',
                 caption: caption || '',
                 visibility: visibility || 'followers',
+                closeFriendsOnly: closeFriendsOnly || false,
+                poll: poll || undefined,
                 post: post || undefined
             })
 
             await newMoment.save()
             const populated = await newMoment.populate([
-                { path: 'user', select: 'username fullname avatar' },
+                { path: 'user', select: 'username fullname avatar closeFriends' },
                 { path: 'post', populate: { path: 'user', select: 'username fullname avatar' } }
             ])
 
@@ -38,7 +41,7 @@ const momentCtrl = {
             const activeMoments = await Moments.find({
                 user: { $in: myAndFollowingIds },
                 createdAt: { $gte: twentyFourHoursAgo }
-            }).populate('user', 'username fullname avatar')
+            }).populate('user', 'username fullname avatar closeFriends')
               .populate('views', 'username fullname avatar')
               .populate({
                   path: 'post',
@@ -49,15 +52,22 @@ const momentCtrl = {
               })
               .sort('-createdAt')
 
-            // Group by user id under visibility gates
+            // Group by user id under visibility gates & Close Friends gates
             const grouped = {}
             activeMoments.forEach(moment => {
                 if (!moment.user) return;
                 
-                // Enforce visibility gate for other users
                 const authorId = moment.user._id.toString();
+                
+                // Enforce visibility gate for other users
                 if (authorId !== req.user._id.toString()) {
                     if (moment.visibility === 'private') return; // hide private stories of others
+                    
+                    // Close Friends check
+                    if (moment.closeFriendsOnly) {
+                        const isCloseFriend = moment.user.closeFriends && moment.user.closeFriends.some(id => id.toString() === req.user._id.toString())
+                        if (!isCloseFriend) return; // Skip if they are not on the close friends list
+                    }
                 }
 
                 const userId = moment.user._id.toString()
@@ -130,6 +140,30 @@ const momentCtrl = {
             res.json({ msg: 'Moment deleted.' })
         } catch (err) {
             return res.status(500).json({ msg: err.message })
+        }
+    },
+    voteStoryPoll: async (req, res) => {
+        try {
+            const { optionId } = req.body
+            const moment = await Moments.findById(req.params.id)
+            if(!moment) return res.status(400).json({msg: 'This story does not exist.'})
+
+            // Check if user has already voted
+            const hasVoted = moment.poll.options.some(opt => opt.votes.includes(req.user._id))
+            if(hasVoted) return res.status(400).json({msg: 'You have already voted on this poll.'})
+
+            const updatedMoment = await Moments.findOneAndUpdate(
+                { _id: req.params.id, "poll.options._id": optionId },
+                { $push: { "poll.options.$.votes": req.user._id } },
+                { new: true }
+            ).populate('user', 'username fullname avatar closeFriends')
+
+            res.json({
+                msg: 'Vote registered.',
+                moment: updatedMoment
+            })
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
         }
     }
 }

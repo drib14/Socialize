@@ -32,7 +32,6 @@ router.get('/getSavePosts', auth, postCtrl.getSavePosts)
 router.get('/posts/tag/:tag', auth, postCtrl.getPostsByTag)
 
 router.patch('/post/:id/view', auth, postCtrl.recordPostView)
-router.patch('/post/:id/poll_vote', auth, postCtrl.votePollOption)
 router.patch('/post/:id/pin', auth, postCtrl.pinPost)
 router.get('/trending_tags', auth, postCtrl.getTrendingTags)
 

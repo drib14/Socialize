@@ -8,6 +8,7 @@ import Followers from './Info/Followers'
 import Following from './Info/Following'
 import CreateMomentModal from '../home/CreateMomentModal'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
+import Highlights from './Highlights'
 
 const Info = ({id, auth, profile, dispatch}) => {
     const { online } = useSelector(state => state)
@@ -81,10 +82,10 @@ const Info = ({id, auth, profile, dispatch}) => {
                                                 Edit Profile
                                             </button>
                                             <button className="btn btn-success d-flex align-items-center"
-                                            onClick={() => setOnAddMoment(true)} title="Add Moment" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>
-                                                <span className="material-icons mr-1" style={{ fontSize: '1.1rem' }}>flash_on</span>
-                                                Add Moment
-                                            </button>
+                                             onClick={() => setOnAddMoment(true)} title="Add Story" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>
+                                                 <span className="material-icons mr-1" style={{ fontSize: '1.1rem' }}>add_circle</span>
+                                                 Add Story
+                                             </button>
                                         </div>
                                     ) : (
                                         <div className="d-flex align-items-center">
@@ -112,14 +113,20 @@ const Info = ({id, auth, profile, dispatch}) => {
                                 </span>
                             </div>
 
-                            <h6>@{user.username} <span className="text-danger">{user.mobile}</span></h6>
-                            <p className="m-0">{user.address}</p>
-                            <h6 className="m-0">{user.email}</h6>
-                            <a href={user.website} target="_blank" rel="noreferrer">
-                                {user.website}
-                            </a>
-                            <p>{user.story}</p>
+                            <h6>
+                                @{user.username} 
+                                {user.pronouns && <span className="ml-2 text-muted" style={{ fontSize: '0.85rem', fontWeight: 'normal' }}>{user.pronouns}</span>}
+                            </h6>
+                            <h6 className="m-0" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{user.email}</h6>
+                            {user.website && (
+                                <a href={user.website} target="_blank" rel="noreferrer" className="d-block mb-1" style={{ color: '#00376b', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none' }}>
+                                    {user.website}
+                                </a>
+                            )}
+                            <p style={{ whiteSpace: 'pre-wrap', fontSize: '0.9rem' }}>{user.bio}</p>
                         </div>
+
+                        <Highlights userId={user._id} />
 
                         {
                             onEdit && <EditProfile setOnEdit={setOnEdit} />

@@ -38,8 +38,8 @@ const MomentsBar = () => {
     return (
         <div className="moments-wrapper">
             <div className="moments-title d-flex align-items-center" style={{ gap: '4px' }}>
-                <i className="fas fa-bolt text-primary" style={{ fontSize: '1rem' }}></i>
-                <span>Moments</span>
+                <i className="fas fa-history text-primary" style={{ fontSize: '1rem' }}></i>
+                <span>Stories</span>
             </div>
 
             <div className="moments-container">
@@ -96,6 +96,7 @@ const MomentsBar = () => {
                 {
                     followingGroups.map((group) => {
                         const isNew = hasUnviewedMoments(group)
+                        const isCF = group.moments.some(m => m.closeFriendsOnly)
                         const latestMoment = group.moments[0]
 
                         return (
@@ -108,11 +109,12 @@ const MomentsBar = () => {
                                     src={latestMoment.media} 
                                     alt="thumbnail" 
                                     className="moment-card-media" 
+                                    style={{ borderColor: isCF ? '#00e575' : '' }}
                                 />
                                 <div className="moment-card-overlay"></div>
 
-                                <div className={`moment-card-avatar ${isNew ? 'unviewed' : 'viewed'}`}>
-                                    <img src={group.user.avatar} alt="avatar" />
+                                <div className={`moment-card-avatar ${isNew ? 'unviewed' : 'viewed'} ${isCF ? 'close-friends' : ''}`}>
+                                    <img src={group.user.avatar} alt="avatar" style={{ border: isCF ? '2px solid #00e575' : '' }} />
                                 </div>
 
                                 <div className="moment-card-name text-truncate">

@@ -7,7 +7,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { viewMoment, deleteMoment } from '../../redux/actions/momentAction'
 import { addMessage } from '../../redux/actions/messageAction'
 import Avatar from '../Avatar'
-import { getDataAPI } from '../../utils/fetchData'
+import { getDataAPI, patchDataAPI } from '../../utils/fetchData'
 
 dayjs.extend(relativeTime)
 
@@ -32,6 +32,18 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
     const [videoDuration, setVideoDuration] = useState(5) // Default to 5s for image fallback
     const [showViewerList, setShowViewerList] = useState(false)
     const [isMuted, setIsMuted] = useState(true)
+
+    const handleVotePoll = async (optionId) => {
+        try {
+            const res = await patchDataAPI(`moments/${activeMoment._id}/vote`, { optionId }, auth.token)
+            if (res.data && res.data.moment) {
+                moments[activeIndex] = res.data.moment
+                setProgress(0) // reset progress to trigger update
+            }
+        } catch (err) {
+            dispatch({ type: GLOBALTYPES.ALERT, payload: { error: err.response?.data?.msg || err.message } })
+        }
+    }
     
     const activeMoment = moments[activeIndex]
     const timerRef = useRef(null)
@@ -325,6 +337,74 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
                                 alt="moment" 
                                 className="viewer-media" 
                             />
+                        )
+                    }
+
+                    {/* Story Poll Sticker Overlay */}
+                    {
+                        activeMoment.poll && activeMoment.poll.question && (
+                            <div 
+                                style={{
+                                    position: 'absolute',
+                                    top: '40%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    background: 'rgba(255,255,255,0.92)',
+                                    backdropFilter: 'blur(10px)',
+                                    borderRadius: '16px',
+                                    padding: '16px',
+                                    width: '260px',
+                                    textAlign: 'center',
+                                    boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                                    zIndex: 25,
+                                    border: '1px solid rgba(255,255,255,0.4)',
+                                    color: '#000'
+                                }}
+                                onClick={e => e.stopPropagation()}
+                            >
+                                <div style={{ fontWeight: 'bold', fontSize: '0.95rem', marginBottom: '12px' }}>
+                                    {activeMoment.poll.question}
+                                </div>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    {activeMoment.poll.options.map(opt => {
+                                        const totalVotes = activeMoment.poll.options.reduce((sum, o) => sum + o.votes.length, 0);
+                                        const myVote = opt.votes.includes(auth.user._id);
+                                        const hasVoted = activeMoment.poll.options.some(o => o.votes.includes(auth.user._id));
+                                        const percent = totalVotes > 0 ? Math.round((opt.votes.length / totalVotes) * 100) : 0;
+
+                                        return (
+                                            <button
+                                                key={opt._id}
+                                                onClick={() => !hasVoted && handleVotePoll(opt._id)}
+                                                disabled={hasVoted}
+                                                style={{
+                                                    flex: 1,
+                                                    padding: '10px',
+                                                    borderRadius: '12px',
+                                                    border: '1px solid #ddd',
+                                                    background: myVote ? 'linear-gradient(45deg, #f09433, #dc2743)' : '#fff',
+                                                    color: myVote ? '#fff' : '#000',
+                                                    fontSize: '0.85rem',
+                                                    fontWeight: 'bold',
+                                                    cursor: hasVoted ? 'default' : 'pointer',
+                                                    transition: 'all 0.2s',
+                                                    position: 'relative',
+                                                    overflow: 'hidden'
+                                                }}
+                                            >
+                                                {hasVoted ? (
+                                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                                        <span>{opt.text}</span>
+                                                        <span style={{ fontSize: '0.95rem', color: myVote ? '#fff' : '#0095f6' }}>{percent}%</span>
+                                                    </div>
+                                                ) : (
+                                                    opt.text
+                                                )}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            </div>
                         )
                     }
 

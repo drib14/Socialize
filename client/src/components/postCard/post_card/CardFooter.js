@@ -11,12 +11,14 @@ import { BASE_URL } from '../../../utils/config'
 import { FaRegComment, FaRegPaperPlane, FaRetweet, FaRegBookmark, FaBookmark } from 'react-icons/fa'
 import { customConfirm } from '../../../utils/customAlert'
 import Avatar from '../../Avatar'
+import SaveToCollectionModal from '../../saved/SaveToCollectionModal'
 
 const CardFooter = ({post, showComments, setShowComments}) => {
     const [isLike, setIsLike] = useState(false)
     const [loadLike, setLoadLike] = useState(false)
 
     const [isShare, setIsShare] = useState(false)
+    const [showSaveModal, setShowSaveModal] = useState(false)
 
     const { auth, theme, socket } = useSelector(state => state)
     const dispatch = useDispatch()
@@ -89,6 +91,7 @@ const CardFooter = ({post, showComments, setShowComments}) => {
         setSaveLoad(true)
         await dispatch(savePost({post, auth}))
         setSaveLoad(false)
+        setShowSaveModal(true)
     }
 
     const handleUnSavePost = async () => {
@@ -178,7 +181,11 @@ const CardFooter = ({post, showComments, setShowComments}) => {
 
             <div className="d-flex justify-content-between pt-2 px-1" style={{ fontSize: '0.85rem', borderTop: '1px solid var(--border-color)', opacity: 0.85 }}>
                 <span className="font-weight-bold" style={{ cursor: 'pointer', color: 'var(--text-main)' }} onClick={() => setShowLikesModal(true)}>
-                    {post.likes.length} {post.likes.length === 1 ? 'like' : 'likes'}
+                    {
+                        post.hideLikeCounts && post.user._id !== auth.user._id
+                        ? "View likes"
+                        : `${post.likes.length} ${post.likes.length === 1 ? 'like' : 'likes'}`
+                    }
                 </span>
                 
                 <span className="font-weight-bold" style={{ cursor: 'pointer', color: 'var(--text-main)' }} onClick={() => setShowComments(!showComments)}>
@@ -359,6 +366,12 @@ const CardFooter = ({post, showComments, setShowComments}) => {
                     </div>
                 </div>
             )}
+            
+            <SaveToCollectionModal 
+                isOpen={showSaveModal} 
+                onClose={() => setShowSaveModal(false)} 
+                postId={post._id} 
+            />
         </div>
     )
 }

@@ -14,39 +14,39 @@
 @import url("./moments.css");
 
 :root {
-  --primary-color: #10b981; /* Leaf Green / Emerald */
-  --primary-hover: #059669;
-  --primary-light: #ecfdf5;
-  --accent-color: #84cc16; /* Lime Accent */
-  --bg-body: #f8fafc; /* Slate-50 */
+  --primary-color: #0095f6; /* Instagram CTA Blue */
+  --primary-hover: #1877f2;
+  --primary-light: #e0f4ff;
+  --accent-color: #ed4956; /* Instagram Like Red */
+  --bg-body: #fafafa; /* Flat Instagram off-white */
   --bg-card: #ffffff;
-  --bg-nav: rgba(255, 255, 255, 0.75);
-  --bg-input: #f1f5f9;
-  --text-main: #0f172a; /* Slate-900 */
-  --text-secondary: #1e293b; /* Slate-800 for high readability */
-  --text-muted: #576574; /* Darker muted text for high contrast */
-  --border-color: #e2e8f0;
+  --bg-nav: rgba(255, 255, 255, 0.95);
+  --bg-input: #efefef;
+  --text-main: #262626; /* Dark gray */
+  --text-secondary: #8e8e8e; /* Muted gray */
+  --text-muted: #c7c7c7; /* Light gray */
+  --border-color: #dbdbdb;
   
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.12);
   
-  --radius-lg: 18px;
-  --radius-md: 12px;
-  --radius-sm: 8px;
+  --radius-lg: 8px; /* Flatter cards */
+  --radius-md: 8px;
+  --radius-sm: 4px;
   
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: all 0.2s ease-in-out;
 }
 
 [data-theme="dark"] {
-  --bg-body: #090d16; /* Deep futuristic space navy */
-  --bg-card: #111827; /* Dark gray/slate */
-  --bg-nav: rgba(17, 24, 39, 0.75);
-  --bg-input: #1f2937;
-  --text-main: #f9fafb;
-  --text-secondary: #f1f5f9; /* Slate-100 for high readability */
-  --text-muted: #cbd5e1; /* Slate-300 for high contrast */
-  --border-color: #374151;
+  --bg-body: #000000; /* Flat black */
+  --bg-card: #121212; /* Dark gray */
+  --bg-nav: rgba(0, 0, 0, 0.95);
+  --bg-input: #262626;
+  --text-main: #f5f5f5;
+  --text-secondary: #a8a8a8;
+  --text-muted: #737373;
+  --border-color: #262626;
   
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);

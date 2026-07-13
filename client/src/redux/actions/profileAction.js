@@ -54,8 +54,8 @@ export const updateProfileUser = ({userData, avatar, auth}) => async (dispatch) 
     if(userData.fullname.length > 25)
     return dispatch({type: GLOBALTYPES.ALERT, payload: {error: "Your full name too long."}})
 
-    if(userData.story.length > 200)
-    return dispatch({type: GLOBALTYPES.ALERT, payload: {error: "Your story too long."}})
+    if(userData.bio && userData.bio.length > 150)
+    return dispatch({type: GLOBALTYPES.ALERT, payload: {error: "Your bio is too long."}})
 
     try {
         let media;
@@ -79,6 +79,50 @@ export const updateProfileUser = ({userData, avatar, auth}) => async (dispatch) 
             }
         })
 
+        dispatch({type: GLOBALTYPES.ALERT, payload: {success: res.data.msg}})
+    } catch (err) {
+        dispatch({
+            type: GLOBALTYPES.ALERT, 
+            payload: {error: err.response?.data?.msg || err.message}
+        })
+    }
+}
+
+export const addCloseFriend = ({user, auth}) => async (dispatch) => {
+    try {
+        const res = await patchDataAPI(`user/${user._id}/add_close_friend`, null, auth.token)
+        dispatch({
+            type: GLOBALTYPES.AUTH,
+            payload: {
+                ...auth,
+                user: {
+                    ...auth.user,
+                    closeFriends: [...auth.user.closeFriends, user._id]
+                }
+            }
+        })
+        dispatch({type: GLOBALTYPES.ALERT, payload: {success: res.data.msg}})
+    } catch (err) {
+        dispatch({
+            type: GLOBALTYPES.ALERT, 
+            payload: {error: err.response?.data?.msg || err.message}
+        })
+    }
+}
+
+export const removeCloseFriend = ({user, auth}) => async (dispatch) => {
+    try {
+        const res = await patchDataAPI(`user/${user._id}/remove_close_friend`, null, auth.token)
+        dispatch({
+            type: GLOBALTYPES.AUTH,
+            payload: {
+                ...auth,
+                user: {
+                    ...auth.user,
+                    closeFriends: auth.user.closeFriends.filter(id => id !== user._id)
+                }
+            }
+        })
         dispatch({type: GLOBALTYPES.ALERT, payload: {success: res.data.msg}})
     } catch (err) {
         dispatch({

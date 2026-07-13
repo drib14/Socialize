@@ -4,10 +4,6 @@ const commentSchema = new mongoose.Schema({
     content: {
         type: String
     },
-    images: [{
-        url: { type: String },
-        public_id: { type: String }
-    }],
     tag: Object,
     reply: mongoose.Types.ObjectId,
     likes: [{type: mongoose.Types.ObjectId, ref: 'user'}],

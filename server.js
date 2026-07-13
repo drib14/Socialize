@@ -51,6 +51,8 @@ app.use('/api', require('./routes/commentRouter'))
 app.use('/api', require('./routes/notifyRouter'))
 app.use('/api', require('./routes/messageRouter'))
 app.use('/api', require('./routes/momentRouter'))
+app.use('/api', require('./routes/savedCollectionRouter'))
+app.use('/api', require('./routes/highlightRouter'))
 
 
 // Connect to MongoDB

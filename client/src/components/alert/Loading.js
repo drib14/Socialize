@@ -17,14 +17,12 @@ const Loading = () => {
         }}>
             <div className="splash_container" style={{ textAlign: 'center' }}>
                 <img 
-                    src="/icon-web-01.png" 
+                    src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" 
                     alt="Instagram Logo" 
                     className="pulse"
                     style={{
                         width: '90px',
                         height: '90px',
-                        borderRadius: '20px',
-                        boxShadow: '0 8px 32px rgba(16, 185, 129, 0.2)',
                         animation: 'pulse 1.8s infinite ease-in-out'
                     }} 
                 />
@@ -41,7 +39,7 @@ const Loading = () => {
                     marginTop: '15px',
                     height: '4px',
                     width: '80px',
-                    background: 'linear-gradient(90deg, var(--primary-color) 0%, var(--accent-color) 50%, var(--primary-color) 100%)',
+                    background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
                     backgroundSize: '200% 100%',
                     borderRadius: '4px',
                     margin: '10px auto 0',

@@ -10,5 +10,6 @@ router.get('/moments/archive', auth, momentCtrl.getMomentsArchive)
 
 router.post('/moments/:id/view', auth, momentCtrl.viewMoment)
 router.delete('/moments/:id', auth, momentCtrl.deleteMoment)
+router.patch('/moments/:id/vote', auth, momentCtrl.voteStoryPoll)
 
 module.exports = router

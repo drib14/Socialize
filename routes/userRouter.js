@@ -14,6 +14,8 @@ router.patch('/user/:id/unfollow', auth, userCtrl.unfollow)
 
 router.patch('/user/:id/block', auth, userCtrl.blockUser)
 router.patch('/user/:id/unblock', auth, userCtrl.unblockUser)
+router.patch('/user/:id/add_close_friend', auth, userCtrl.addCloseFriend)
+router.patch('/user/:id/remove_close_friend', auth, userCtrl.removeCloseFriend)
 
 router.get('/user_requests', auth, userCtrl.getFollowRequests)
 router.patch('/user_requests/:id/accept', auth, userCtrl.acceptFollowRequest)

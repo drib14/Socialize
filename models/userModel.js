@@ -29,20 +29,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'https://res.cloudinary.com/devatchannel/image/upload/v1602752402/avatar/avatar_cugq40.png'
     },
-    role: {type: String, default: 'user'},
-    gender: {type: String, default: 'male'},
-    mobile: {type: String, default: ''},
-    address: {type: String, default: ''},
-    story: {
+    bio: {
         type: String, 
         default: '',
-        maxlength: 200
+        maxlength: 150
     },
+    pronouns: {type: String, default: ''},
     website: {type: String, default: ''},
     followers: [{type: mongoose.Types.ObjectId, ref: 'user'}],
     following: [{type: mongoose.Types.ObjectId, ref: 'user'}],
     saved: [{type: mongoose.Types.ObjectId, ref: 'post'}],
     blockedUsers: [{type: mongoose.Types.ObjectId, ref: 'user'}],
+    closeFriends: [{type: mongoose.Types.ObjectId, ref: 'user'}],
     isPrivate: {type: Boolean, default: false},
     status: {type: String, enum: ['active', 'deactivated', 'suspended'], default: 'active'},
     lastActive: {type: Date, default: Date.now}

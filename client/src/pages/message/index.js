@@ -12,14 +12,13 @@ const Message = () => {
                 <div className="d-flex justify-content-center 
                 align-items-center flex-column h-100">
 
-                    <img src="/icon-web-01.png" alt="Chattix Logo" 
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram Logo" 
                     style={{
                         width: '90px', 
-                        height: '90px', 
-                        borderRadius: '20px', 
-                        boxShadow: 'var(--shadow-md)'
+                        height: '90px'
                     }} />
-                    <h4 className="mt-3 font-weight-bold" style={{color: 'var(--text-secondary)'}}>Chattix</h4>
+                    <h4 className="mt-3 font-weight-bold" style={{color: 'var(--text-main)', fontSize: '1.25rem'}}>Your Messages</h4>
+                    <p className="text-muted" style={{fontSize: '0.88rem'}}>Send private photos and messages to a friend or group.</p>
 
                 </div>
             </div>
