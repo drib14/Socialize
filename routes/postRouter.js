@@ -27,6 +27,8 @@ router.patch('/unSavePost/:id', auth, postCtrl.unSavePost)
 
 router.get('/getSavePosts', auth, postCtrl.getSavePosts)
 
+router.get('/posts/tag/:tag', auth, postCtrl.getPostsByTag)
+
 router.post('/upload_media', auth, postCtrl.uploadMedia)
 
 router.get('/location_key', auth, (req, res) => {

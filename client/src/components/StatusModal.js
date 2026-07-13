@@ -18,6 +18,7 @@ const StatusModal = () => {
 
     const [content, setContent] = useState('')
     const [images, setImages] = useState([])
+    const [visibility, setVisibility] = useState('public')
 
     const [stream, setStream] = useState(false)
     const videoRef = useRef()
@@ -197,15 +198,16 @@ const StatusModal = () => {
         })
 
         if(status.onEdit){
-            dispatch(updatePost({content, images, auth, status, location, mood}))
+            dispatch(updatePost({content, images, auth, status, location, mood, visibility}))
         }else{
-            dispatch(createPost({content, images, auth, socket, location, mood}))
+            dispatch(createPost({content, images, auth, socket, location, mood, visibility}))
         }
 
         setContent('')
         setImages([])
         setLocation('')
         setMood('')
+        setVisibility('public')
         setShowLocationInput(false)
         setShowMoodCards(false)
         if(tracks) tracks.stop()
@@ -217,6 +219,7 @@ const StatusModal = () => {
         setImages([])
         setLocation('')
         setMood('')
+        setVisibility('public')
         setShowLocationInput(false)
         setShowMoodCards(false)
         if(tracks) tracks.stop()
@@ -229,6 +232,7 @@ const StatusModal = () => {
             setImages(status.images)
             setLocation(status.location || '')
             setMood(status.mood || '')
+            setVisibility(status.visibility || 'public')
         }
     },[status])
 
@@ -249,6 +253,37 @@ const StatusModal = () => {
                 </div>
 
                 <div className="status_body">
+                    <div className="d-flex align-items-center mb-3">
+                        <Avatar src={auth.user.avatar} size="big-avatar" />
+                        <div className="ml-2">
+                            <span className="d-block font-weight-bold" style={{ color: 'var(--text-main)', fontSize: '0.9rem' }}>
+                                {auth.user.fullname}
+                            </span>
+                            <div className="mt-1">
+                                <select 
+                                    value={visibility} 
+                                    onChange={(e) => setVisibility(e.target.value)}
+                                    className="custom-select custom-select-sm"
+                                    style={{ 
+                                        width: 'auto', 
+                                        borderRadius: '12px', 
+                                        fontSize: '0.75rem', 
+                                        padding: '2px 8px', 
+                                        height: '24px', 
+                                        cursor: 'pointer',
+                                        background: 'var(--bg-input)',
+                                        color: 'var(--text-main)',
+                                        borderColor: 'var(--border-color)'
+                                    }}
+                                >
+                                    <option value="public">🌐 Public</option>
+                                    <option value="followers">👥 Followers Only</option>
+                                    <option value="private">🔒 Only Me</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <textarea name="content" value={content}
                     placeholder={`${auth.user.username}, what are you thinking?`}
                     onChange={handleTextareaChange}

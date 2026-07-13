@@ -47,23 +47,25 @@ const Info = ({id, auth, profile, dispatch}) => {
                                 <h2>{user.fullname}</h2>
                                 {
                                     user._id === auth.user._id ? (
-                                        <div className="d-flex align-items-center gap-2">
-                                            <button className="btn btn-outline-info d-flex align-items-center gap-1"
-                                            onClick={() => setOnEdit(true)} title="Edit Profile">
-                                                <span className="material-icons" style={{ fontSize: '1.2rem' }}>edit</span>
+                                        <div className="d-flex align-items-center">
+                                            <button className="btn btn-outline-secondary d-flex align-items-center mr-2"
+                                            onClick={() => setOnEdit(true)} title="Edit Profile" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>
+                                                <span className="material-icons mr-1" style={{ fontSize: '1.1rem' }}>edit</span>
                                                 Edit Profile
                                             </button>
-                                            <button className="btn btn-success d-flex align-items-center gap-1"
-                                            onClick={() => setOnAddMoment(true)} title="Add Moment">
-                                                <span className="material-icons" style={{ fontSize: '1.2rem' }}>add_a_photo</span>
+                                            <button className="btn btn-success d-flex align-items-center"
+                                            onClick={() => setOnAddMoment(true)} title="Add Moment" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>
+                                                <span className="material-icons mr-1" style={{ fontSize: '1.1rem' }}>flash_on</span>
                                                 Add Moment
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="d-flex align-items-center gap-2">
-                                            <FollowBtn user={user} />
-                                            <Link to={`/message/${user._id}`} className="btn btn-outline-info d-flex align-items-center gap-1" title="Send Message">
-                                                <span className="material-icons" style={{ fontSize: '1.2rem' }}>near_me</span>
+                                        <div className="d-flex align-items-center">
+                                            <div className="mr-2">
+                                                <FollowBtn user={user} />
+                                            </div>
+                                            <Link to={`/message/${user._id}`} className="btn btn-outline-success d-flex align-items-center" title="Send Message" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>
+                                                <span className="material-icons mr-1" style={{ fontSize: '1.1rem' }}>near_me</span>
                                                 Message
                                             </Link>
                                         </div>

@@ -20,13 +20,18 @@ class APIfeatures {
 const postCtrl = {
     createPost: async (req, res) => {
         try {
-            const { content, images, location, mood } = req.body
+            const { content, images, location, mood, visibility } = req.body
 
             if(content.trim().length === 0 && images.length === 0)
             return res.status(400).json({msg: "Please add content or a photo."})
 
+            const contentStr = content || ''
+            const hashtags = contentStr.match(/#\w+/g)?.map(tag => tag.slice(1).toLowerCase()) || []
+
             const newPost = new Posts({
-                content, images, user: req.user._id, location, mood
+                content, images, user: req.user._id, location, mood,
+                visibility: visibility || 'public',
+                tags: hashtags
             })
             await newPost.save()
 
@@ -43,9 +48,19 @@ const postCtrl = {
     },
     getPosts: async (req, res) => {
         try {
-            const features =  new APIfeatures(Posts.find({
-                user: [...req.user.following, req.user._id]
-            }), req.query).paginating()
+            const myBlocked = req.user.blockedUsers || []
+            const usersWhoBlockedMe = await Users.find({ blockedUsers: req.user._id }).select('_id')
+            const excludeUsers = [...myBlocked, ...usersWhoBlockedMe.map(u => u._id)]
+
+            const query = {
+                $or: [
+                    { user: req.user._id },
+                    { user: { $in: req.user.following }, visibility: { $ne: 'private' } }
+                ],
+                user: { $nin: excludeUsers }
+            }
+
+            const features =  new APIfeatures(Posts.find(query), req.query).paginating()
 
             const posts = await features.query.sort('-createdAt')
             .populate("user likes", "avatar username fullname followers lastActive")
@@ -76,10 +91,15 @@ const postCtrl = {
     },
     updatePost: async (req, res) => {
         try {
-            const { content, images, location, mood } = req.body
+            const { content, images, location, mood, visibility } = req.body
 
-            const post = await Posts.findOneAndUpdate({_id: req.params.id}, {
-                content, images, location, mood
+            const contentStr = content || ''
+            const hashtags = contentStr.match(/#\w+/g)?.map(tag => tag.slice(1).toLowerCase()) || []
+
+            const post = await Posts.findOneAndUpdate({_id: req.params.id, user: req.user._id}, {
+                content, images, location, mood,
+                visibility: visibility || 'public',
+                tags: hashtags
             }).populate("user likes", "avatar username fullname lastActive")
             .populate({
                 path: "comments",
@@ -89,11 +109,13 @@ const postCtrl = {
                 }
             })
 
+            if(!post) return res.status(400).json({msg: 'This post does not exist or you are not authorized.'})
+
             res.json({
                 msg: "Updated Post!",
                 newPost: {
                     ...post._doc,
-                    content, images
+                    content, images, location, mood, visibility: visibility || 'public', tags: hashtags
                 }
             })
         } catch (err) {
@@ -134,7 +156,26 @@ const postCtrl = {
     },
     getUserPosts: async (req, res) => {
         try {
-            const features = new APIfeatures(Posts.find({user: req.params.id}), req.query)
+            const targetId = req.params.id
+            const myBlocked = req.user.blockedUsers || []
+            const targetUser = await Users.findById(targetId)
+
+            if (!targetUser || myBlocked.some(id => (id._id || id).toString() === targetId.toString()) || 
+                targetUser.blockedUsers.some(id => (id._id || id).toString() === req.user._id.toString())) {
+                return res.json({ posts: [], result: 0 })
+            }
+
+            let query = { user: targetId }
+            if (targetId.toString() !== req.user._id.toString()) {
+                const isFollowing = targetUser.followers.some(id => (id._id || id).toString() === req.user._id.toString())
+                if (isFollowing) {
+                    query.visibility = { $in: ['public', 'followers'] }
+                } else {
+                    query.visibility = 'public'
+                }
+            }
+
+            const features = new APIfeatures(Posts.find(query), req.query)
             .paginating()
             const posts = await features.query.sort("-createdAt")
             .populate("user likes", "avatar username fullname followers")
@@ -176,6 +217,26 @@ const postCtrl = {
 
             if(!post) return res.status(400).json({msg: 'This post does not exist.'})
 
+            const authorId = post.user._id.toString()
+            const authorUser = await Users.findById(authorId)
+            const myBlocked = req.user.blockedUsers || []
+            if (myBlocked.some(id => (id._id || id).toString() === authorId) || 
+                (authorUser && authorUser.blockedUsers.some(id => (id._id || id).toString() === req.user._id.toString()))) {
+                return res.status(403).json({msg: "You are blocked or not authorized to view this post."})
+            }
+
+            if (authorId !== req.user._id.toString()) {
+                if (post.visibility === 'private') {
+                    return res.status(403).json({msg: "This post is private."})
+                }
+                if (post.visibility === 'followers') {
+                    const isFollowing = authorUser && authorUser.followers.some(id => (id._id || id).toString() === req.user._id.toString())
+                    if (!isFollowing) {
+                        return res.status(403).json({msg: "This post is for followers only."})
+                    }
+                }
+            }
+
             res.json({
                 post
             })
@@ -186,15 +247,25 @@ const postCtrl = {
     },
     getPostsDicover: async (req, res) => {
         try {
+            const myBlocked = req.user.blockedUsers || []
+            const usersWhoBlockedMe = await Users.find({ blockedUsers: req.user._id }).select('_id')
+            const excludeUsers = [...myBlocked.map(id => (id._id || id)), ...usersWhoBlockedMe.map(u => u._id)]
 
-            const newArr = [...req.user.following, req.user._id]
-
+            const newArr = [...req.user.following, req.user._id, ...excludeUsers]
             const num  = req.query.num || 9
 
-            const posts = await Posts.aggregate([
-                { $match: { user : { $nin: newArr } } },
-                { $sample: { size: Number(num) } },
-            ])
+            const posts = await Posts.find({
+                user: { $nin: newArr },
+                visibility: 'public'
+            }).limit(Number(num)).sort('-createdAt')
+            .populate("user likes", "avatar username fullname followers lastActive")
+            .populate({
+                path: "comments",
+                populate: {
+                    path: "user likes",
+                    select: "-password"
+                }
+            })
 
             return res.json({
                 msg: 'Success!',
@@ -208,13 +279,28 @@ const postCtrl = {
     },
     deletePost: async (req, res) => {
         try {
-            const post = await Posts.findOneAndDelete({_id: req.params.id, user: req.user._id})
+            const post = await Posts.findOne({_id: req.params.id, user: req.user._id})
+            if(!post) return res.status(400).json({msg: 'Post not found or unauthorized.'})
+
+            if(post.images && post.images.length > 0) {
+                for(const img of post.images) {
+                    if(img.public_id) {
+                        try {
+                            await deleteCloudinaryMedia(img.public_id, img.resource_type || 'image')
+                        } catch(err) {
+                            console.error("Cloudinary delete error:", err)
+                        }
+                    }
+                }
+            }
+
+            await Posts.findOneAndDelete({_id: req.params.id})
             await Comments.deleteMany({_id: {$in: post.comments }})
 
             res.json({
                 msg: 'Deleted Post!',
                 newPost: {
-                    ...post,
+                    ...post._doc,
                     user: req.user
                 }
             })
@@ -381,7 +467,99 @@ const postCtrl = {
         } catch (err) {
             return res.status(500).json({msg: err.message});
         }
+    },
+    getPostsByTag: async (req, res) => {
+        try {
+            const hashtag = req.params.tag.toLowerCase();
+            const myBlocked = req.user.blockedUsers || [];
+            const usersWhoBlockedMe = await Users.find({ blockedUsers: req.user._id }).select('_id');
+            const excludeUsers = [...myBlocked.map(id => (id._id || id)), ...usersWhoBlockedMe.map(u => u._id)];
+
+            const features = new APIfeatures(Posts.find({
+                tags: hashtag,
+                user: { $nin: excludeUsers },
+                $or: [
+                    { user: req.user._id },
+                    { visibility: 'public' },
+                    { user: { $in: req.user.following }, visibility: 'followers' }
+                ]
+            }), req.query).paginating();
+
+            const posts = await features.query.sort('-createdAt')
+                .populate("user likes", "avatar username fullname followers lastActive")
+                .populate({
+                    path: "comments",
+                    populate: {
+                        path: "user likes",
+                        select: "-password"
+                    }
+                })
+                .populate({
+                    path: "repostOf",
+                    populate: {
+                        path: "user likes",
+                        select: "avatar username fullname lastActive"
+                    }
+                });
+
+            res.json({
+                msg: 'Success!',
+                result: posts.length,
+                posts
+            });
+        } catch (err) {
+            return res.status(500).json({ msg: err.message });
+        }
     }
 }
+
+const deleteCloudinaryMedia = (publicId, resourceType = 'image') => {
+    return new Promise((resolve, reject) => {
+        const crypto = require('crypto');
+        const https = require('https');
+
+        const timestamp = Math.round(new Date().getTime() / 1000);
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME || 'dwquuisuj';
+        const apiKey = process.env.CLOUDINARY_API_KEY || '655351295167741';
+        const apiSecret = process.env.CLOUDINARY_API_SECRET || 'F0UAKwbXYzDbcTbFr43iwL0D0qQ';
+
+        const stringToSign = `public_id=${publicId}&timestamp=${timestamp}${apiSecret}`;
+        const signature = crypto.createHash('sha1').update(stringToSign).digest('hex');
+
+        const postData = JSON.stringify({
+            public_id: publicId,
+            timestamp: timestamp,
+            api_key: apiKey,
+            signature: signature
+        });
+
+        const options = {
+            hostname: 'api.cloudinary.com',
+            path: `/v1_1/${cloudName}/${resourceType === 'video' ? 'video' : 'image'}/destroy`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
+            }
+        };
+
+        const request = https.request(options, (response) => {
+            let rawData = '';
+            response.on('data', (chunk) => { rawData += chunk; });
+            response.on('end', () => {
+                try {
+                    const parsed = JSON.parse(rawData);
+                    resolve(parsed);
+                } catch (e) {
+                    reject(new Error(`Failed to parse destroy response: ${rawData}`));
+                }
+            });
+        });
+
+        request.on('error', (e) => { reject(e); });
+        request.write(postData);
+        request.end();
+    });
+};
 
 module.exports = postCtrl
