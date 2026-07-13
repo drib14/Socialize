@@ -215,49 +215,61 @@
 
 /* --------- Save Tab ----------- */
 .profile_tab {
+    position: relative;
     width: 100%;
+    max-width: 320px;
+    margin: 0 auto 30px auto;
     display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
-    gap: 15px;
-    background-color: var(--bg-card);
-    padding: 12px;
-    border-radius: var(--radius-lg);
+    justify-content: space-between;
+    background-color: var(--bg-input);
+    padding: 4px;
+    border-radius: 24px;
     border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
+    overflow: hidden;
 }
 
 .profile_tab button {
+    position: relative;
+    width: 50%;
     outline: none !important;
     border: none !important;
-    text-transform: uppercase;
-    font-weight: 700 !important;
-    font-size: 0.95rem !important;
-    padding: 10px 24px !important;
-    cursor: pointer;
-    border-radius: var(--radius-md) !important;
-    background: linear-gradient(135deg, var(--bg-input) 0%, var(--border-color) 100%) !important;
+    background: transparent !important;
     color: var(--text-secondary) !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05),
-                inset 2px 2px 4px rgba(255, 255, 255, 0.4),
-                inset -2px -2px 4px rgba(0, 0, 0, 0.1) !important;
-    transition: var(--transition) !important;
-    opacity: 0.8;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    padding: 8px 0 !important;
+    cursor: pointer;
+    border-radius: 20px !important;
+    z-index: 2;
+    transition: color 0.25s ease !important;
+    box-shadow: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .profile_tab button.active {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
     color: white !important;
-    opacity: 1;
-    box-shadow: 0 6px 14px rgba(16, 185, 129, 0.3),
-                inset 2px 2px 4px rgba(255, 255, 255, 0.4),
-                inset -2px -2px 4px rgba(0, 0, 0, 0.2) !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
 .profile_tab button:hover {
-    opacity: 1;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1),
-                inset 3px 3px 6px rgba(255, 255, 255, 0.5),
-                inset -3px -3px 6px rgba(0, 0, 0, 0.15) !important;
+    transform: none !important;
+    color: var(--text-main) !important;
+    box-shadow: none !important;
+}
+
+.profile_tab .tab_slider {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    height: calc(100% - 8px);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    border-radius: 20px;
+    z-index: 1;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
 }

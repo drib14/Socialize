@@ -47,10 +47,19 @@ const Profile = () => {
                         <div className="profile_tab">
                             <button className={tab === 'posts' ? 'active' : ''} onClick={() => setTab('posts')} title="Posts">
                                 <span className="material-icons">grid_on</span>
+                                Posts
                             </button>
                             <button className={tab === 'reposts' ? 'active' : ''} onClick={() => setTab('reposts')} title="Reposts">
                                 <span className="material-icons">repeat</span>
+                                Reposts
                             </button>
+
+                            <div 
+                                className="tab_slider" 
+                                style={{
+                                    transform: `translateX(${tab === 'posts' ? '0' : 'calc(100% - 4px)'})`
+                                }}
+                            />
                         </div>
 
                         {

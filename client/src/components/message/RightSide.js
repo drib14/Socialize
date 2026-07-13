@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import UserCard from '../UserCard'
+import Avatar from '../Avatar'
 import { useSelector, useDispatch } from 'react-redux'
 import { useParams, useNavigate } from 'react-router-dom'
 import MsgDisplay from './MsgDisplay'
@@ -16,6 +17,42 @@ const RightSide = () => {
 
     const { id } = useParams()
     const [user, setUser] = useState([])
+
+    const isMutualFollower = (userId) => {
+        if (!auth.user || !auth.user.following || !auth.user.followers) return false;
+        const targetId = typeof userId === 'object' ? (userId._id || userId) : userId;
+        const isFollowing = auth.user.following.some(item => {
+            const id = typeof item === 'object' ? (item._id || item) : item;
+            return id.toString() === targetId.toString();
+        });
+        const isFollower = auth.user.followers.some(item => {
+            const id = typeof item === 'object' ? (item._id || item) : item;
+            return id.toString() === targetId.toString();
+        });
+        return isFollowing && isFollower;
+    }
+
+    const getOfflineTime = (lastActive) => {
+        if (!lastActive) return '';
+        const diff = new Date().getTime() - new Date(lastActive).getTime();
+        if (diff < 0) return '<1m';
+        
+        const minutes = Math.floor(diff / 1000 / 60);
+        if (minutes < 1) return '<1m';
+        if (minutes < 60) return `${minutes}m`;
+        
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h`;
+        
+        const days = Math.floor(hours / 24);
+        if (days < 30) return `${days}d`;
+        
+        const months = Math.floor(days / 30);
+        if (months < 12) return `${months}mo`;
+        
+        const years = Math.floor(months / 12);
+        return `${years}y`;
+    };
     const [text, setText] = useState('')
     const [media, setMedia] = useState([])
     const [loadMedia, setLoadMedia] = useState(false)
@@ -316,21 +353,46 @@ const RightSide = () => {
 
     return (
         <>
-            <div className="message_header" style={{cursor: 'pointer'}} >
+            <div className="message_header d-flex align-items-center justify-content-between py-2 px-3" style={{ cursor: 'pointer', borderBottom: '1px solid var(--border-color)', height: '70px' }} >
                 {
                     user.length !== 0 &&
-                    <UserCard user={user}>
-                        <div>
-                            <i className="fas fa-phone-alt"
-                            onClick={handleAudioCall} />
-
-                            <i className="fas fa-video mx-3"
-                            onClick={handleVideoCall} />
-
-                            <i className="fas fa-trash text-danger"
-                            onClick={handleDeleteConversation} />
+                    <>
+                        <div className="d-flex align-items-center" onClick={() => navigate(`/profile/${user._id}`)}>
+                            <div className="position-relative mr-2">
+                                <Avatar src={user.avatar} size="big-avatar" />
+                                {
+                                    ((online.includes(user._id) && isMutualFollower(user._id)) || user._id === auth.user._id) ? (
+                                        <span className="position-absolute" style={{
+                                            width: '10px',
+                                            height: '10px',
+                                            background: '#2b8a3e',
+                                            border: '2px solid var(--bg-card)',
+                                            borderRadius: '50%',
+                                            bottom: '2px',
+                                            right: '2px',
+                                            boxShadow: '0 0 0 2px rgba(43,138,62,0.2)'
+                                        }} />
+                                    ) : null
+                                }
+                            </div>
+                            <div>
+                                <h6 className="m-0 font-weight-bold" style={{ fontSize: '0.9rem', color: 'var(--text-main)' }}>{user.fullname}</h6>
+                                <small style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                    {
+                                        ((online.includes(user._id) && isMutualFollower(user._id)) || user._id === auth.user._id)
+                                        ? <span className="text-success font-weight-bold">Online</span>
+                                        : user.lastActive ? `Active ${getOfflineTime(user.lastActive)} ago` : `@${user.username}`
+                                    }
+                                </small>
+                            </div>
                         </div>
-                    </UserCard>
+
+                        <div className="d-flex align-items-center" style={{ gap: '15px' }}>
+                            <i className="fas fa-phone-alt text-secondary" onClick={handleAudioCall} style={{ cursor: 'pointer', fontSize: '1.1rem' }} title="Audio Call" />
+                            <i className="fas fa-video text-secondary mx-3" onClick={handleVideoCall} style={{ cursor: 'pointer', fontSize: '1.1rem' }} title="Video Call" />
+                            <i className="fas fa-trash text-danger" onClick={handleDeleteConversation} style={{ cursor: 'pointer', fontSize: '1.1rem' }} title="Delete Chat" />
+                        </div>
+                    </>
                 }
             </div>
 

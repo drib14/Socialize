@@ -9,6 +9,17 @@ import Modal from 'react-modal'
 
 Modal.setAppElement('#root')
 
+const getReactionColor = (iconName) => {
+    if (iconName === 'thumb_up') return '#1877f2'; // FB Blue
+    if (iconName === 'favorite') return '#e0245e'; // Heart Red
+    if (iconName === 'sentiment_very_satisfied') return '#f5c33b'; // Laugh Yellow
+    if (iconName === 'sentiment_very_dissatisfied') return '#f5c33b'; // Sad Yellow
+    if (iconName === 'celebration') return '#ff9f43'; // Celebration Orange
+    if (iconName === 'local_fire_department') return '#ff4757'; // Fire Red
+    if (iconName === 'lightbulb') return '#eccc68'; // Idea Gold
+    return 'var(--text-secondary)';
+};
+
 // Customized Audio Bubble Component
 const CustomAudioPlayer = ({ url }) => {
     const audioRef = useRef(null);
@@ -481,14 +492,17 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
                                           zIndex: 100,
                                           boxShadow: 'var(--shadow-md)'
                                       }}>
-                                      {['👍', '❤️', '😂', '😮', '😢', '🙏', '🔥', '👏', '🎉', '💯', '👀', '🤔', '💩', '🚀', '💡'].map(emoji => (
-                                          <span key={emoji} style={{ cursor: 'pointer', fontSize: '1.2rem' }}
+                                      {['thumb_up', 'favorite', 'sentiment_very_satisfied', 'sentiment_very_dissatisfied', 'celebration', 'local_fire_department', 'lightbulb'].map(icon => (
+                                          <span key={icon} style={{ cursor: 'pointer', transition: 'all 0.15s' }}
                                                 onClick={() => {
-                                                    handleReactMessage(emoji);
+                                                    handleReactMessage(icon);
                                                     setShowReactions(false);
                                                 }}
-                                                className="quick_emoji_btn">
-                                              {emoji}
+                                                className="quick_emoji_btn mx-1"
+                                                title={icon.replace(/_/g, ' ')}>
+                                              <span className="material-icons" style={{ fontSize: '1.25rem', color: getReactionColor(icon) }}>
+                                                  {icon}
+                                              </span>
                                           </span>
                                       ))}
                                  </div>
@@ -656,9 +670,10 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
                                 msg.reactions.forEach(r => {
                                     counts[r.emoji] = (counts[r.emoji] || 0) + 1;
                                 });
-                                return Object.keys(counts).map(emoji => (
-                                    <span key={emoji} title={`${counts[emoji]} reaction(s)`} style={{ display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
-                                        {emoji} <small style={{ color: 'var(--text-secondary)' }}>{counts[emoji]}</small>
+                                return Object.keys(counts).map(iconName => (
+                                    <span key={iconName} title={`${counts[iconName]} reaction(s)`} style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', marginRight: '4px' }}>
+                                        <span className="material-icons" style={{ fontSize: '1rem', color: getReactionColor(iconName) }}>{iconName}</span>
+                                        <small style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{counts[iconName]}</small>
                                     </span>
                                 ));
                             })()}
