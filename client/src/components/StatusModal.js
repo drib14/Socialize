@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { GLOBALTYPES } from '../redux/actions/globalTypes'
-import { createPost, updatePost } from '../redux/actions/postAction'
+import { createPost, updatePost, repostPost } from '../redux/actions/postAction'
 import Icons from './Icons'
 import { imageShow, videoShow } from '../utils/mediaShow'
 import Modal from 'react-modal'
@@ -41,6 +41,16 @@ const StatusModal = () => {
     const [mentionSuggestions, setMentionSuggestions] = useState([])
     const [mentionSearch, setMentionSearch] = useState('')
     const [showMentionDropdown, setShowMentionDropdown] = useState(false)
+
+    // Poll states
+    const [showPoll, setShowPoll] = useState(false)
+    const [pollQuestion, setPollQuestion] = useState('')
+    const [pollOptions, setPollOptions] = useState(['', ''])
+
+    // Hashtag autocomplete states
+    const [tagSuggestions, setTagSuggestions] = useState([])
+    const [tagSearch, setTagSearch] = useState('')
+    const [showTagDropdown, setShowTagDropdown] = useState(false)
 
     useEffect(() => {
         if(status && textareaRef.current){
@@ -153,6 +163,7 @@ const StatusModal = () => {
             const query = lastWord.substring(1);
             setMentionSearch(query);
             setShowMentionDropdown(true);
+            setShowTagDropdown(false);
             try {
                 const res = await getDataAPI(`search?username=${query}`, auth.token);
                 if (res.data && Array.isArray(res.data.users)) {
@@ -161,10 +172,51 @@ const StatusModal = () => {
             } catch (err) {
                 console.error(err);
             }
+        } else if (lastWord.startsWith('#') && lastWord.length > 1) {
+            const query = lastWord.substring(1).toLowerCase();
+            setTagSearch(query);
+            setShowTagDropdown(true);
+            setShowMentionDropdown(false);
+            try {
+                const res = await getDataAPI(`trending_tags`, auth.token);
+                if (res.data && Array.isArray(res.data.tags)) {
+                    const matches = res.data.tags
+                        .map(t => t.tag)
+                        .filter(t => t.startsWith(query));
+                    setTagSuggestions(matches);
+                }
+            } catch (err) {
+                console.error(err);
+            }
         } else {
             setShowMentionDropdown(false);
             setMentionSuggestions([]);
+            setShowTagDropdown(false);
+            setTagSuggestions([]);
         }
+    };
+
+    const selectTag = (tag) => {
+        const selectionStart = textareaRef.current.selectionStart;
+        const textBeforeCursor = content.slice(0, selectionStart);
+        const textAfterCursor = content.slice(selectionStart);
+        
+        const words = textBeforeCursor.split(/\s+/);
+        words[words.length - 1] = `#${tag} `;
+        const newTextBeforeCursor = words.join(' ');
+        
+        const newContent = newTextBeforeCursor + textAfterCursor;
+        setContent(newContent);
+        setShowTagDropdown(false);
+        setTagSuggestions([]);
+        
+        setTimeout(() => {
+            if (textareaRef.current) {
+                textareaRef.current.focus();
+                const newCursorPos = newTextBeforeCursor.length;
+                textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+            }
+        }, 50);
     };
 
     const selectMention = (userObj) => {
@@ -192,15 +244,32 @@ const StatusModal = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        if(content.trim().length === 0 && images.length === 0)
+        if(content.trim().length === 0 && images.length === 0 && !showPoll)
         return dispatch({ 
-            type: GLOBALTYPES.ALERT, payload: {error: "Please add content or a photo."}
+            type: GLOBALTYPES.ALERT, payload: {error: "Please add content, a photo, or a poll."}
         })
 
-        if(status.onEdit){
+        let pollPayload = undefined
+        if (showPoll) {
+            if (!pollQuestion.trim()) {
+                return dispatch({ type: GLOBALTYPES.ALERT, payload: {error: "Please enter a poll question."} })
+            }
+            const filledOptions = pollOptions.filter(o => o.trim() !== '')
+            if (filledOptions.length < 2) {
+                return dispatch({ type: GLOBALTYPES.ALERT, payload: {error: "Please enter at least 2 poll options."} })
+            }
+            pollPayload = {
+                question: pollQuestion,
+                options: filledOptions.map(text => ({ text }))
+            }
+        }
+
+        if(status.repostOf){
+            dispatch(repostPost({post: status.repostOf, content, auth, socket}))
+        }else if(status.onEdit){
             dispatch(updatePost({content, images, auth, status, location, mood, visibility}))
         }else{
-            dispatch(createPost({content, images, auth, socket, location, mood, visibility}))
+            dispatch(createPost({content, images, auth, socket, location, mood, visibility, poll: pollPayload}))
         }
 
         setContent('')
@@ -210,6 +279,9 @@ const StatusModal = () => {
         setVisibility('public')
         setShowLocationInput(false)
         setShowMoodCards(false)
+        setShowPoll(false)
+        setPollQuestion('')
+        setPollOptions(['', ''])
         if(tracks) tracks.stop()
         dispatch({ type: GLOBALTYPES.STATUS, payload: false})
     }
@@ -222,6 +294,9 @@ const StatusModal = () => {
         setVisibility('public')
         setShowLocationInput(false)
         setShowMoodCards(false)
+        setShowPoll(false)
+        setPollQuestion('')
+        setPollOptions(['', ''])
         if(tracks) tracks.stop()
         dispatch({ type: GLOBALTYPES.STATUS, payload: false})
     }
@@ -246,7 +321,7 @@ const StatusModal = () => {
         >
             <form onSubmit={handleSubmit}>
                 <div className="status_header">
-                    <h5 className="m-0">Create Post</h5>
+                    <h5 className="m-0">{status && status.repostOf ? 'Quote Post' : 'Create Post'}</h5>
                     <span onClick={handleCloseModal}>
                         &times;
                     </span>
@@ -302,6 +377,25 @@ const StatusModal = () => {
                         padding: '12px'
                     }} />
 
+                    {/* Quoted post preview inside editor */}
+                    {status && status.repostOf && (
+                        <div className="mt-2 p-3 text-left mb-2" style={{
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '12px',
+                            background: 'rgba(0,0,0,0.02)',
+                        }}>
+                            <div className="d-flex align-items-center mb-1">
+                                <Avatar src={status.repostOf.user.avatar} size="small-avatar" />
+                                <div className="ml-2">
+                                    <strong style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>@{status.repostOf.user.username}</strong>
+                                </div>
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-main)', wordBreak: 'break-word' }}>
+                                {status.repostOf.content}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Mention Autocomplete Dropdown overlay */}
                     {
                         showMentionDropdown && mentionSuggestions.length > 0 && (
@@ -328,6 +422,86 @@ const StatusModal = () => {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        )
+                    }
+
+                    {/* Hashtag Autocomplete Dropdown overlay */}
+                    {
+                        showTagDropdown && tagSuggestions.length > 0 && (
+                            <div className="mention_dropdown mb-2" style={{ 
+                                background: 'var(--bg-card)', 
+                                border: '1px solid var(--border-color)', 
+                                borderRadius: '8px', 
+                                maxHeight: '150px', 
+                                overflowY: 'auto', 
+                                zIndex: 100, 
+                                boxShadow: 'var(--shadow-md)',
+                            }}>
+                                {tagSuggestions.map((tag) => (
+                                    <div 
+                                        key={tag} 
+                                        onClick={() => selectTag(tag)} 
+                                        className="p-2 dropdown-item d-flex align-items-center" 
+                                        style={{ cursor: 'pointer', gap: '8px', color: 'var(--text-main)', fontSize: '0.85rem' }}
+                                    >
+                                        <i className="fas fa-hashtag text-muted mr-1" />
+                                        <strong>{tag}</strong>
+                                    </div>
+                                ))}
+                            </div>
+                        )
+                    }
+
+                    {/* Poll Creator Block */}
+                    {
+                        showPoll && (
+                            <div className="p-3 mb-2 text-left" style={{
+                                background: 'var(--bg-body)',
+                                borderRadius: '12px',
+                                border: '1px solid var(--border-color)',
+                            }}>
+                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                    <small className="text-muted font-weight-bold">Create Poll</small>
+                                    <span className="material-icons text-danger" style={{ fontSize: '1.2rem', cursor: 'pointer' }} 
+                                          onClick={() => {
+                                              setShowPoll(false);
+                                              setPollQuestion('');
+                                              setPollOptions(['', '']);
+                                          }}>close</span>
+                                </div>
+                                <input type="text" className="form-control form-control-sm mb-2" 
+                                       placeholder="Ask a question..." value={pollQuestion}
+                                       onChange={e => setPollQuestion(e.target.value)}
+                                       style={{ background: 'var(--bg-card)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '8px' }} />
+                                
+                                <div className="d-flex flex-column" style={{ gap: '8px' }}>
+                                    {pollOptions.map((option, index) => (
+                                        <div key={index} className="d-flex align-items-center">
+                                            <input type="text" className="form-control form-control-sm"
+                                                   placeholder={`Option ${index + 1}`} value={option}
+                                                   onChange={e => {
+                                                       const newOptions = [...pollOptions]
+                                                       newOptions[index] = e.target.value
+                                                       setPollOptions(newOptions)
+                                                   }}
+                                                   style={{ background: 'var(--bg-card)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '8px' }} />
+                                            {pollOptions.length > 2 && (
+                                                <span className="material-icons text-danger ml-2" style={{ cursor: 'pointer', fontSize: '1.2rem' }}
+                                                      onClick={() => {
+                                                          const newOptions = pollOptions.filter((_, idx) => idx !== index)
+                                                          setPollOptions(newOptions)
+                                                      }}>remove_circle_outline</span>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                                {pollOptions.length < 4 && (
+                                    <button type="button" className="btn btn-sm btn-outline-info mt-2" style={{ borderRadius: '20px', fontSize: '0.75rem' }}
+                                            onClick={() => setPollOptions([...pollOptions, ''])}>
+                                        + Add Option
+                                    </button>
+                                )}
                             </div>
                         )
                     }
@@ -501,6 +675,10 @@ const StatusModal = () => {
 
                                     <div className="file_upload mr-2" onClick={() => setShowLocationInput(!showLocationInput)} title="Add Location" style={{ cursor: 'pointer' }}>
                                         <span className="material-icons text-primary" style={{ fontSize: '1.4rem', verticalAlign: 'middle' }}>place</span>
+                                    </div>
+
+                                    <div className="file_upload mr-2" onClick={() => setShowPoll(!showPoll)} title="Create Poll" style={{ cursor: 'pointer' }}>
+                                        <span className="material-icons text-info" style={{ fontSize: '1.4rem', verticalAlign: 'middle' }}>poll</span>
                                     </div>
 
                                     <div className="file_upload" onClick={toggleMoodCards} title="Add Mood" style={{ cursor: 'pointer' }}>

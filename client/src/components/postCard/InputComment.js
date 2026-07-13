@@ -84,7 +84,6 @@ const InputComment = ({children, post, onReply, setOnReply}) => {
                     <input type="text" placeholder="Write a comment..."
                     value={content} onChange={e => setContent(e.target.value)}
                     style={{
-                        filter: theme ? 'invert(1)' : 'invert(0)',
                         color: 'var(--text-main)',
                         background: 'transparent',
                         border: 'none',

@@ -13,13 +13,13 @@ export const POST_TYPES = {
 }
 
 
-export const createPost = ({content, images, auth, socket, location, mood, visibility}) => async (dispatch) => {
+export const createPost = ({content, images, auth, socket, location, mood, visibility, poll}) => async (dispatch) => {
     let media = []
     try {
         dispatch({ type: GLOBALTYPES.ALERT, payload: {loading: true} })
         if(images.length > 0) media = await imageUpload(images, auth.token)
 
-        const res = await postDataAPI('posts', { content, images: media, location, mood, visibility }, auth.token)
+        const res = await postDataAPI('posts', { content, images: media, location, mood, visibility, poll }, auth.token)
 
         dispatch({ 
             type: POST_TYPES.CREATE_POST, 
@@ -154,10 +154,10 @@ export const unLikePost = ({post, auth, socket}) => async (dispatch) => {
     }
 }
 
-export const repostPost = ({post, auth, socket}) => async (dispatch) => {
+export const repostPost = ({post, content, auth, socket}) => async (dispatch) => {
     try {
         dispatch({ type: GLOBALTYPES.ALERT, payload: {loading: true} })
-        const res = await postDataAPI(`post/${post._id}/repost`, null, auth.token)
+        const res = await postDataAPI(`post/${post._id}/repost`, { content: content || '' }, auth.token)
         
         dispatch({ type: POST_TYPES.CREATE_POST, payload: res.data.newPost })
         dispatch({ type: GLOBALTYPES.ALERT, payload: {loading: false} })
@@ -240,6 +240,39 @@ export const unSavePost = ({post, auth}) => async (dispatch) => {
 
     try {
         await patchDataAPI(`unSavePost/${post._id}`, null, auth.token)
+    } catch (err) {
+        dispatch({
+            type: GLOBALTYPES.ALERT,
+            payload: {error: err.response?.data?.msg || err.message}
+        })
+    }
+}
+
+export const recordPostView = ({post, auth}) => async (dispatch) => {
+    try {
+        await patchDataAPI(`post/${post._id}/view`, null, auth.token)
+    } catch (err) {
+        console.error("View record error:", err)
+    }
+}
+
+export const votePollOption = ({post, optionId, auth}) => async (dispatch) => {
+    try {
+        const res = await patchDataAPI(`post/${post._id}/poll_vote`, { optionId }, auth.token)
+        dispatch({ type: POST_TYPES.UPDATE_POST, payload: res.data.post })
+    } catch (err) {
+        dispatch({
+            type: GLOBALTYPES.ALERT,
+            payload: {error: err.response?.data?.msg || err.message}
+        })
+    }
+}
+
+export const pinPost = ({post, auth}) => async (dispatch) => {
+    try {
+        const res = await patchDataAPI(`post/${post._id}/pin`, null, auth.token)
+        dispatch({ type: POST_TYPES.UPDATE_POST, payload: res.data.post })
+        dispatch({ type: GLOBALTYPES.ALERT, payload: {success: res.data.msg} })
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT,

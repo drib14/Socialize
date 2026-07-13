@@ -20,10 +20,10 @@ class APIfeatures {
 const postCtrl = {
     createPost: async (req, res) => {
         try {
-            const { content, images, location, mood, visibility } = req.body
+            const { content, images, location, mood, visibility, poll } = req.body
 
-            if(content.trim().length === 0 && images.length === 0)
-            return res.status(400).json({msg: "Please add content or a photo."})
+            if(content.trim().length === 0 && images.length === 0 && !poll)
+            return res.status(400).json({msg: "Please add content, a photo, or a poll."})
 
             const contentStr = content || ''
             const hashtags = contentStr.match(/#\w+/g)?.map(tag => tag.slice(1).toLowerCase()) || []
@@ -31,7 +31,8 @@ const postCtrl = {
             const newPost = new Posts({
                 content, images, user: req.user._id, location, mood,
                 visibility: visibility || 'public',
-                tags: hashtags
+                tags: hashtags,
+                poll: poll || undefined
             })
             await newPost.save()
 
@@ -63,7 +64,7 @@ const postCtrl = {
             const features =  new APIfeatures(Posts.find(query), req.query).paginating()
 
             const posts = await features.query.sort('-createdAt')
-            .populate("user likes", "avatar username fullname followers lastActive")
+            .populate("user likes views", "avatar username fullname followers lastActive")
             .populate({
                 path: "comments",
                 populate: {
@@ -177,8 +178,8 @@ const postCtrl = {
 
             const features = new APIfeatures(Posts.find(query), req.query)
             .paginating()
-            const posts = await features.query.sort("-createdAt")
-            .populate("user likes", "avatar username fullname followers")
+            const posts = await features.query.sort("-isPinned -createdAt")
+            .populate("user likes views", "avatar username fullname followers")
             .populate({
                 path: "repostOf",
                 populate: {
@@ -199,7 +200,7 @@ const postCtrl = {
     getPost: async (req, res) => {
         try {
             const post = await Posts.findById(req.params.id)
-            .populate("user likes", "avatar username fullname followers lastActive")
+            .populate("user likes views", "avatar username fullname followers lastActive")
             .populate({
                 path: "comments",
                 populate: {
@@ -258,7 +259,7 @@ const postCtrl = {
                 user: { $nin: newArr },
                 visibility: 'public'
             }).limit(Number(num)).sort('-createdAt')
-            .populate("user likes", "avatar username fullname followers lastActive")
+            .populate("user likes views", "avatar username fullname followers lastActive")
             .populate({
                 path: "comments",
                 populate: {
@@ -347,7 +348,7 @@ const postCtrl = {
             }), req.query).paginating()
 
             const savePosts = await features.query.sort("-createdAt")
-            .populate("user likes", "avatar username fullname followers lastActive")
+            .populate("user likes views", "avatar username fullname followers lastActive")
             .populate({
                 path: "repostOf",
                 populate: {
@@ -367,14 +368,17 @@ const postCtrl = {
     },
     repostPost: async (req, res) => {
         try {
+            const { content } = req.body
             const originalPost = await Posts.findById(req.params.id)
             if(!originalPost) return res.status(400).json({msg: 'This post does not exist.'})
 
-            const alreadyReposted = await Posts.findOne({user: req.user._id, repostOf: req.params.id})
-            if(alreadyReposted) return res.status(400).json({msg: 'You already reposted this post.'})
+            if (!content) {
+                const alreadyReposted = await Posts.findOne({user: req.user._id, repostOf: req.params.id, content: ''})
+                if(alreadyReposted) return res.status(400).json({msg: 'You already reposted this post.'})
+            }
 
             const newPost = new Posts({
-                content: '',
+                content: content || '',
                 images: [],
                 user: req.user._id,
                 repostOf: req.params.id
@@ -383,7 +387,7 @@ const postCtrl = {
             await newPost.save()
 
             const populatedPost = await Posts.findById(newPost._id)
-            .populate("user likes", "avatar username fullname followers lastActive")
+            .populate("user likes views", "avatar username fullname followers lastActive")
             .populate({
                 path: "repostOf",
                 populate: {
@@ -509,6 +513,117 @@ const postCtrl = {
             });
         } catch (err) {
             return res.status(500).json({ msg: err.message });
+        }
+    },
+    recordPostView: async (req, res) => {
+        try {
+            const post = await Posts.findById(req.params.id)
+            if(!post) return res.status(400).json({msg: 'This post does not exist.'})
+
+            if(!post.views.includes(req.user._id)){
+                await Posts.findOneAndUpdate({_id: req.params.id}, {
+                    $push: {views: req.user._id}
+                })
+            }
+
+            res.json({msg: 'View recorded.'})
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
+        }
+    },
+    votePollOption: async (req, res) => {
+        try {
+            const { optionId } = req.body
+            const post = await Posts.findById(req.params.id)
+            if(!post) return res.status(400).json({msg: 'This post does not exist.'})
+
+            const hasVoted = post.poll.options.some(opt => opt.votes.includes(req.user._id))
+            if(hasVoted) return res.status(400).json({msg: 'You have already voted on this poll.'})
+
+            const updatedPost = await Posts.findOneAndUpdate(
+                { _id: req.params.id, "poll.options._id": optionId },
+                { $push: { "poll.options.$.votes": req.user._id } },
+                { new: true }
+            ).populate("user likes", "avatar username fullname followers lastActive")
+            .populate({
+                path: "repostOf",
+                populate: {
+                    path: "user likes",
+                    select: "avatar username fullname lastActive"
+                }
+            })
+
+            res.json({
+                msg: 'Vote registered.',
+                post: updatedPost
+            })
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
+        }
+    },
+    pinPost: async (req, res) => {
+        try {
+            const post = await Posts.findById(req.params.id)
+            if(!post) return res.status(400).json({msg: 'This post does not exist.'})
+
+            if(post.user.toString() !== req.user._id.toString()){
+                return res.status(403).json({msg: "You are not authorized to pin this post."})
+            }
+
+            const newPinState = !post.isPinned
+
+            if(newPinState){
+                await Posts.updateMany({user: req.user._id}, {isPinned: false})
+            }
+
+            const updatedPost = await Posts.findOneAndUpdate(
+                {_id: req.params.id},
+                {isPinned: newPinState},
+                {new: true}
+            ).populate("user likes", "avatar username fullname followers lastActive")
+            .populate({
+                path: "repostOf",
+                populate: {
+                    path: "user likes",
+                    select: "avatar username fullname lastActive"
+                }
+            })
+
+            res.json({
+                msg: newPinState ? 'Post pinned to profile!' : 'Post unpinned!',
+                post: updatedPost
+            })
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
+        }
+    },
+    getTrendingTags: async (req, res) => {
+        try {
+            const posts = await Posts.find({
+                $or: [
+                    { user: req.user._id },
+                    { visibility: 'public' },
+                    { user: { $in: req.user.following }, visibility: 'followers' }
+                ]
+            }).select('tags')
+
+            const tagCounts = {}
+            posts.forEach(post => {
+                if (post.tags) {
+                    post.tags.forEach(tag => {
+                        tagCounts[tag] = (tagCounts[tag] || 0) + 1
+                    })
+                }
+            })
+
+            const sortedTags = Object.keys(tagCounts)
+                .map(tag => ({ tag, count: tagCounts[tag] }))
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 10)
+
+            res.json({ tags: sortedTags })
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
         }
     }
 }

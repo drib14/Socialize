@@ -2,9 +2,13 @@ import React, { useState, useRef } from 'react'
 import Carousel from '../../Carousel'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { likePost } from '../../../redux/actions/postAction'
-
+import { likePost, votePollOption } from '../../../redux/actions/postAction'
+import Avatar from '../../Avatar'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { renderTextWithIcons } from '../../../utils/iconParser'
+
+dayjs.extend(relativeTime)
 
 const CardBody = ({post, theme}) => {
     const [readMore, setReadMore] = useState(false)
@@ -13,6 +17,10 @@ const CardBody = ({post, theme}) => {
     const dispatch = useDispatch()
     const { auth, socket } = useSelector(state => state)
     const lastTap = useRef(0)
+
+    const handleVote = (optionId) => {
+        dispatch(votePollOption({post, optionId, auth}))
+    }
 
     const renderContent = (content) => {
         if (!content) return '';
@@ -131,6 +139,94 @@ const CardBody = ({post, theme}) => {
                     </div>
                 )
             }
+
+            {/* Poll options component */}
+            {post.poll && post.poll.options && post.poll.options.length > 0 && (
+                <div className="mt-3 p-3" style={{
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '12px',
+                    background: 'var(--bg-card)'
+                }}>
+                    {post.poll.question && (
+                        <h6 className="font-weight-bold mb-3" style={{ color: 'var(--text-main)', fontSize: '0.9rem' }}>
+                            {post.poll.question}
+                        </h6>
+                    )}
+                    <div className="d-flex flex-column" style={{ gap: '10px' }}>
+                        {post.poll.options.map(option => {
+                            const totalVotes = post.poll.options.reduce((sum, opt) => sum + opt.votes.length, 0)
+                            const hasVoted = post.poll.options.some(opt => opt.votes.includes(auth.user._id))
+                            const voteCount = option.votes.length
+                            const percentage = totalVotes > 0 ? Math.round((voteCount / totalVotes) * 100) : 0
+                            const isMyVote = option.votes.includes(auth.user._id)
+
+                            return (
+                                <div key={option._id} 
+                                     onClick={() => !hasVoted && handleVote(option._id)}
+                                     className="position-relative p-2 d-flex align-items-center justify-content-between"
+                                     style={{
+                                         border: '1px solid var(--border-color)',
+                                         borderRadius: '8px',
+                                         cursor: hasVoted ? 'default' : 'pointer',
+                                         overflow: 'hidden',
+                                         fontSize: '0.85rem',
+                                         background: 'var(--bg-input)',
+                                         transition: 'background 0.2s'
+                                     }}>
+                                    
+                                    {/* Percentage fill indicator */}
+                                    {hasVoted && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: 0, left: 0, bottom: 0,
+                                            width: `${percentage}%`,
+                                            background: isMyVote ? 'rgba(16, 185, 129, 0.15)' : 'rgba(0,0,0,0.05)',
+                                            zIndex: 1,
+                                            transition: 'width 0.5s ease-out'
+                                        }} />
+                                    )}
+
+                                    <span style={{ zIndex: 2, fontWeight: isMyVote ? '600' : 'normal', color: 'var(--text-main)' }}>
+                                        {option.text} {isMyVote && <i className="fas fa-check-circle text-success ml-1" />}
+                                    </span>
+
+                                    {hasVoted && (
+                                        <span style={{ zIndex: 2, fontWeight: '600', color: 'var(--text-main)' }}>
+                                            {percentage}% ({voteCount})
+                                        </span>
+                                    )}
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* Embedded Quote Repost original card block */}
+            {post.repostOf && (
+                <div className="mt-3 p-3 text-left" style={{
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '12px',
+                    background: 'rgba(0,0,0,0.02)',
+                    cursor: 'pointer'
+                }} onClick={() => window.location.href = `/post/${post.repostOf._id}`}>
+                    <div className="d-flex align-items-center mb-2">
+                        <Avatar src={post.repostOf.user.avatar} size="small-avatar" />
+                        <div className="ml-2">
+                            <strong style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>@{post.repostOf.user.username}</strong>
+                            <span className="text-muted ml-2" style={{ fontSize: '0.75rem' }}>{dayjs(post.repostOf.createdAt).fromNow()}</span>
+                        </div>
+                    </div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-main)', wordBreak: 'break-word' }}>
+                        {renderContent(post.repostOf.content)}
+                    </div>
+                    {post.repostOf.images && post.repostOf.images.length > 0 && (
+                        <div className="mt-2" style={{ maxHeight: '200px', overflow: 'hidden', borderRadius: '8px' }}>
+                            <Carousel images={post.repostOf.images} id={post.repostOf._id} />
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     )
 }

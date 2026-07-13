@@ -7,7 +7,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { GLOBALTYPES } from '../../../redux/actions/globalTypes'
 
 dayjs.extend(relativeTime)
-import { deletePost } from '../../../redux/actions/postAction'
+import { deletePost, pinPost } from '../../../redux/actions/postAction'
 import { BASE_URL } from '../../../utils/config'
 import { customConfirm } from '../../../utils/customAlert'
 import { getMoodIcon } from '../../../utils/moods'
@@ -68,6 +68,10 @@ const CardHeader = ({post}) => {
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(`${BASE_URL}/post/${post._id}`)
+    }
+
+    const handlePinPost = () => {
+        dispatch(pinPost({post, auth}))
     }
 
     const getVisibilityIcon = (visibility) => {
@@ -145,6 +149,14 @@ const CardHeader = ({post}) => {
                         <span>{dayjs(post.createdAt).fromNow()}</span>
                         <span className="mx-1">•</span>
                         {getVisibilityIcon(post.visibility)}
+                        {post.isPinned && (
+                            <>
+                                <span className="mx-1">•</span>
+                                <span className="text-success d-flex align-items-center" style={{ fontWeight: 'bold' }}>
+                                    <i className="fas fa-thumbtack mr-1" style={{ fontSize: '0.75rem' }} /> Pinned
+                                </span>
+                            </>
+                        )}
                     </small>
                 </div>
             </div>
@@ -158,6 +170,9 @@ const CardHeader = ({post}) => {
                     {
                         auth.user._id === post.user._id &&
                         <>
+                            <div className="dropdown-item d-flex align-items-center py-2" onClick={handlePinPost} style={{ cursor: 'pointer' }}>
+                                <span className="material-icons mr-2" style={{ fontSize: '1.2rem' }}>push_pin</span> {post.isPinned ? 'Unpin from Profile' : 'Pin to Profile'}
+                            </div>
                             <div className="dropdown-item d-flex align-items-center py-2" onClick={handleEditPost} style={{ cursor: 'pointer' }}>
                                 <span className="material-icons mr-2" style={{ fontSize: '1.2rem' }}>create</span> Edit Post
                             </div>

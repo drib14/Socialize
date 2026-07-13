@@ -14,7 +14,16 @@ const postSchema = new mongoose.Schema({
     visibility: { type: String, enum: ['public', 'followers', 'private'], default: 'public' },
     tags: [{ type: String, lowercase: true, trim: true }],
     location: { type: String, default: '' },
-    mood: { type: String, default: '' }
+    mood: { type: String, default: '' },
+    views: [{ type: mongoose.Types.ObjectId, ref: 'user' }],
+    isPinned: { type: Boolean, default: false },
+    poll: {
+        question: { type: String, default: '' },
+        options: [{
+            text: { type: String, required: true },
+            votes: [{ type: mongoose.Types.ObjectId, ref: 'user' }]
+        }]
+    }
 }, {
     timestamps: true
 })

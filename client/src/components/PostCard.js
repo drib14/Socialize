@@ -20,7 +20,8 @@ const PostCard = ({post, theme}) => {
         );
     }
 
-    const displayPost = isRepost ? post.repostOf : post
+    const isQuoteRepost = isRepost && post.content && post.content.trim() !== ''
+    const displayPost = isRepost && !isQuoteRepost ? post.repostOf : post
 
     return (
         <div className="card my-4" style={{ 
@@ -41,7 +42,7 @@ const PostCard = ({post, theme}) => {
                     background: 'rgba(16, 185, 129, 0.03)'
                 }}>
                     <i className="fas fa-retweet text-success mr-2" style={{ fontSize: '16px' }} />
-                    <span>@{post.user.username} reposted</span>
+                    <span>@{post.user.username} {isQuoteRepost ? 'quoted' : 'reposted'}</span>
                 </div>
             }
             <CardHeader post={displayPost} />
