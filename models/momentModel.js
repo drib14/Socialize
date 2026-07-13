@@ -6,6 +6,7 @@ const momentSchema = new mongoose.Schema({
     resource_type: { type: String, enum: ['image', 'video'], default: 'image' },
     caption: { type: String, default: '' },
     views: [{ type: mongoose.Types.ObjectId, ref: 'user' }],
+    visibility: { type: String, enum: ['public', 'followers', 'private'], default: 'followers' },
     createdAt: { type: Date, default: Date.now }
 })
 

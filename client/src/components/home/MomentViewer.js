@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 import Modal from 'react-modal'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -17,6 +18,8 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
     const [progress, setProgress] = useState(0)
     const [isPaused, setIsPaused] = useState(false)
     const [videoDuration, setVideoDuration] = useState(5) // Default to 5s for image fallback
+    const [showViewerList, setShowViewerList] = useState(false)
+    const [isMuted, setIsMuted] = useState(true)
     
     const activeMoment = moments[activeIndex]
     const timerRef = useRef(null)
@@ -26,7 +29,8 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
     useEffect(() => {
         if (activeMoment && auth.token) {
             // Check if user has already viewed
-            if (!activeMoment.views.includes(auth.user._id)) {
+            const viewerIds = activeMoment.views.map(v => typeof v === 'object' ? v._id : v);
+            if (!viewerIds.includes(auth.user._id)) {
                 dispatch(viewMoment({ momentId: activeMoment._id, auth }))
             }
         }
@@ -35,6 +39,7 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
     // Reset progress when index changes
     useEffect(() => {
         setProgress(0)
+        setShowViewerList(false)
         if (activeMoment && activeMoment.resource_type === 'video') {
             setVideoDuration(0) // wait for video loadedmetadata to set actual duration
         } else {
@@ -162,14 +167,35 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
                         <Avatar src={user.avatar} size="medium-avatar" />
                         <div>
                             <div className="viewer-username">@{user.username}</div>
-                            <div className="viewer-time">{dayjs(activeMoment.createdAt).fromNow()}</div>
+                            <div className="viewer-time d-flex align-items-center" style={{ gap: '4px' }}>
+                                {dayjs(activeMoment.createdAt).fromNow()}
+                                <span style={{ opacity: 0.7 }}>&bull;</span>
+                                {activeMoment.visibility === 'followers' && <i className="fas fa-users" title="Followers Only" style={{ fontSize: '0.75rem' }}></i>}
+                                {activeMoment.visibility === 'private' && <i className="fas fa-lock" title="Only Me" style={{ fontSize: '0.75rem' }}></i>}
+                                {activeMoment.visibility === 'public' && <i className="fas fa-globe" title="Public" style={{ fontSize: '0.75rem' }}></i>}
+                            </div>
                         </div>
                     </div>
 
                     <div className="viewer-actions">
                         {
                             auth.user._id === user._id && (
-                                <button className="viewer-btn text-danger" onClick={handleDelete} title="Delete Moment">
+                                <button className="viewer-btn mr-2" onClick={(e) => { e.stopPropagation(); setIsPaused(true); setShowViewerList(true); }} title="Viewer list" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', padding: '4px 8px', border: 'none', color: '#fff' }}>
+                                    <i className="far fa-eye" style={{ fontSize: '0.88rem' }}></i>
+                                    <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>{activeMoment.views ? activeMoment.views.length : 0}</span>
+                                </button>
+                            )
+                        }
+                        {
+                            activeMoment.resource_type === 'video' && (
+                                <button className="viewer-btn mr-2" onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }} title={isMuted ? "Unmute" : "Mute"} style={{ border: 'none', background: 'transparent', color: '#fff', cursor: 'pointer' }}>
+                                    <i className={isMuted ? "fas fa-volume-mute" : "fas fa-volume-up"} style={{ fontSize: '1.1rem' }}></i>
+                                </button>
+                            )
+                        }
+                        {
+                            auth.user._id === user._id && (
+                                <button className="viewer-btn text-danger mr-2" onClick={handleDelete} title="Delete Moment">
                                     <i className="fas fa-trash-alt"></i>
                                 </button>
                             )
@@ -200,6 +226,7 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
                                 className="viewer-media"
                                 autoPlay 
                                 playsInline
+                                muted={isMuted}
                                 onLoadedMetadata={handleMetadata}
                                 onPlay={() => setIsPaused(false)}
                                 onPause={() => setIsPaused(true)}
@@ -223,6 +250,56 @@ const MomentViewer = ({ userMoments, onClose, onPrevUser, onNextUser }) => {
                     }
                 </div>
             </div>
+
+            {/* Story Viewer list overlay */}
+            {showViewerList && (
+                <div className="position-absolute" style={{
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    background: 'rgba(255, 255, 255, 0.98)',
+                    backdropFilter: 'blur(10px)',
+                    borderTopLeftRadius: '20px',
+                    borderTopRightRadius: '20px',
+                    zIndex: 1000,
+                    padding: '20px',
+                    maxHeight: '60%',
+                    overflowY: 'auto',
+                    color: '#000',
+                    boxShadow: '0 -10px 25px rgba(0,0,0,0.2)'
+                }} onClick={(e) => e.stopPropagation()}>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h6 className="font-weight-bold mb-0" style={{ fontSize: '1rem', color: '#111' }}>Views ({activeMoment.views ? activeMoment.views.length : 0})</h6>
+                        <button className="btn btn-sm btn-light d-flex align-items-center justify-content-center" style={{ borderRadius: '50%', width: '30px', height: '30px', padding: 0 }} 
+                                onClick={() => { setShowViewerList(false); setIsPaused(false); }}>
+                            <i className="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <hr className="my-2" style={{ borderColor: '#ddd' }} />
+                    
+                    {(!activeMoment.views || activeMoment.views.length === 0) ? (
+                        <div className="text-center py-4 text-muted" style={{ fontSize: '0.85rem' }}>No views yet</div>
+                    ) : (
+                        <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                            {activeMoment.views.map(viewer => (
+                                <div key={viewer._id || viewer} className="d-flex align-items-center mb-3 justify-content-between">
+                                    <div className="d-flex align-items-center">
+                                        <Avatar src={viewer.avatar} size="medium-avatar" />
+                                        <div className="ml-3">
+                                            <strong className="d-block" style={{ fontSize: '0.88rem', color: '#111', textAlign: 'left' }}>@{viewer.username || 'user'}</strong>
+                                            <span className="small text-muted" style={{ display: 'block', fontSize: '0.75rem', textAlign: 'left' }}>{viewer.fullname || ''}</span>
+                                        </div>
+                                    </div>
+                                    <Link to={`/profile/${viewer._id || viewer}`} className="btn btn-sm btn-outline-primary" style={{ fontSize: '0.75rem', borderRadius: '8px' }} onClick={() => onClose()}>
+                                        View
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Desktop Right navigation arrow */}
             {

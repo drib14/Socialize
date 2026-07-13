@@ -22,7 +22,7 @@ export const getMoments = (token) => async (dispatch) => {
     }
 }
 
-export const createMoment = ({ file, caption, auth }) => async (dispatch) => {
+export const createMoment = ({ file, caption, visibility, auth }) => async (dispatch) => {
     try {
         dispatch({ type: GLOBALTYPES.ALERT, payload: { loading: true } })
 
@@ -37,7 +37,8 @@ export const createMoment = ({ file, caption, auth }) => async (dispatch) => {
         const res = await postDataAPI('moments', {
             media: mediaUrl,
             resource_type,
-            caption
+            caption,
+            visibility
         }, auth.token)
 
         dispatch({

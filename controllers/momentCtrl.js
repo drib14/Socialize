@@ -3,14 +3,15 @@ const Moments = require('../models/momentModel')
 const momentCtrl = {
     createMoment: async (req, res) => {
         try {
-            const { media, resource_type, caption } = req.body
+            const { media, resource_type, caption, visibility } = req.body
             if (!media) return res.status(400).json({ msg: "Please add your media." })
 
             const newMoment = new Moments({
                 user: req.user._id,
                 media,
                 resource_type: resource_type || 'image',
-                caption: caption || ''
+                caption: caption || '',
+                visibility: visibility || 'followers'
             })
 
             await newMoment.save()
@@ -33,12 +34,19 @@ const momentCtrl = {
             const activeMoments = await Moments.find({
                 user: { $in: myAndFollowingIds },
                 createdAt: { $gte: twentyFourHoursAgo }
-            }).populate('user', 'username fullname avatar').sort('-createdAt')
+            }).populate('user', 'username fullname avatar').populate('views', 'username fullname avatar').sort('-createdAt')
 
-            // Group by user id
+            // Group by user id under visibility gates
             const grouped = {}
             activeMoments.forEach(moment => {
                 if (!moment.user) return;
+                
+                // Enforce visibility gate for other users
+                const authorId = moment.user._id.toString();
+                if (authorId !== req.user._id.toString()) {
+                    if (moment.visibility === 'private') return; // hide private stories of others
+                }
+
                 const userId = moment.user._id.toString()
                 if (!grouped[userId]) {
                     grouped[userId] = {
@@ -71,7 +79,7 @@ const momentCtrl = {
             const archivedMoments = await Moments.find({
                 user: req.user._id,
                 createdAt: { $lt: twentyFourHoursAgo }
-            }).populate('user', 'username fullname avatar').sort('-createdAt')
+            }).populate('user', 'username fullname avatar').populate('views', 'username fullname avatar').sort('-createdAt')
 
             res.json({ archivedMoments })
         } catch (err) {

@@ -11,6 +11,7 @@ const CreateMomentModal = ({ isOpen, onClose }) => {
     const [file, setFile] = useState(null)
     const [preview, setPreview] = useState('')
     const [caption, setCaption] = useState('')
+    const [visibility, setVisibility] = useState('followers')
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0]
@@ -37,12 +38,13 @@ const CreateMomentModal = ({ isOpen, onClose }) => {
         e.preventDefault()
         if (!file) return;
 
-        dispatch(createMoment({ file, caption, auth }))
+        dispatch(createMoment({ file, caption, visibility, auth }))
         
         // Reset and close
         setFile(null)
         setPreview('')
         setCaption('')
+        setVisibility('followers')
         onClose()
     }
 
@@ -102,20 +104,55 @@ const CreateMomentModal = ({ isOpen, onClose }) => {
 
                 {
                     preview && (
-                        <div className="mb-3">
-                            <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-main)' }}>
-                                Add Caption (Optional)
-                            </label>
-                            <input 
-                                type="text"
-                                className="form-control"
-                                placeholder="Write something overlaying..."
-                                value={caption}
-                                onChange={(e) => setCaption(e.target.value)}
-                                style={{ background: 'var(--bg-input)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
-                                maxLength={80}
-                            />
-                        </div>
+                        <>
+                            <div className="mb-3">
+                                <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                                    Add Caption (Optional)
+                                </label>
+                                <input 
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Write something overlaying..."
+                                    value={caption}
+                                    onChange={(e) => setCaption(e.target.value)}
+                                    style={{ background: 'var(--bg-input)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
+                                    maxLength={80}
+                                />
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                                    Who can see this moment?
+                                </label>
+                                <div className="d-flex align-items-center" style={{ gap: '6px' }}>
+                                    <i className={
+                                        visibility === 'followers' ? 'fas fa-users text-muted' :
+                                        visibility === 'private' ? 'fas fa-lock text-muted' :
+                                        'fas fa-globe text-muted'
+                                    } style={{ fontSize: '0.88rem' }}></i>
+                                    <select 
+                                        value={visibility} 
+                                        onChange={(e) => setVisibility(e.target.value)}
+                                        className="custom-select custom-select-sm"
+                                        style={{ 
+                                            width: 'auto', 
+                                            borderRadius: '8px', 
+                                            fontSize: '0.8rem', 
+                                            padding: '4px 10px', 
+                                            height: '32px', 
+                                            cursor: 'pointer',
+                                            background: 'var(--bg-input)',
+                                            color: 'var(--text-main)',
+                                            borderColor: 'var(--border-color)'
+                                        }}
+                                    >
+                                        <option value="public">Public</option>
+                                        <option value="followers">Followers Only</option>
+                                        <option value="private">Only Me</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </>
                     )
                 }
 

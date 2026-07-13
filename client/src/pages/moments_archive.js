@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { getDataAPI, deleteDataAPI } from '../utils/fetchData'
 import LeftSideBar from '../components/home/LeftSideBar'
 import RightSideBar from '../components/home/RightSideBar'
+import Avatar from '../components/Avatar'
 import dayjs from 'dayjs'
 import { GLOBALTYPES } from '../redux/actions/globalTypes'
 
@@ -12,6 +14,7 @@ const MomentsArchive = () => {
     
     const [archived, setArchived] = useState([])
     const [loading, setLoading] = useState(true)
+    const [selectedViews, setSelectedViews] = useState(null)
 
     useEffect(() => {
         if (auth.token) {
@@ -83,7 +86,14 @@ const MomentsArchive = () => {
                                 archived.map(moment => (
                                     <div key={moment._id} className="col-sm-6 col-md-4 mb-4">
                                         <div className="card position-relative overflow-hidden shadow-sm h-100" style={{ borderRadius: '12px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', minHeight: '220px' }}>
-                                            
+                                            {/* Action Visibility Indicator Overlay */}
+                                            <span className="position-absolute" style={{ top: '8px', left: '8px', zIndex: 10, background: 'rgba(0,0,0,0.5)', color: '#fff', borderRadius: '4px', padding: '4px 6px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                {moment.visibility === 'followers' ? <i className="fas fa-users" title="Followers Only"></i> :
+                                                 moment.visibility === 'private' ? <i className="fas fa-lock" title="Only Me"></i> :
+                                                 <i className="fas fa-globe" title="Public"></i>}
+                                                <span style={{ fontSize: '0.65rem', textTransform: 'capitalize' }}>{moment.visibility}</span>
+                                            </span>
+
                                             {/* Media Rendering */}
                                             {
                                                 moment.resource_type === 'video' ? (
@@ -97,7 +107,7 @@ const MomentsArchive = () => {
                                             <div className="p-2" style={{ background: 'rgba(0,0,0,0.65)', color: '#fff', position: 'absolute', bottom: 0, left: 0, right: 0, borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px' }}>
                                                 {moment.caption && <p className="mb-1 text-truncate small" title={moment.caption}>{moment.caption}</p>}
                                                 <div className="d-flex justify-content-between align-items-center" style={{ fontSize: '0.75rem' }}>
-                                                    <span className="d-flex align-items-center">
+                                                    <span className="d-flex align-items-center" style={{ cursor: 'pointer' }} onClick={() => setSelectedViews(moment.views || [])} title="Click to view viewers">
                                                         <i className="far fa-eye mr-1" style={{ fontSize: '0.85rem' }}></i>
                                                         {moment.views ? moment.views.length : 0} views
                                                     </span>
@@ -124,6 +134,57 @@ const MomentsArchive = () => {
             <div className="col-md-3 px-0">
                 <RightSideBar />
             </div>
+
+            {/* Viewers modal */}
+            {selectedViews && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    zIndex: 2000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backdropFilter: 'blur(4px)'
+                }} onClick={() => setSelectedViews(null)}>
+                    <div className="card p-3" style={{
+                        width: '320px',
+                        maxHeight: '400px',
+                        borderRadius: '16px',
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-color)',
+                        boxShadow: 'var(--shadow-lg)'
+                    }} onClick={(e) => e.stopPropagation()}>
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            <h6 className="font-weight-bold mb-0" style={{ color: 'var(--text-main)' }}>Viewers ({selectedViews.length})</h6>
+                            <button className="btn btn-sm btn-light d-flex align-items-center justify-content-center" style={{ borderRadius: '50%', width: '30px', height: '30px', padding: 0 }} onClick={() => setSelectedViews(null)}>
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <hr className="my-1" style={{ borderColor: 'var(--border-color)' }} />
+                        <div style={{ overflowY: 'auto', maxHeight: '280px', paddingRight: '4px' }} className="notify-list-container">
+                            {selectedViews.length === 0 ? (
+                                <div className="text-center py-4 text-muted" style={{ fontSize: '0.85rem' }}>No views yet</div>
+                            ) : (
+                                selectedViews.map(viewer => (
+                                    <div key={viewer._id || viewer} className="d-flex align-items-center mb-2 justify-content-between">
+                                        <div className="d-flex align-items-center">
+                                            <Avatar src={viewer.avatar} size="medium-avatar" />
+                                            <div className="ml-2">
+                                                <strong className="d-block" style={{ fontSize: '0.85rem', color: 'var(--text-main)', textAlign: 'left' }}>@{viewer.username || 'user'}</strong>
+                                                <span className="small text-muted" style={{ display: 'block', fontSize: '0.75rem', textAlign: 'left' }}>{viewer.fullname || ''}</span>
+                                            </div>
+                                        </div>
+                                        <Link to={`/profile/${viewer._id || viewer}`} className="btn btn-sm btn-outline-primary" style={{ fontSize: '0.75rem', borderRadius: '8px' }} onClick={() => setSelectedViews(null)}>
+                                            View
+                                        </Link>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

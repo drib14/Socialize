@@ -37,8 +37,8 @@ const MomentsBar = () => {
 
     return (
         <div className="moments-wrapper">
-            <div className="moments-title">
-                <span className="material-icons text-primary" style={{ fontSize: '1.2rem' }}>flash_on</span>
+            <div className="moments-title d-flex align-items-center" style={{ gap: '4px' }}>
+                <i className="fas fa-bolt text-primary" style={{ fontSize: '1rem' }}></i>
                 <span>Moments</span>
             </div>
 
