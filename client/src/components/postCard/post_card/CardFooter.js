@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { likePost, unLikePost, savePost, unSavePost, repostPost, recordPostView } from '../../../redux/actions/postAction'
 import { addMessage } from '../../../redux/actions/messageAction'
 import { GLOBALTYPES } from '../../../redux/actions/globalTypes'
+import { createMoment } from '../../../redux/actions/momentAction'
 import ShareModal from '../../ShareModal'
 import { BASE_URL } from '../../../utils/config'
 import { FaRegComment, FaRegPaperPlane, FaRetweet, FaRegBookmark, FaBookmark } from 'react-icons/fa'
@@ -107,6 +108,15 @@ const CardFooter = ({post, showComments, setShowComments}) => {
 
     const handleQuoteRepost = () => {
         dispatch({ type: GLOBALTYPES.STATUS, payload: { repostOf: post } })
+    }
+
+    const handleShareToStory = () => {
+        dispatch(createMoment({
+            caption: `Check out this post!`,
+            visibility: 'followers',
+            post: post._id,
+            auth
+        }))
     }
 
     return (

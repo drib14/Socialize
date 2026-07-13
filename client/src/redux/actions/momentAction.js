@@ -22,23 +22,26 @@ export const getMoments = (token) => async (dispatch) => {
     }
 }
 
-export const createMoment = ({ file, caption, visibility, auth }) => async (dispatch) => {
+export const createMoment = ({ file, caption, visibility, post, auth }) => async (dispatch) => {
     try {
         dispatch({ type: GLOBALTYPES.ALERT, payload: { loading: true } })
 
-        // Upload media file to Cloudinary via the /api/upload_media proxy endpoint
-        const mediaRes = await imageUpload([file], auth.token)
-        if (mediaRes.length === 0) throw new Error("Failed to upload media.")
+        let mediaUrl = ''
+        let resource_type = 'image'
 
-        const mediaUrl = mediaRes[0].url
-        // Identify resource type (image vs video)
-        const resource_type = file.type.startsWith('video') ? 'video' : 'image'
+        if (file) {
+            const mediaRes = await imageUpload([file], auth.token)
+            if (mediaRes.length === 0) throw new Error("Failed to upload media.")
+            mediaUrl = mediaRes[0].url
+            resource_type = file.type.startsWith('video') ? 'video' : 'image'
+        }
 
         const res = await postDataAPI('moments', {
             media: mediaUrl,
             resource_type,
             caption,
-            visibility
+            visibility,
+            post
         }, auth.token)
 
         dispatch({

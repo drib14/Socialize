@@ -3,19 +3,23 @@ const Moments = require('../models/momentModel')
 const momentCtrl = {
     createMoment: async (req, res) => {
         try {
-            const { media, resource_type, caption, visibility } = req.body
-            if (!media) return res.status(400).json({ msg: "Please add your media." })
+            const { media, resource_type, caption, visibility, post } = req.body
+            if (!media && !post) return res.status(400).json({ msg: "Please add your media or share a post." })
 
             const newMoment = new Moments({
                 user: req.user._id,
-                media,
+                media: media || '',
                 resource_type: resource_type || 'image',
                 caption: caption || '',
-                visibility: visibility || 'followers'
+                visibility: visibility || 'followers',
+                post: post || undefined
             })
 
             await newMoment.save()
-            const populated = await newMoment.populate('user', 'username fullname avatar')
+            const populated = await newMoment.populate([
+                { path: 'user', select: 'username fullname avatar' },
+                { path: 'post', populate: { path: 'user', select: 'username fullname avatar' } }
+            ])
 
             res.json({
                 msg: 'Moment Created!',
@@ -34,7 +38,16 @@ const momentCtrl = {
             const activeMoments = await Moments.find({
                 user: { $in: myAndFollowingIds },
                 createdAt: { $gte: twentyFourHoursAgo }
-            }).populate('user', 'username fullname avatar').populate('views', 'username fullname avatar').sort('-createdAt')
+            }).populate('user', 'username fullname avatar')
+              .populate('views', 'username fullname avatar')
+              .populate({
+                  path: 'post',
+                  populate: {
+                      path: 'user',
+                      select: 'username fullname avatar'
+                  }
+              })
+              .sort('-createdAt')
 
             // Group by user id under visibility gates
             const grouped = {}
@@ -79,7 +92,16 @@ const momentCtrl = {
             const archivedMoments = await Moments.find({
                 user: req.user._id,
                 createdAt: { $lt: twentyFourHoursAgo }
-            }).populate('user', 'username fullname avatar').populate('views', 'username fullname avatar').sort('-createdAt')
+            }).populate('user', 'username fullname avatar')
+              .populate('views', 'username fullname avatar')
+              .populate({
+                  path: 'post',
+                  populate: {
+                      path: 'user',
+                      select: 'username fullname avatar'
+                  }
+              })
+              .sort('-createdAt')
 
             res.json({ archivedMoments })
         } catch (err) {
