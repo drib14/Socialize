@@ -91,41 +91,45 @@ export const updateProfileUser = ({userData, avatar, auth}) => async (dispatch) 
 export const follow = ({users, user, auth, socket}) => async (dispatch) => {
     let newUser;
     
-    if(users.every(item => item._id !== user._id)){
-        newUser = {...user, followers: [...user.followers, auth.user]}
-    }else{
-        users.forEach(item => {
-            if(item._id === user._id){
-                newUser = {...item, followers: [...item.followers, auth.user]}
+    if (user.isPrivate) {
+        newUser = { ...user, isPendingRequest: true }
+        dispatch({ type: PROFILE_TYPES.FOLLOW, payload: newUser })
+    } else {
+        if(users.every(item => item._id !== user._id)){
+            newUser = {...user, followers: [...user.followers, auth.user]}
+        }else{
+            users.forEach(item => {
+                if(item._id === user._id){
+                    newUser = {...item, followers: [...item.followers, auth.user]}
+                }
+            })
+        }
+        dispatch({ type: PROFILE_TYPES.FOLLOW, payload: newUser })
+        dispatch({
+            type: GLOBALTYPES.AUTH, 
+            payload: {
+                ...auth,
+                user: {...auth.user, following: [...auth.user.following, newUser]}
             }
         })
     }
 
-    dispatch({ type: PROFILE_TYPES.FOLLOW, payload: newUser })
-
-    dispatch({
-        type: GLOBALTYPES.AUTH, 
-        payload: {
-            ...auth,
-            user: {...auth.user, following: [...auth.user.following, newUser]}
-        }
-    })
-
-
     try {
         const res = await patchDataAPI(`user/${user._id}/follow`, null, auth.token)
-        socket.emit('follow', res.data.newUser)
-
-        // Notify
-        const msg = {
-            id: auth.user._id,
-            text: 'has started to follow you.',
-            recipients: [newUser._id],
-            url: `/profile/${auth.user._id}`,
+        
+        if (res.data.status === 'pending') {
+            const pendingUser = { ...user, isPendingRequest: true }
+            dispatch({ type: PROFILE_TYPES.FOLLOW, payload: pendingUser })
+        } else {
+            socket.emit('follow', res.data.newUser)
+            const msg = {
+                id: auth.user._id,
+                text: 'has started to follow you.',
+                recipients: [newUser._id],
+                url: `/profile/${auth.user._id}`,
+            }
+            dispatch(createNotify({msg, auth, socket}))
         }
-
-        dispatch(createNotify({msg, auth, socket}))
-
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT, 
@@ -135,15 +139,14 @@ export const follow = ({users, user, auth, socket}) => async (dispatch) => {
 }
 
 export const unfollow = ({users, user, auth, socket}) => async (dispatch) => {
-
     let newUser;
 
     if(users.every(item => item._id !== user._id)){
-        newUser = {...user, followers: DeleteData(user.followers, auth.user._id)}
+        newUser = {...user, followers: DeleteData(user.followers, auth.user._id), isPendingRequest: false}
     }else{
         users.forEach(item => {
             if(item._id === user._id){
-                newUser = {...item, followers: DeleteData(item.followers, auth.user._id)}
+                newUser = {...item, followers: DeleteData(item.followers, auth.user._id), isPendingRequest: false}
             }
         })
     }
@@ -160,25 +163,117 @@ export const unfollow = ({users, user, auth, socket}) => async (dispatch) => {
             }
         }
     })
-   
 
     try {
         const res = await patchDataAPI(`user/${user._id}/unfollow`, null, auth.token)
         socket.emit('unFollow', res.data.newUser)
 
-        // Notify
         const msg = {
             id: auth.user._id,
             text: 'has started to follow you.',
             recipients: [newUser._id],
             url: `/profile/${auth.user._id}`,
         }
-
         dispatch(removeNotify({msg, auth, socket}))
-
     } catch (err) {
         dispatch({
             type: GLOBALTYPES.ALERT, 
+            payload: {error: err.response?.data?.msg || err.message}
+        })
+    }
+}
+
+export const blockUser = ({user, auth, socket}) => async (dispatch) => {
+    dispatch({type: GLOBALTYPES.ALERT, payload: {loading: true}})
+    try {
+        const res = await patchDataAPI(`user/${user._id}/block`, null, auth.token)
+        
+        const unfollowedUser = {
+            ...user,
+            followers: DeleteData(user.followers, auth.user._id),
+            isBlockedByMe: true
+        }
+
+        dispatch({ type: PROFILE_TYPES.UNFOLLOW, payload: unfollowedUser })
+
+        dispatch({
+            type: GLOBALTYPES.AUTH,
+            payload: {
+                ...auth,
+                user: {
+                    ...auth.user,
+                    following: DeleteData(auth.user.following, user._id),
+                    followers: DeleteData(auth.user.followers, user._id),
+                    blockedUsers: [...(auth.user.blockedUsers || []), user._id]
+                }
+            }
+        })
+
+        dispatch({type: GLOBALTYPES.ALERT, payload: {success: res.data.msg}})
+    } catch (err) {
+        dispatch({
+            type: GLOBALTYPES.ALERT,
+            payload: {error: err.response?.data?.msg || err.message}
+        })
+    }
+}
+
+export const unblockUser = ({user, auth}) => async (dispatch) => {
+    dispatch({type: GLOBALTYPES.ALERT, payload: {loading: true}})
+    try {
+        const res = await patchDataAPI(`user/${user._id}/unblock`, null, auth.token)
+
+        dispatch({
+            type: GLOBALTYPES.AUTH,
+            payload: {
+                ...auth,
+                user: {
+                    ...auth.user,
+                    blockedUsers: DeleteData(auth.user.blockedUsers || [], user._id)
+                }
+            }
+        })
+
+        dispatch({type: GLOBALTYPES.ALERT, payload: {success: res.data.msg}})
+    } catch (err) {
+        dispatch({
+            type: GLOBALTYPES.ALERT,
+            payload: {error: err.response?.data?.msg || err.message}
+        })
+    }
+}
+
+export const getFollowRequests = (token) => async (dispatch) => {
+    try {
+        const res = await getDataAPI('user_requests', token)
+        return res.data.requests;
+    } catch (err) {
+        console.error(err)
+        return [];
+    }
+}
+
+export const acceptFollowRequest = ({requestId, auth}) => async (dispatch) => {
+    try {
+        dispatch({type: GLOBALTYPES.ALERT, payload: {loading: true}})
+        const res = await patchDataAPI(`user_requests/${requestId}/accept`, null, auth.token)
+        dispatch({type: GLOBALTYPES.ALERT, payload: {success: res.data.msg}})
+    } catch (err) {
+        dispatch({
+            type: GLOBALTYPES.ALERT,
+            payload: {error: err.response?.data?.msg || err.message}
+        })
+    }
+}
+
+export const declineFollowRequest = ({requestId, auth}) => async (dispatch) => {
+    try {
+        dispatch({type: GLOBALTYPES.ALERT, payload: {loading: true}})
+        const res = await patchDataAPI(`user_requests/${requestId}/decline`, null, auth.token)
+        dispatch({type: GLOBALTYPES.ALERT, payload: {success: res.data.msg}})
+    } catch (err) {
+        dispatch({
+            type: GLOBALTYPES.ALERT,
             payload: {error: err.response?.data?.msg || err.message}
         })
     }

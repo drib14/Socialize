@@ -41,11 +41,19 @@ const userSchema = new mongoose.Schema({
     website: {type: String, default: ''},
     followers: [{type: mongoose.Types.ObjectId, ref: 'user'}],
     following: [{type: mongoose.Types.ObjectId, ref: 'user'}],
-    saved: [{type: mongoose.Types.ObjectId, ref: 'user'}],
+    saved: [{type: mongoose.Types.ObjectId, ref: 'post'}],
+    blockedUsers: [{type: mongoose.Types.ObjectId, ref: 'user'}],
+    isPrivate: {type: Boolean, default: false},
+    status: {type: String, enum: ['active', 'deactivated', 'suspended'], default: 'active'},
     lastActive: {type: Date, default: Date.now}
 }, {
     timestamps: true
 })
+
+userSchema.index({ username: 1 }, { unique: true })
+userSchema.index({ email: 1 }, { unique: true })
+userSchema.index({ lastActive: -1 })
+userSchema.index({ username: 'text', fullname: 'text' })
 
 
 module.exports = mongoose.model('user', userSchema)

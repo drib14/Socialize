@@ -6,10 +6,10 @@ import { updateProfileUser } from '../../../redux/actions/profileAction'
 
 const EditProfile = ({setOnEdit}) => {
     const initState = {
-        fullname: '', mobile: '', address: '', website: '', story: '', gender: ''
+        fullname: '', mobile: '', address: '', website: '', story: '', gender: '', isPrivate: false
     }
     const [userData, setUserData] = useState(initState)
-    const { fullname, mobile, address, website, story, gender } = userData
+    const { fullname, mobile, address, website, story, gender, isPrivate } = userData
 
     const [avatar, setAvatar] = useState('')
 
@@ -33,8 +33,8 @@ const EditProfile = ({setOnEdit}) => {
     }
 
     const handleInput = e => {
-        const { name, value } = e.target
-        setUserData({ ...userData, [name]:value })
+        const { name, value, checked, type } = e.target
+        setUserData({ ...userData, [name]: type === 'checkbox' ? checked : value })
     }
 
     const handleSubmit = e => {
@@ -99,6 +99,14 @@ const EditProfile = ({setOnEdit}) => {
                     <small className="text-danger d-block text-right">
                         {story.length}/200
                     </small>
+                </div>
+
+                <div className="form-group d-flex align-items-center mb-3">
+                    <input type="checkbox" name="isPrivate" id="isPrivate" checked={isPrivate}
+                    onChange={handleInput} style={{ width: '20px', height: '20px', cursor: 'pointer' }} />
+                    <label htmlFor="isPrivate" className="m-0 ml-2" style={{ cursor: 'pointer', fontWeight: 600 }}>
+                        Private Account
+                    </label>
                 </div>
 
                 <label htmlFor="gender">Gender</label>
