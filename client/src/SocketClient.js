@@ -145,6 +145,14 @@ const SocketClient = () => {
         return () => socket.off('reactMessageToClient')
     }, [socket, dispatch])
 
+    // Read Message
+    useEffect(() => {
+        socket.on('readMessageToClient', id => {
+            dispatch({ type: MESS_TYPES.READ_MESSAGE, payload: id })
+        })
+        return () => socket.off('readMessageToClient')
+    }, [socket, dispatch])
+
     // Check User Online / Offline
     useEffect(() => {
         socket.emit('checkUserOnline', auth.user)

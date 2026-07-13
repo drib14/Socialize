@@ -9,7 +9,8 @@ export const MESS_TYPES = {
     UPDATE_MESSAGES: 'UPDATE_MESSAGES',
     DELETE_MESSAGES: 'DELETE_MESSAGES',
     DELETE_CONVERSATION: 'DELETE_CONVERSATION',
-    CHECK_ONLINE_OFFLINE: 'CHECK_ONLINE_OFFLINE'
+    CHECK_ONLINE_OFFLINE: 'CHECK_ONLINE_OFFLINE',
+    READ_MESSAGE: 'READ_MESSAGE'
 }
 
 
@@ -124,5 +125,15 @@ export const reactMessage = ({msg, emoji, auth, socket}) => async (dispatch) => 
         });
     } catch (err) {
         dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}});
+    }
+}
+
+export const markMessagesAsRead = ({auth, id, socket}) => async (dispatch) => {
+    dispatch({ type: MESS_TYPES.READ_MESSAGE, payload: id })
+    try {
+        await patchDataAPI(`message/read/${id}`, null, auth.token)
+        socket.emit('readMessage', { sender: auth.user._id, recipient: id })
+    } catch (err) {
+        console.error("Mark read error:", err)
     }
 }

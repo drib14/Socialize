@@ -287,6 +287,30 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
     const [showReactions, setShowReactions] = useState(false)
     const [showForwardModal, setShowForwardModal] = useState(false)
 
+    const isOwn = msg.sender === auth.user._id
+
+    const getBubbleStyle = () => {
+        if (!data || data.length === 0) return {};
+        const msgIndex = data.findIndex(m => m._id === msg._id);
+        if (msgIndex === -1) return {};
+
+        const prevMsg = msgIndex > 0 ? data[msgIndex - 1] : null;
+        const isConsecutivePrev = prevMsg && prevMsg.sender === msg.sender;
+
+        const nextMsg = msgIndex < data.length - 1 ? data[msgIndex + 1] : null;
+        const isConsecutiveNext = nextMsg && nextMsg.sender === msg.sender;
+
+        if (isOwn) {
+            return {
+                borderRadius: `${isConsecutivePrev ? '4px' : '16px'} 16px ${isConsecutiveNext ? '4px' : '16px'} 16px`
+            };
+        } else {
+            return {
+                borderRadius: `16px ${isConsecutivePrev ? '4px' : '16px'} 16px ${isConsecutiveNext ? '4px' : '16px'}`
+            };
+        }
+    };
+
     const handleDeleteMessages = async () => {
         if(!data) return;
         
@@ -400,8 +424,6 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
         // --- FALLBACK: unknown type → show as downloadable file bubble ---
         return <CustomFileBubble key={index} item={item} />;
     };
-
-    const isOwn = msg.sender === auth.user._id;
 
     return (
         <>
@@ -573,7 +595,7 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
                             </div>
                         ) : (
                             msg.text && 
-                            <div className="chat_text">
+                            <div className="chat_text" style={getBubbleStyle()}>
                                 {msg.text}
                             </div>
                         )
@@ -646,8 +668,20 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
             
             </div>
 
-            <div className="chat_time">
-                {new Date(msg.createdAt).toLocaleString()}
+            <div className="chat_time d-flex align-items-center justify-content-end" style={{ gap: '4px' }}>
+                <span>{new Date(msg.createdAt).toLocaleString()}</span>
+                {
+                    msg.sender === auth.user._id && (
+                        <span className="material-icons" style={{ 
+                            fontSize: '14px', 
+                            color: msg.isRead ? 'var(--primary-color)' : 'var(--text-muted)',
+                            verticalAlign: 'middle',
+                            lineHeight: '1'
+                        }}>
+                            {msg.isRead ? 'done_all' : 'done'}
+                        </span>
+                    )
+                }
             </div>
 
             {/* Forward Message Modal */}

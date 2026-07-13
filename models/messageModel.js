@@ -8,7 +8,8 @@ const messageSchema = new mongoose.Schema({
     media: Array,
     call: Object,
     replyTo: { type: mongoose.Types.ObjectId, ref: 'message' },
-    reactions: { type: Array, default: [] }
+    reactions: { type: Array, default: [] },
+    isRead: { type: Boolean, default: false }
 }, {
     timestamps: true
 })

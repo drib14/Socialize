@@ -7,7 +7,7 @@ import Icons from '../Icons'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
 import { imageShow, videoShow } from '../../utils/mediaShow'
 import { imageUpload } from '../../utils/imageUpload'
-import { addMessage, getMessages, loadMoreMessages, deleteConversation } from '../../redux/actions/messageAction'
+import { addMessage, getMessages, loadMoreMessages, deleteConversation, markMessagesAsRead } from '../../redux/actions/messageAction'
 import { customConfirm } from '../../utils/customAlert'
 
 const RightSide = () => {
@@ -36,6 +36,31 @@ const RightSide = () => {
     const [replyMessage, setReplyMessage] = useState(null)
     const [recordingTime, setRecordingTime] = useState(0)
     const timerRef = useRef(null)
+
+    const [isTyping, setIsTyping] = useState(false)
+    const typingTimeoutRef = useRef(null)
+
+    // Mark messages as read on conversation load/new messages
+    useEffect(() => {
+        if(id && auth.user && socket){
+            dispatch(markMessagesAsRead({auth, id, socket}))
+        }
+    }, [id, auth.user, socket, data.length, dispatch])
+
+    // Typing listeners
+    useEffect(() => {
+        socket.on('typingToClient', (senderId) => {
+            if(senderId === id) setIsTyping(true)
+        })
+        socket.on('stopTypingToClient', (senderId) => {
+            if(senderId === id) setIsTyping(false)
+        })
+
+        return () => {
+            socket.off('typingToClient')
+            socket.off('stopTypingToClient')
+        }
+    }, [socket, id])
 
     useEffect(() => {
         const newData = message.data.find(item => item._id === id)
@@ -97,6 +122,9 @@ const RightSide = () => {
         setReplyMessage(null)
         setLoadMedia(true)
 
+        if(typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+        socket.emit('stopTyping', { sender: auth.user._id, recipient: id })
+
         let newArr = [];
         if(mediaToSend.length > 0) newArr = await imageUpload(mediaToSend, auth.token)
 
@@ -114,6 +142,15 @@ const RightSide = () => {
         if(refDisplay.current){
             refDisplay.current.scrollIntoView({behavior: 'smooth', block: 'end'})
         }
+    }
+
+    const handleTextChange = (e) => {
+        setText(e.target.value)
+        socket.emit('typing', { sender: auth.user._id, recipient: id })
+        if(typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+        typingTimeoutRef.current = setTimeout(() => {
+            socket.emit('stopTyping', { sender: auth.user._id, recipient: id })
+        }, 2000)
     }
 
     useEffect(() => {
@@ -310,7 +347,7 @@ const RightSide = () => {
                                     {
                                         msg.sender !== auth.user._id &&
                                         <div className="chat_row other_message">
-                                            <MsgDisplay user={user} msg={msg} theme={theme} setOnReply={setReplyMessage} />
+                                            <MsgDisplay user={user} msg={msg} theme={theme} data={data} setOnReply={setReplyMessage} />
                                         </div>
                                     }
 
@@ -331,6 +368,29 @@ const RightSide = () => {
                            <img src="/icon-web-01.png" alt="loading" className="loading-logo" />
                        </div>
                    }
+
+                    {
+                        isTyping && (
+                            <div className="chat_row other_message mb-2">
+                                <div className="d-flex align-items-center" style={{ gap: '8px', padding: '0 8px' }}>
+                                    <Avatar src={user.avatar} size="small-avatar" />
+                                    <div className="d-flex align-items-center justify-content-center px-3 py-2" 
+                                         style={{ 
+                                             background: 'var(--bg-input)', 
+                                             border: '1px solid var(--border-color)', 
+                                             borderRadius: '16px',
+                                             width: 'fit-content'
+                                         }}>
+                                        <div className="typing-loader d-flex align-items-center" style={{ gap: '4px' }}>
+                                            <span style={{ width: '6px', height: '6px', background: 'var(--text-secondary)', borderRadius: '50%', animation: 'bounce 1.4s infinite ease-in-out both' }} />
+                                            <span style={{ width: '6px', height: '6px', background: 'var(--text-secondary)', borderRadius: '50%', animation: 'bounce 1.4s infinite ease-in-out both 0.2s' }} />
+                                            <span style={{ width: '6px', height: '6px', background: 'var(--text-secondary)', borderRadius: '50%', animation: 'bounce 1.4s infinite ease-in-out both 0.4s' }} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    }
 
                 </div>
             </div>
@@ -491,7 +551,7 @@ const RightSide = () => {
                 ) : (
                     <form className="chat_input" onSubmit={handleSubmit} >
                         <input type="text" placeholder="Enter your message..."
-                        value={text} onChange={e => setText(e.target.value)}
+                        value={text} onChange={handleTextChange}
                         style={{
                             background: 'var(--bg-input)',
                             color: 'var(--text-main)',

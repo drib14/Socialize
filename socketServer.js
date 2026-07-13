@@ -141,6 +141,21 @@ const SocketServer = (socket) => {
         user && socket.to(`${user.socketId}`).emit('reactMessageToClient', msg)
     })
 
+    socket.on('typing', ({ sender, recipient }) => {
+        const user = users.find(u => u.id === recipient)
+        user && socket.to(`${user.socketId}`).emit('typingToClient', sender)
+    })
+
+    socket.on('stopTyping', ({ sender, recipient }) => {
+        const user = users.find(u => u.id === recipient)
+        user && socket.to(`${user.socketId}`).emit('stopTypingToClient', sender)
+    })
+
+    socket.on('readMessage', ({ sender, recipient }) => {
+        const user = users.find(u => u.id === recipient)
+        user && socket.to(`${user.socketId}`).emit('readMessageToClient', sender)
+    })
+
 
     // Check User Online / Offline
     socket.on('checkUserOnline', data => {

@@ -149,6 +149,17 @@ const messageCtrl = {
         } catch (err) {
             return res.status(500).json({msg: err.message});
         }
+    },
+    markMessagesAsRead: async (req, res) => {
+        try {
+            await Messages.updateMany(
+                { sender: req.params.id, recipient: req.user._id, isRead: false },
+                { isRead: true }
+            )
+            res.json({ msg: 'Marked read success!' })
+        } catch (err) {
+            return res.status(500).json({ msg: err.message })
+        }
     }
 }
 

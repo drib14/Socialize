@@ -14,6 +14,8 @@ router.put('/message/:id', auth, messageCtrl.updateMessage)
 
 router.patch('/message/:id/react', auth, messageCtrl.reactMessage)
 
+router.patch('/message/read/:id', auth, messageCtrl.markMessagesAsRead)
+
 router.delete('/conversation/:id', auth, messageCtrl.deleteConversation)
 
 module.exports = router

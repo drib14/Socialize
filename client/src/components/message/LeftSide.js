@@ -80,50 +80,51 @@ const LeftSide = () => {
         }
     },[online, message.firstLoad, dispatch])
 
+    const handleSearchChange = (e) => {
+        const val = e.target.value
+        setSearch(val)
+        if(!val) {
+            setSearchUsers([])
+        }
+    }
+
+    const conversationsToDisplay = searchUsers.length > 0 
+        ? searchUsers 
+        : (search ? message.users.filter(u => 
+            u.username.toLowerCase().includes(search.toLowerCase()) || 
+            u.fullname.toLowerCase().includes(search.toLowerCase())
+          ) : message.users)
+
     return (
         <>
-            <form className="message_header" onSubmit={handleSearch} >
+            <form className="message_header" onSubmit={handleSearch} style={{ borderBottom: '1px solid var(--border-color)', padding: '12px 16px' }}>
                 <input type="text" value={search}
-                placeholder="Enter to Search..."
-                onChange={e => setSearch(e.target.value)} />
+                placeholder="Search chats or search globally..."
+                onChange={handleSearchChange} 
+                style={{ borderRadius: '24px', background: 'var(--bg-input)', border: '1px solid var(--border-color)', padding: '10px 16px', fontSize: '0.85rem' }} />
 
                 <button type="submit" style={{display: 'none'}}>Search</button>
             </form>
 
-            <div className="message_chat_list">
+            <div className="message_chat_list" style={{ overflowY: 'auto' }}>
                 {
-                    searchUsers.length !== 0
-                    ?  <>
-                        {
-                            searchUsers.map(user => (
-                                <div key={user._id} className={`message_user ${isActive(user)}`}
-                                onClick={() => handleAddUser(user)}>
-                                    <UserCard user={user} />
-                                </div>
-                            ))
-                        }
-                        
-                    </>
-                    : <>
-                        {
-                            message.users.map(user => {
-                                const isMutual = auth.user.following.some(item => (item._id || item).toString() === user._id.toString()) && 
-                                                 auth.user.followers.some(item => (item._id || item).toString() === user._id.toString());
-                                const isOnline = online.includes(user._id);
-                                return (
-                                    <div key={user._id} className={`message_user ${isActive(user)}`}
-                                    onClick={() => handleAddUser(user)}>
-                                        <UserCard user={user} msg={true}>
-                                            {
-                                                (isOnline && isMutual) &&
-                                                <i className="fas fa-circle text-success" />
-                                            }
-                                        </UserCard>
-                                    </div>
-                                );
-                            })
-                        }
-                    </>
+                    conversationsToDisplay.map(user => {
+                        const isMutual = auth.user.following.some(item => (item._id || item).toString() === user._id.toString()) && 
+                                         auth.user.followers.some(item => (item._id || item).toString() === user._id.toString());
+                        const isOnline = online.includes(user._id);
+                        const hasConversation = message.users.some(u => u._id === user._id);
+                        return (
+                            <div key={user._id} className={`message_user ${isActive(user)}`}
+                            onClick={() => handleAddUser(user)}>
+                                <UserCard user={user} msg={hasConversation}>
+                                    {
+                                        (isOnline && isMutual) &&
+                                        <i className="fas fa-circle text-success" />
+                                    }
+                                </UserCard>
+                            </div>
+                        )
+                    })
                 }
                
                <button ref={pageEnd} style={{opacity: 0}} >Load More</button>
