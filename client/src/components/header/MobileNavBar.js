@@ -38,7 +38,7 @@ const MobileNavBar = () => {
                             WebkitTextFillColor: 'transparent'
                         }}>
                         Socialize
-                    </h5>
+                    </h4>
                 </Link>
 
                 <div className="d-flex align-items-center" style={{ gap: '15px' }}>
