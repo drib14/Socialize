@@ -140,19 +140,19 @@ const authCtrl = {
             })
 
             const mailOptions = {
-                from: `Instagram Support <${process.env.EMAIL_USER}>`,
+                from: `Socialize Support <${process.env.EMAIL_USER}>`,
                 to: email,
-                subject: "Reset your Instagram Password",
+                subject: "Reset your Socialize Password",
                 html: `
                     <div style="max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 8px; font-family: sans-serif; color: #333333; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                         <div style="background-color: #2b8a3e; padding: 24px; text-align: center;">
-                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 0.5px;">Instagram</h1>
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 0.5px;">Socialize</h1>
                         </div>
                         <div style="padding: 32px 24px;">
                             <h2 style="color: #2b8a3e; margin-top: 0; font-size: 20px;">Password Reset Request</h2>
                             <p style="font-size: 16px; line-height: 1.5; color: #555555; margin-bottom: 24px;">
                                 Hello ${user.fullname || user.username},<br/><br/>
-                                We received a request to reset your password for your Instagram account. Click the button below to set a new password. This link is valid for 15 minutes.
+                                We received a request to reset your password for your Socialize account. Click the button below to set a new password. This link is valid for 15 minutes.
                             </p>
                             <div style="text-align: center; margin: 32px 0;">
                                 <a href="${url}" target="_blank" style="background-color: #2b8a3e; color: #ffffff; padding: 14px 28px; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 5px; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Reset Password</a>
@@ -162,7 +162,7 @@ const authCtrl = {
                             </p>
                             <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;"/>
                             <p style="font-size: 12px; color: #999999; line-height: 1.5; text-align: center;">
-                                © 2026 Instagram Inc. All rights reserved.
+                                © 2026 Socialize Inc. All rights reserved.
                             </p>
                         </div>
                     </div>

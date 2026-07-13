@@ -1,67 +1,155 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const NotFound = () => {
+    const canvasRef = useRef(null)
+    const [mousePos, setMousePos] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 })
+
+    useEffect(() => {
+        const canvas = canvasRef.current
+        const ctx = canvas.getContext('2d')
+        let animationFrameId
+
+        let width = canvas.width = window.innerWidth
+        let height = canvas.height = window.innerHeight
+
+        const particles = []
+        const particleCount = 100
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width
+                this.y = Math.random() * height
+                this.size = Math.random() * 3 + 1
+                this.baseX = this.x
+                this.baseY = this.y
+                this.density = (Math.random() * 30) + 1
+            }
+
+            draw() {
+                ctx.fillStyle = 'rgba(37, 99, 235, 0.8)' // primary color
+                ctx.beginPath()
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
+                ctx.closePath()
+                ctx.fill()
+            }
+
+            update() {
+                let dx = mousePos.x - this.x
+                let dy = mousePos.y - this.y
+                let distance = Math.sqrt(dx * dx + dy * dy)
+                let forceDirectionX = dx / distance
+                let forceDirectionY = dy / distance
+                let maxDistance = 150
+                let force = (maxDistance - distance) / maxDistance
+                let directionX = forceDirectionX * force * this.density
+                let directionY = forceDirectionY * force * this.density
+
+                if (distance < maxDistance) {
+                    this.x -= directionX
+                    this.y -= directionY
+                } else {
+                    if (this.x !== this.baseX) {
+                        let dx = this.x - this.baseX
+                        this.x -= dx / 10
+                    }
+                    if (this.y !== this.baseY) {
+                        let dy = this.y - this.baseY
+                        this.y -= dy / 10
+                    }
+                }
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle())
+        }
+
+        const animate = () => {
+            ctx.clearRect(0, 0, width, height)
+            for (let i = 0; i < particleCount; i++) {
+                particles[i].draw()
+                particles[i].update()
+            }
+            connect()
+            animationFrameId = requestAnimationFrame(animate)
+        }
+
+        const connect = () => {
+            let opacityValue = 1
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a; b < particles.length; b++) {
+                    let distance = ((particles[a].x - particles[b].x) * (particles[a].x - particles[b].x))
+                                 + ((particles[a].y - particles[b].y) * (particles[a].y - particles[b].y))
+                    if (distance < (canvas.width/7) * (canvas.height/7)) {
+                        opacityValue = 1 - (distance / 20000)
+                        ctx.strokeStyle = `rgba(37, 99, 235, ${opacityValue})`
+                        ctx.lineWidth = 1
+                        ctx.beginPath()
+                        ctx.moveTo(particles[a].x, particles[a].y)
+                        ctx.lineTo(particles[b].x, particles[b].y)
+                        ctx.stroke()
+                    }
+                }
+            }
+        }
+
+        animate()
+
+        const handleResize = () => {
+            width = canvas.width = window.innerWidth
+            height = canvas.height = window.innerHeight
+        }
+
+        window.addEventListener('resize', handleResize)
+        return () => {
+            window.removeEventListener('resize', handleResize)
+            cancelAnimationFrame(animationFrameId)
+        }
+    }, [mousePos])
+
+    const handleMouseMove = (e) => {
+        const rect = canvasRef.current.getBoundingClientRect()
+        setMousePos({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        })
+    }
+
     return (
-        <div className="d-flex flex-column align-items-center justify-content-center text-center px-4" 
-        style={{ minHeight: 'calc(100vh - 80px)', background: 'var(--bg-body)', transition: 'var(--transition)' }}>
+        <div
+            className="d-flex flex-column align-items-center justify-content-center text-center px-4"
+            style={{ minHeight: 'calc(100vh - 80px)', background: 'var(--bg-body)', position: 'relative', overflow: 'hidden' }}
+            onMouseMove={handleMouseMove}
+        >
+            <canvas
+                ref={canvasRef}
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}
+            />
             
-            {/* Animated Radar Scanning / Sonar SVG */}
-            <div className="position-relative mb-4" style={{ width: '220px', height: '220px' }}>
-                <svg viewBox="0 0 100 100" width="100%" height="100%">
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="var(--border-color)" strokeWidth="0.5" />
-                    <circle cx="50" cy="50" r="30" fill="none" stroke="var(--border-color)" strokeWidth="0.5" />
-                    <circle cx="50" cy="50" r="15" fill="none" stroke="var(--border-color)" strokeWidth="0.5" />
-                    
-                    {/* Crosshairs */}
-                    <line x1="50" y1="5" x2="50" y2="95" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="2 2" />
-                    <line x1="5" y1="50" x2="95" y2="50" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="2 2" />
-                    
-                    {/* Rotating Radar Sweep Line */}
-                    <line x1="50" y1="50" x2="50" y2="5" stroke="var(--primary-color)" strokeWidth="1.5">
-                        <animateTransform 
-                            attributeName="transform" 
-                            type="rotate" 
-                            from="0 50 50" 
-                            to="360 50 50" 
-                            dur="4s" 
-                            repeatCount="indefinite" 
-                        />
-                    </line>
-                    
-                    {/* Blinking signal dot for lost page */}
-                    <circle cx="75" cy="30" r="2.5" fill="#ef4444">
-                        <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" repeatCount="indefinite" />
-                    </circle>
-                </svg>
-                
-                {/* 404 Number Layered in the Center */}
-                <h1 className="position-absolute m-0" 
-                style={{ 
-                    top: '50%', 
-                    left: '50%', 
-                    transform: 'translate(-50%, -50%)', 
-                    fontSize: '3rem', 
-                    fontWeight: '800', 
-                    color: 'var(--text-main)', 
-                    letterSpacing: '1px' 
-                }}>
+            <div style={{ position: 'relative', zIndex: 10, background: 'rgba(255, 255, 255, 0.5)', padding: '40px', borderRadius: '16px', backdropFilter: 'blur(10px)', boxShadow: 'var(--shadow-lg)' }}>
+                <h1 className="font-weight-bold m-0"
+                    style={{
+                        fontSize: '6rem',
+                        color: 'var(--primary-color)',
+                        letterSpacing: '2px',
+                        textShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+                    }}>
                     404
                 </h1>
+
+                <h2 className="font-weight-bold mb-3" style={{ color: 'var(--text-main)', fontSize: '2rem' }}>
+                    Connection Lost
+                </h2>
+
+                <p className="text-muted mb-4 mx-auto" style={{ maxWidth: '400px', fontSize: '1.1rem' }}>
+                    The node you're looking for doesn't exist in our network. Try interacting with the particles while you're here.
+                </p>
+
+                <Link to="/" className="btn btn-primary px-4 py-2" style={{ textDecoration: 'none', borderRadius: '30px', fontWeight: 'bold' }}>
+                    Return Home
+                </Link>
             </div>
-
-            <h2 className="font-weight-bold mb-2" style={{ color: 'var(--text-main)', fontSize: '1.75rem' }}>
-                Lost in Space
-            </h2>
-            
-            <p className="text-muted mb-4 mx-auto" style={{ maxWidth: '400px', fontSize: '1rem', color: 'var(--text-secondary)' }}>
-                The coordinates you entered led to an empty quadrant. The page you are looking for has been moved or doesn't exist.
-            </p>
-
-            <Link to="/" className="btn btn-primary" style={{ textDecoration: 'none' }}>
-                <span className="material-icons mr-2">home</span>
-                Return Orbit
-            </Link>
         </div>
     )
 }

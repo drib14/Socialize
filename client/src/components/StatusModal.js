@@ -30,7 +30,7 @@ const StatusModal = () => {
     const [locationSuggestions, setLocationSuggestions] = useState([])
     const [showLocationInput, setShowLocationInput] = useState(false)
 
-    // Instagram post settings
+    // Socialize post settings
     const [altText, setAltText] = useState('')
     const [commentsDisabled, setCommentsDisabled] = useState(false)
     const [hideLikeCounts, setHideLikeCounts] = useState(false)

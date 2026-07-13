@@ -250,7 +250,7 @@ const postCtrl = {
             return res.status(500).json({ msg: err.message })
         }
     },
-    getReelsPosts: async (req, res) => {
+    getClipsPosts: async (req, res) => {
         try {
             const myBlocked = req.user.blockedUsers || []
             const usersWhoBlockedMe = await Users.find({ blockedUsers: req.user._id }).select('_id')

@@ -17,7 +17,7 @@ import call from './callReducer'
 import peer from './peerReducer'
 import moments from './momentReducer'
 import savedCollections from './savedCollectionReducer'
-import highlights from './highlightReducer'
+import fleets from './fleetReducer'
 
 
 export default combineReducers({
@@ -39,5 +39,5 @@ export default combineReducers({
     peer,
     moments,
     savedCollections,
-    highlights
+    fleets
 })

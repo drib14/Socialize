@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { getHighlights, createHighlight, deleteHighlight } from '../../redux/actions/highlightAction'
+import { getFleets, createFleet, deleteFleet } from '../../redux/actions/fleetAction'
 import { getDataAPI } from '../../utils/fetchData'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
 import Modal from 'react-modal'
@@ -8,8 +8,8 @@ import MomentViewer from '../home/MomentViewer'
 
 Modal.setAppElement('#root')
 
-const Highlights = ({ userId }) => {
-    const { auth, highlights } = useSelector(state => state)
+const Fleets = ({ userId }) => {
+    const { auth, fleets } = useSelector(state => state)
     const dispatch = useDispatch()
 
     const [isMyProfile, setIsMyProfile] = useState(false)
@@ -18,12 +18,12 @@ const Highlights = ({ userId }) => {
     const [selectedMoments, setSelectedMoments] = useState([])
     const [title, setTitle] = useState('')
 
-    const [activeViewerHighlight, setActiveViewerHighlight] = useState(null)
+    const [activeViewerFleet, setActiveViewerFleet] = useState(null)
 
     useEffect(() => {
         setIsMyProfile(auth.user && auth.user._id === userId)
         if (auth.token) {
-            dispatch(getHighlights({ userId, token: auth.token }))
+            dispatch(getFleets({ userId, token: auth.token }))
         }
     }, [userId, auth, dispatch])
 
@@ -56,24 +56,24 @@ const Highlights = ({ userId }) => {
         const matched = archiveMoments.find(m => m._id === selectedMoments[0])
         const cover = matched ? matched.media : ''
 
-        await dispatch(createHighlight({ title: title.trim(), cover, moments: selectedMoments, auth }))
+        await dispatch(createFleet({ title: title.trim(), cover, moments: selectedMoments, auth }))
         setShowCreateModal(false)
-        dispatch(getHighlights({ userId, token: auth.token }))
+        dispatch(getFleets({ userId, token: auth.token }))
     }
 
     const handleDelete = async (colId, e) => {
         e.stopPropagation()
-        const confirmed = window.confirm("Are you sure you want to delete this highlight?")
+        const confirmed = window.confirm("Are you sure you want to delete this fleet?")
         if (confirmed) {
-            await dispatch(deleteHighlight({ highlightId: colId, auth }))
-            dispatch(getHighlights({ userId, token: auth.token }))
+            await dispatch(deleteFleet({ fleetId: colId, auth }))
+            dispatch(getFleets({ userId, token: auth.token }))
         }
     }
 
     return (
-        <div className="highlights-container my-3 px-3">
+        <div className="fleets-container my-3 px-3">
             <div className="d-flex align-items-center flex-wrap" style={{ gap: '20px' }}>
-                {/* Create New Highlight button */}
+                {/* Create New Fleet button */}
                 {isMyProfile && (
                     <div className="d-flex flex-column align-items-center" onClick={handleOpenCreateModal} style={{ cursor: 'pointer' }}>
                         <div className="d-flex align-items-center justify-content-center" 
@@ -84,12 +84,12 @@ const Highlights = ({ userId }) => {
                     </div>
                 )}
 
-                {/* Highlights List */}
-                {highlights.highlights && highlights.highlights.map(hl => (
+                {/* Fleets List */}
+                {fleets.fleets && fleets.fleets.map(hl => (
                     <div 
                         key={hl._id} 
                         className="d-flex flex-column align-items-center position-relative" 
-                        onClick={() => setActiveViewerHighlight(hl)}
+                        onClick={() => setActiveViewerFleet(hl)}
                         style={{ cursor: 'pointer' }}
                     >
                         <div style={{ width: '64px', height: '64px', borderRadius: '50%', padding: '2px', border: '2px solid var(--border-color)', background: 'var(--bg-card)' }}>
@@ -108,7 +108,7 @@ const Highlights = ({ userId }) => {
                                 className="btn p-0 position-absolute" 
                                 onClick={(e) => handleDelete(hl._id, e)}
                                 style={{ top: '-5px', right: '-5px', width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(237,73,86,0.9)', color: '#fff', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none' }}
-                                title="Delete Highlight"
+                                title="Delete Fleet"
                             >
                                 <i className="fas fa-times"></i>
                             </button>
@@ -117,7 +117,7 @@ const Highlights = ({ userId }) => {
                 ))}
             </div>
 
-            {/* Create Highlight Modal */}
+            {/* Create Fleet Modal */}
             <Modal
                 isOpen={showCreateModal}
                 onRequestClose={() => setShowCreateModal(false)}
@@ -133,7 +133,7 @@ const Highlights = ({ userId }) => {
                 }}
             >
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h6 className="m-0 font-weight-bold">New Highlight</h6>
+                    <h6 className="m-0 font-weight-bold">New Fleet</h6>
                     <button className="btn btn-sm btn-light" onClick={() => setShowCreateModal(false)} style={{ borderRadius: '50%', width: '30px', height: '30px', padding: 0 }}>
                         <i className="fas fa-times" />
                     </button>
@@ -141,7 +141,7 @@ const Highlights = ({ userId }) => {
 
                 <form onSubmit={handleCreate}>
                     <div className="form-group mb-3">
-                        <label className="small font-weight-bold">Highlight Title</label>
+                        <label className="small font-weight-bold">Fleet Title</label>
                         <input 
                             type="text" 
                             className="form-control form-control-sm" 
@@ -187,23 +187,23 @@ const Highlights = ({ userId }) => {
                     </div>
 
                     <button type="submit" className="btn btn-sm btn-primary w-100 font-weight-bold" style={{ borderRadius: '12px', background: '#0095f6', border: 'none' }}>
-                        Add to Highlights
+                        Add to Fleets
                     </button>
                 </form>
             </Modal>
 
-            {/* View Highlight Moments (reusing MomentViewer) */}
-            {activeViewerHighlight && (
+            {/* View Fleet Moments (reusing MomentViewer) */}
+            {activeViewerFleet && (
                 <MomentViewer 
                     userMoments={{
-                        user: activeViewerHighlight.user,
-                        moments: activeViewerHighlight.moments
+                        user: activeViewerFleet.user,
+                        moments: activeViewerFleet.moments
                     }}
-                    onClose={() => setActiveViewerHighlight(null)}
+                    onClose={() => setActiveViewerFleet(null)}
                 />
             )}
         </div>
     )
 }
 
-export default Highlights
+export default Fleets

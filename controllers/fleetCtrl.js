@@ -1,6 +1,6 @@
-const Highlights = require('../models/highlightModel')
+const Highlights = require('../models/fleetModel')
 
-const highlightCtrl = {
+const fleetCtrl = {
     createHighlight: async (req, res) => {
         try {
             const { title, cover, moments } = req.body
@@ -16,7 +16,7 @@ const highlightCtrl = {
             })
             await newHighlight.save()
 
-            res.json({ msg: "Highlight created!", highlight: newHighlight })
+            res.json({ msg: "Highlight created!", fleet: newHighlight })
         } catch (err) {
             return res.status(500).json({ msg: err.message })
         }
@@ -25,7 +25,7 @@ const highlightCtrl = {
     getHighlights: async (req, res) => {
         try {
             const userId = req.params.id || req.user._id
-            const highlights = await Highlights.find({ user: userId })
+            const fleets = await Highlights.find({ user: userId })
                 .sort('createdAt')
                 .populate({
                     path: 'moments',
@@ -33,7 +33,7 @@ const highlightCtrl = {
                     select: 'media resource_type caption createdAt'
                 })
 
-            res.json({ highlights, result: highlights.length })
+            res.json({ fleets, result: fleets.length })
         } catch (err) {
             return res.status(500).json({ msg: err.message })
         }
@@ -41,15 +41,15 @@ const highlightCtrl = {
 
     getHighlight: async (req, res) => {
         try {
-            const highlight = await Highlights.findById(req.params.id)
+            const fleet = await Highlights.findById(req.params.id)
                 .populate({
                     path: 'moments',
                     populate: { path: 'user', select: 'avatar username fullname' }
                 })
 
-            if (!highlight) return res.status(404).json({ msg: "Highlight not found." })
+            if (!fleet) return res.status(404).json({ msg: "Highlight not found." })
 
-            res.json({ highlight })
+            res.json({ fleet })
         } catch (err) {
             return res.status(500).json({ msg: err.message })
         }
@@ -58,21 +58,21 @@ const highlightCtrl = {
     addMomentToHighlight: async (req, res) => {
         try {
             const { momentId } = req.body
-            const highlight = await Highlights.findOne({
+            const fleet = await Highlights.findOne({
                 _id: req.params.id,
                 user: req.user._id
             })
 
-            if (!highlight) return res.status(404).json({ msg: "Highlight not found." })
+            if (!fleet) return res.status(404).json({ msg: "Highlight not found." })
 
-            if (highlight.moments.map(m => m.toString()).includes(momentId)) {
-                return res.status(400).json({ msg: "Story already in this highlight." })
+            if (fleet.moments.map(m => m.toString()).includes(momentId)) {
+                return res.status(400).json({ msg: "Story already in this fleet." })
             }
 
-            highlight.moments.push(momentId)
-            await highlight.save()
+            fleet.moments.push(momentId)
+            await fleet.save()
 
-            res.json({ msg: "Story added to highlight!", highlight })
+            res.json({ msg: "Story added to fleet!", fleet })
         } catch (err) {
             return res.status(500).json({ msg: err.message })
         }
@@ -81,17 +81,17 @@ const highlightCtrl = {
     removeMomentFromHighlight: async (req, res) => {
         try {
             const { momentId } = req.body
-            const highlight = await Highlights.findOne({
+            const fleet = await Highlights.findOne({
                 _id: req.params.id,
                 user: req.user._id
             })
 
-            if (!highlight) return res.status(404).json({ msg: "Highlight not found." })
+            if (!fleet) return res.status(404).json({ msg: "Highlight not found." })
 
-            highlight.moments = highlight.moments.filter(m => m.toString() !== momentId)
-            await highlight.save()
+            fleet.moments = fleet.moments.filter(m => m.toString() !== momentId)
+            await fleet.save()
 
-            res.json({ msg: "Story removed from highlight!", highlight })
+            res.json({ msg: "Story removed from fleet!", fleet })
         } catch (err) {
             return res.status(500).json({ msg: err.message })
         }
@@ -104,15 +104,15 @@ const highlightCtrl = {
             if (title) updateData.title = title.trim()
             if (cover !== undefined) updateData.cover = cover
 
-            const highlight = await Highlights.findOneAndUpdate(
+            const fleet = await Highlights.findOneAndUpdate(
                 { _id: req.params.id, user: req.user._id },
                 updateData,
                 { new: true }
             )
 
-            if (!highlight) return res.status(404).json({ msg: "Highlight not found." })
+            if (!fleet) return res.status(404).json({ msg: "Highlight not found." })
 
-            res.json({ msg: "Highlight updated!", highlight })
+            res.json({ msg: "Highlight updated!", fleet })
         } catch (err) {
             return res.status(500).json({ msg: err.message })
         }
@@ -120,12 +120,12 @@ const highlightCtrl = {
 
     deleteHighlight: async (req, res) => {
         try {
-            const highlight = await Highlights.findOneAndDelete({
+            const fleet = await Highlights.findOneAndDelete({
                 _id: req.params.id,
                 user: req.user._id
             })
 
-            if (!highlight) return res.status(404).json({ msg: "Highlight not found." })
+            if (!fleet) return res.status(404).json({ msg: "Highlight not found." })
 
             res.json({ msg: "Highlight deleted!" })
         } catch (err) {
@@ -134,4 +134,4 @@ const highlightCtrl = {
     }
 }
 
-module.exports = highlightCtrl
+module.exports = fleetCtrl

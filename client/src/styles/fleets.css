@@ -90,7 +90,7 @@
 }
 
 .moment-card-avatar.unviewed {
-    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); /* Instagram default story gradient */
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); /* Socialize default story gradient */
 }
 
 .moment-card-avatar.unviewed.close-friends {

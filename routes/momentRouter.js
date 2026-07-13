@@ -4,9 +4,9 @@ const auth = require('../middleware/auth')
 
 router.route('/moments')
     .post(auth, momentCtrl.createMoment)
-    .get(auth, momentCtrl.getMoments)
+    .get(auth, momentCtrl.getFleets)
 
-router.get('/moments/archive', auth, momentCtrl.getMomentsArchive)
+router.get('/moments/archive', auth, momentCtrl.getFleetsArchive)
 
 router.post('/moments/:id/view', auth, momentCtrl.viewMoment)
 router.delete('/moments/:id', auth, momentCtrl.deleteMoment)

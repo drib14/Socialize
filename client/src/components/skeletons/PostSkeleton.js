@@ -7,7 +7,7 @@ const PostSkeleton = () => {
     const { theme } = useSelector(state => state)
     
     return (
-        <SkeletonTheme baseColor={theme ? '#202020' : '#e0e0e0'} highlightColor={theme ? '#353535' : '#f5f5f5'}>
+        <SkeletonTheme baseColor={theme ? '#202020' : '#e0e0e0'} fleetColor={theme ? '#353535' : '#f5f5f5'}>
             <div className="card my-3" style={{ padding: '15px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
                 {/* Header */}
                 <div className="d-flex align-items-center mb-3">

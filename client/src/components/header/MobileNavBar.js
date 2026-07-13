@@ -37,7 +37,7 @@ const MobileNavBar = () => {
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent'
                         }}>
-                        Instagram
+                        Socialize
                     </h4>
                 </Link>
 
@@ -70,7 +70,7 @@ const MobileNavBar = () => {
                     <i className="fas fa-search" style={{ fontSize: '1.25rem' }} />
                 </Link>
 
-                <Link to="/reels" className={`text-decoration-none ${isActive('/reels')}`} style={{ color: pathname === '/reels' ? 'var(--primary-color)' : 'var(--text-main)' }}>
+                <Link to="/clips" className={`text-decoration-none ${isActive('/clips')}`} style={{ color: pathname === '/clips' ? 'var(--primary-color)' : 'var(--text-main)' }}>
                     <i className="fas fa-video" style={{ fontSize: '1.25rem' }} />
                 </Link>
 

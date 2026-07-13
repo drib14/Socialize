@@ -67,7 +67,7 @@ const NavSidebar = () => {
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent'
                         }}>
-                        Instagram
+                        Socialize
                     </h3>
                 </Link>
 
@@ -88,20 +88,20 @@ const NavSidebar = () => {
 
                     <Link to="/discover" className={`nav_sidebar_link d-flex align-items-center py-2 px-3 rounded text-decoration-none ${isActive('/discover')}`}
                           style={{ color: 'var(--text-main)', transition: 'background 0.2s', gap: '15px' }}>
-                        <i className="fas fa-compass" style={{ fontSize: '1.25rem' }} />
+                        <i className="far fa-compass" style={{ fontSize: '1.25rem' }} />
                         <span className="link_text">Explore</span>
                     </Link>
 
-                    <Link to="/reels" className={`nav_sidebar_link d-flex align-items-center py-2 px-3 rounded text-decoration-none ${isActive('/reels')}`}
+                    <Link to="/clips" className={`nav_sidebar_link d-flex align-items-center py-2 px-3 rounded text-decoration-none ${isActive('/clips')}`}
                           style={{ color: 'var(--text-main)', transition: 'background 0.2s', gap: '15px' }}>
-                        <i className="fas fa-video" style={{ fontSize: '1.25rem' }} />
-                        <span className="link_text">Reels</span>
+                        <i className="fas fa-play-circle" style={{ fontSize: '1.25rem' }} />
+                        <span className="link_text">Clips</span>
                     </Link>
 
                     <Link to="/message" className={`nav_sidebar_link d-flex align-items-center py-2 px-3 rounded text-decoration-none ${isActive('/message')}`}
                           style={{ color: 'var(--text-main)', transition: 'background 0.2s', gap: '15px' }}>
                         <div className="position-relative">
-                            <i className="fas fa-paper-plane" style={{ fontSize: '1.25rem' }} />
+                            <i className="far fa-paper-plane" style={{ fontSize: '1.25rem' }} />
                         </div>
                         <span className="link_text">Messages</span>
                     </Link>

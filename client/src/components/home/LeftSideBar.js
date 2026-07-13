@@ -48,9 +48,9 @@ const LeftSideBar = () => {
                         </Link>
                     </li>
 
-                    <li className={`nav-item rounded ${isActive('/moments_archive') ? 'active-link' : ''}`} style={{ margin: '4px 0' }}>
-                        <Link className="nav-link d-flex align-items-center py-3 px-4" to="/moments_archive" style={{ color: isActive('/moments_archive') ? 'var(--primary-color)' : 'var(--text-main)', fontWeight: isActive('/moments_archive') ? '700' : '500', gap: '15px', transition: 'var(--transition)' }}>
-                            <i className="fas fa-history" style={{ fontSize: '20px' }}></i>
+                    <li className={`nav-item rounded ${isActive('/fleets_archive') ? 'active-link' : ''}`} style={{ margin: '4px 0' }}>
+                        <Link className="nav-link d-flex align-items-center py-3 px-4" to="/fleets_archive" style={{ color: isActive('/fleets_archive') ? 'var(--primary-color)' : 'var(--text-main)', fontWeight: isActive('/fleets_archive') ? '700' : '500', gap: '15px', transition: 'var(--transition)' }}>
+                            <i className="fas fa-archive" style={{ fontSize: '20px' }}></i>
                             <span style={{ fontSize: '0.95rem' }}>Moments Archive</span>
                         </Link>
                     </li>
