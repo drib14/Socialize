@@ -121,13 +121,10 @@ const Register = () => {
                                 <input type={typePass ? "text" : "password"}
                                     className="form-control"
                                     placeholder="Password"
-                                    onChange={handleChangeInput} value={password} name="password"
-                                    style={{ paddingRight: '80px !important' }} required />
+                                    onChange={handleChangeInput} value={password} name="password" required />
 
-                                <span className="d-flex align-items-center" onClick={() => setTypePass(!typePass)}
-                                      style={{ position: 'absolute', right: '14px', cursor: 'pointer', color: 'var(--primary-color)', fontWeight: 'bold', fontSize: '0.85rem', gap: '4px', zIndex: 10, userSelect: 'none' }}>
-                                    <span className="material-icons" style={{ fontSize: '1.1rem' }}>{typePass ? 'visibility_off' : 'visibility'}</span>
-                                    {typePass ? 'Hide' : 'Show'}
+                                <span className="material-icons pass_toggle" onClick={() => setTypePass(!typePass)}>
+                                    {typePass ? 'visibility_off' : 'visibility'}
                                 </span>
                             </div>
                             <small className="form-text text-danger mb-3 mt-n3">
@@ -139,13 +136,10 @@ const Register = () => {
                                 <input type={typeCfPass ? "text" : "password"}
                                     className="form-control"
                                     placeholder="Confirm Password"
-                                    onChange={handleChangeInput} value={cf_password} name="cf_password"
-                                    style={{ paddingRight: '80px !important' }} required />
+                                    onChange={handleChangeInput} value={cf_password} name="cf_password" required />
 
-                                <span className="d-flex align-items-center" onClick={() => setTypeCfPass(!typeCfPass)}
-                                      style={{ position: 'absolute', right: '14px', cursor: 'pointer', color: 'var(--primary-color)', fontWeight: 'bold', fontSize: '0.85rem', gap: '4px', zIndex: 10, userSelect: 'none' }}>
-                                    <span className="material-icons" style={{ fontSize: '1.1rem' }}>{typeCfPass ? 'visibility_off' : 'visibility'}</span>
-                                    {typeCfPass ? 'Hide' : 'Show'}
+                                <span className="material-icons pass_toggle" onClick={() => setTypeCfPass(!typeCfPass)}>
+                                    {typeCfPass ? 'visibility_off' : 'visibility'}
                                 </span>
                             </div>
                             <small className="form-text text-danger mb-3 mt-n3">

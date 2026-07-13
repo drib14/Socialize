@@ -46,12 +46,10 @@ const Login = () => {
                     <input type={typePass ? "text" : "password"} 
                     className="form-control"
                     placeholder="Password"
-                    onChange={handleChangeInput} value={password} name="password" required style={{ paddingRight: '80px !important' }} />
+                    onChange={handleChangeInput} value={password} name="password" required />
 
-                    <span className="d-flex align-items-center" onClick={() => setTypePass(!typePass)}
-                          style={{ position: 'absolute', right: '14px', cursor: 'pointer', color: 'var(--primary-color)', fontWeight: 'bold', fontSize: '0.85rem', gap: '4px', zIndex: 10, userSelect: 'none' }}>
-                        <span className="material-icons" style={{ fontSize: '1.1rem' }}>{typePass ? 'visibility_off' : 'visibility'}</span>
-                        {typePass ? 'Hide' : 'Show'}
+                    <span className="material-icons pass_toggle" onClick={() => setTypePass(!typePass)}>
+                        {typePass ? 'visibility_off' : 'visibility'}
                     </span>
                 </div>
                 
