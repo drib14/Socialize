@@ -123,6 +123,29 @@ const CommentCard = ({children, comment, post, commentId}) => {
                                 )
                             }
                         </div>
+                        
+                        {
+                            comment.images && comment.images.length > 0 && (
+                                <div className="mt-2" style={{ overflow: 'hidden', borderRadius: '8px' }}>
+                                    {
+                                        comment.images.map((img, index) => {
+                                            const url = img.url;
+                                            const isVideo = url && url.match(/video/i);
+                                            return (
+                                                <div key={index} style={{ maxWidth: '200px' }}>
+                                                    {
+                                                        isVideo
+                                                        ? <video src={url} controls style={{ width: '100%', maxHeight: '150px', objectFit: 'contain', borderRadius: '8px' }} />
+                                                        : <img src={url} alt="attachment" style={{ width: '100%', maxHeight: '150px', objectFit: 'cover', borderRadius: '8px', cursor: 'pointer' }} 
+                                                               onClick={() => window.open(url, '_blank')} />
+                                                    }
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            )
+                        }
                     </div>
 
                     <div className="d-flex align-items-center mt-1 pl-1" style={{ fontSize: '0.75rem' }}>

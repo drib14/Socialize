@@ -1,17 +1,27 @@
 import { GLOBALTYPES, EditData, DeleteData } from './globalTypes'
 import { POST_TYPES } from './postAction'
+import { imageUpload } from '../../utils/imageUpload'
 import { postDataAPI, patchDataAPI, deleteDataAPI } from '../../utils/fetchData'
 import { createNotify, removeNotify } from '../actions/notifyAction'
 
 
-export const createComment = ({post, newComment, auth, socket}) => async (dispatch) => {
-    const newPost = {...post, comments: [...post.comments, newComment]}
-    
-    dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost })
-
+export const createComment = ({post, newComment, auth, socket, images}) => async (dispatch) => {
+    let media = []
     try {
-        const data = {...newComment, postId: post._id, postUserId: post.user._id}
-        const res = await postDataAPI('comment', data, auth.token)
+        if(images && images.length > 0) {
+            dispatch({ type: GLOBALTYPES.ALERT, payload: {loading: true} })
+            media = await imageUpload(images, auth.token)
+            dispatch({ type: GLOBALTYPES.ALERT, payload: {loading: false} })
+        }
+
+        const commentData = {
+            ...newComment,
+            images: media,
+            postId: post._id,
+            postUserId: post.user._id
+        }
+
+        const res = await postDataAPI('comment', commentData, auth.token)
 
         const newData = {...res.data.newComment, user: auth.user}
         const newPost = {...post, comments: [...post.comments, newData]}
