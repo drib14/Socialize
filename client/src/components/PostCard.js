@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import CardHeader from './postCard/post_card/CardHeader'
 import CardBody from './postCard/post_card/CardBody'
 import CardFooter from './postCard/post_card/CardFooter'
@@ -8,6 +8,8 @@ import InputComment from './postCard/InputComment'
 
 const PostCard = ({post, theme}) => {
     const isRepost = !!post.repostOf
+    const isSinglePostPage = window.location.pathname.startsWith('/post/')
+    const [showComments, setShowComments] = useState(isSinglePostPage)
 
     if (isRepost && !post.repostOf) {
         return (
@@ -44,10 +46,16 @@ const PostCard = ({post, theme}) => {
             }
             <CardHeader post={displayPost} />
             <CardBody post={displayPost} theme={theme} />
-            <CardFooter post={displayPost} />
+            <CardFooter post={displayPost} showComments={showComments} setShowComments={setShowComments} />
 
-            <Comments post={displayPost} />
-            <InputComment post={displayPost} />
+            {
+                showComments && (
+                    <div style={{ background: 'rgba(0,0,0,0.01)', borderTop: '1px solid var(--border-color)' }}>
+                        <Comments post={displayPost} />
+                        <InputComment post={displayPost} />
+                    </div>
+                )
+            }
         </div>
     )
 }

@@ -75,91 +75,99 @@ const CommentCard = ({children, comment, post, commentId}) => {
     }
 
     return (
-        <div className="comment_card mt-2" style={styleCard}>
-            <Link to={`/profile/${comment.user._id}`} className="d-flex" style={{ color: 'var(--text-main)', textDecoration: 'none' }}>
-                <Avatar src={comment.user.avatar} size="small-avatar" />
-                <h6 className="mx-1">{comment.user.username}</h6>
-            </Link>
+        <div className="comment_card mt-2" style={{ ...styleCard, padding: '0 15px' }}>
+            <div className="d-flex align-items-start">
+                <Link to={`/profile/${comment.user._id}`} className="mr-2 mt-1">
+                    <Avatar src={comment.user.avatar} size="small-avatar" />
+                </Link>
 
-            <div className="comment_content">
-                <div className="flex-fill" 
-                style={{
-                    color: 'var(--text-main)',
-                }}>
-                    {
-                        onEdit 
-                        ? <textarea rows="5" value={content}
-                        onChange={e => setContent(e.target.value)} />
-
-                        : <div>
+                <div className="flex-fill">
+                    <div style={{
+                        background: 'var(--bg-input)',
+                        borderRadius: '16px',
+                        padding: '8px 12px',
+                        display: 'inline-block',
+                        maxWidth: '90%',
+                        color: 'var(--text-main)'
+                    }}>
+                        <Link to={`/profile/${comment.user._id}`} style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.85rem', display: 'block' }}>
+                            {comment.user.username}
+                        </Link>
+                        
+                        <div style={{ fontSize: '0.88rem', marginTop: '2px' }}>
                             {
-                                comment.tag && comment.tag._id !== comment.user._id &&
-                                <Link to={`/profile/${comment.tag._id}`} className="mr-1">
-                                    @{comment.tag.username}
-                                </Link>
-                            }
-                            <span>
-                                {
-                                    content.length < 100 ? content :
-                                    readMore ? content + ' ' : content.slice(0, 100) + '....'
-                                }
-                            </span>
-                            {
-                                content.length > 100 &&
-                                <span className="readMore" onClick={() => setReadMore(!readMore)}>
-                                    {readMore ? 'Hide content' : 'Read more'}
-                                </span>
+                                onEdit ? (
+                                    <textarea className="form-control form-control-sm mt-1" rows="3" value={content}
+                                    onChange={e => setContent(e.target.value)} style={{ background: 'var(--bg-card)', color: 'var(--text-main)', border: '1px solid var(--border-color)', resize: 'none' }} />
+                                ) : (
+                                    <>
+                                        {
+                                            comment.tag && comment.tag._id !== comment.user._id &&
+                                            <Link to={`/profile/${comment.tag._id}`} className="mr-1 text-primary font-weight-bold" style={{ textDecoration: 'none' }}>
+                                                @{comment.tag.username}
+                                            </Link>
+                                        }
+                                        <span>
+                                            {
+                                                content.length < 100 ? content :
+                                                readMore ? content + ' ' : content.slice(0, 100) + '....'
+                                            }
+                                        </span>
+                                        {
+                                            content.length > 100 &&
+                                            <span className="readMore ml-1" onClick={() => setReadMore(!readMore)} style={{ cursor: 'pointer', color: 'var(--primary-color)', fontWeight: 'bold' }}>
+                                                {readMore ? 'Hide' : 'Read more'}
+                                            </span>
+                                        }
+                                    </>
+                                )
                             }
                         </div>
-                    }
-                    
+                    </div>
 
-                    <div style={{cursor: 'pointer'}}>
-                        <small className="text-muted mr-3">
+                    <div className="d-flex align-items-center mt-1 pl-1" style={{ fontSize: '0.75rem' }}>
+                        <span className="text-muted mr-3">
                             {dayjs(comment.createdAt).fromNow()}
-                        </small>
+                        </span>
 
-                        <small className="font-weight-bold mr-3">
+                        <span className="font-weight-bold text-muted mr-3">
                             {comment.likes.length} likes
-                        </small>
+                        </span>
 
                         {
-                            onEdit
-                            ? <>
-                                <small className="font-weight-bold mr-3"
-                                onClick={handleUpdate}>
-                                    update
-                                </small>
-                                <small className="font-weight-bold mr-3"
-                                onClick={() => setOnEdit(false)}>
-                                    cancel
-                                </small>
-                            </>
-
-                            : <small className="font-weight-bold mr-3"
-                            onClick={handleReply}>
-                                {onReply ? 'cancel' :'reply'}
-                            </small>
+                            onEdit ? (
+                                <>
+                                    <span className="font-weight-bold text-primary mr-3" onClick={handleUpdate} style={{ cursor: 'pointer' }}>
+                                        Save
+                                    </span>
+                                    <span className="font-weight-bold text-danger" onClick={() => setOnEdit(false)} style={{ cursor: 'pointer' }}>
+                                        Cancel
+                                    </span>
+                                </>
+                            ) : (
+                                <span className="font-weight-bold text-secondary" onClick={handleReply} style={{ cursor: 'pointer' }}>
+                                    {onReply ? 'Cancel' : 'Reply'}
+                                </span>
+                            )
                         }
-                        
                     </div>
-                    
                 </div>
 
-
-                <div className="d-flex align-items-center mx-2" style={{cursor: 'pointer'}}>
+                <div className="d-flex align-items-center ml-2" style={{ opacity: 0.8 }}>
                     <CommentMenu post={post} comment={comment} setOnEdit={setOnEdit} />
                     <LikeButton isLike={isLike} handleLike={handleLike} handleUnLike={handleUnLike} />
                 </div>
-            </div> 
-            
+            </div>
+
             {
                 onReply &&
-                <InputComment post={post} onReply={onReply} setOnReply={setOnReply} >
-                    <Link to={`/profile/${onReply.user._id}`} className="mr-1">
-                        @{onReply.user.username}:
-                    </Link>
-                </InputComment>
+                <div className="ml-4 mt-2">
+                    <InputComment post={post} onReply={onReply} setOnReply={setOnReply} >
+                        <Link to={`/profile/${onReply.user._id}`} className="mr-1 text-primary font-weight-bold" style={{ fontSize: '0.85rem' }}>
+                            @{onReply.user.username}:
+                        </Link>
+                    </InputComment>
+                </div>
             }
 
             {children}

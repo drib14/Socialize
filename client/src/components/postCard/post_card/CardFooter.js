@@ -8,7 +8,7 @@ import { BASE_URL } from '../../../utils/config'
 import { FaRegComment, FaRegPaperPlane, FaRetweet, FaRegBookmark, FaBookmark } from 'react-icons/fa'
 import { customConfirm } from '../../../utils/customAlert'
 
-const CardFooter = ({post}) => {
+const CardFooter = ({post, showComments, setShowComments}) => {
     const [isLike, setIsLike] = useState(false)
     const [loadLike, setLoadLike] = useState(false)
 
@@ -90,8 +90,14 @@ const CardFooter = ({post}) => {
                         />
                     </div>
 
-                    <Link to={`/post/${post._id}`} className="text-secondary d-flex align-items-center mr-3" title="Comment">
-                        <FaRegComment style={{ fontSize: '22px', cursor: 'pointer', transition: 'color 0.2s' }} className="icon-hover" />
+                    <Link to={`/post/${post._id}`} className="text-secondary d-flex align-items-center mr-3" title="Comment"
+                    onClick={(e) => {
+                        if (setShowComments) {
+                            e.preventDefault();
+                            setShowComments(!showComments);
+                        }
+                    }}>
+                        <FaRegComment style={{ fontSize: '22px', cursor: 'pointer', transition: 'color 0.2s', color: showComments ? 'var(--primary-color)' : '' }} className="icon-hover" />
                     </Link>
 
                     <FaRegPaperPlane className="text-secondary mr-3" 
