@@ -11,6 +11,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import CommentMenu from './CommentMenu'
 import { updateComment, likeComment, unLikeComment } from '../../../redux/actions/commentAction'
 import InputComment from '../InputComment'
+import { renderTextWithIcons } from '../../../utils/iconParser'
 
 const CommentCard = ({children, comment, post, commentId}) => {
     const { auth, theme } = useSelector(state => state)
@@ -109,8 +110,8 @@ const CommentCard = ({children, comment, post, commentId}) => {
                                         }
                                         <span>
                                             {
-                                                content.length < 100 ? content :
-                                                readMore ? content + ' ' : content.slice(0, 100) + '....'
+                                                content.length < 100 ? renderTextWithIcons(content) :
+                                                readMore ? renderTextWithIcons(content) : renderTextWithIcons(content.slice(0, 100) + '....')
                                             }
                                         </span>
                                         {

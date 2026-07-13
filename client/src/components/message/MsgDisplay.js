@@ -6,6 +6,7 @@ import Times from './Times'
 import { customConfirm } from '../../utils/customAlert'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
 import Modal from 'react-modal'
+import { renderTextWithIcons } from '../../utils/iconParser'
 
 Modal.setAppElement('#root')
 
@@ -610,7 +611,7 @@ const MsgDisplay = ({user, msg, theme, data, setOnReply}) => {
                         ) : (
                             msg.text && 
                             <div className="chat_text" style={getBubbleStyle()}>
-                                {msg.text}
+                                {renderTextWithIcons(msg.text)}
                             </div>
                         )
                     }

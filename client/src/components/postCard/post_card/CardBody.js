@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { likePost } from '../../../redux/actions/postAction'
 
+import { renderTextWithIcons } from '../../../utils/iconParser'
+
 const CardBody = ({post, theme}) => {
     const [readMore, setReadMore] = useState(false)
     const [showHeart, setShowHeart] = useState(false)
@@ -32,7 +34,7 @@ const CardBody = ({post, theme}) => {
                     </Link>
                 );
             }
-            return part;
+            return renderTextWithIcons(part);
         });
     };
 
