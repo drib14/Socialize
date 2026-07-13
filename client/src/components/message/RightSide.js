@@ -12,7 +12,7 @@ import { addMessage, getMessages, loadMoreMessages, deleteConversation, markMess
 import { customConfirm } from '../../utils/customAlert'
 
 const RightSide = () => {
-    const { auth, message, theme, socket, peer } = useSelector(state => state)
+    const { auth, message, theme, socket, peer, online } = useSelector(state => state)
     const dispatch = useDispatch()
 
     const { id } = useParams()
