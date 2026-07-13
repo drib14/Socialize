@@ -259,7 +259,12 @@ const StatusModal = () => {
                             <span className="d-block font-weight-bold" style={{ color: 'var(--text-main)', fontSize: '0.9rem' }}>
                                 {auth.user.fullname}
                             </span>
-                            <div className="mt-1">
+                            <div className="mt-1 d-flex align-items-center" style={{ gap: '6px' }}>
+                                <i className={
+                                    visibility === 'followers' ? 'fas fa-users text-muted' :
+                                    visibility === 'private' ? 'fas fa-lock text-muted' :
+                                    'fas fa-globe text-muted'
+                                } style={{ fontSize: '0.8rem' }}></i>
                                 <select 
                                     value={visibility} 
                                     onChange={(e) => setVisibility(e.target.value)}
@@ -276,9 +281,9 @@ const StatusModal = () => {
                                         borderColor: 'var(--border-color)'
                                     }}
                                 >
-                                    <option value="public">🌐 Public</option>
-                                    <option value="followers">👥 Followers Only</option>
-                                    <option value="private">🔒 Only Me</option>
+                                    <option value="public">Public</option>
+                                    <option value="followers">Followers Only</option>
+                                    <option value="private">Only Me</option>
                                 </select>
                             </div>
                         </div>

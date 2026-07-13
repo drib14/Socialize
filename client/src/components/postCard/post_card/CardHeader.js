@@ -71,9 +71,9 @@ const CardHeader = ({post}) => {
     }
 
     const getVisibilityIcon = (visibility) => {
-        if (visibility === 'followers') return <span className="material-icons text-muted ml-1" style={{ fontSize: '0.85rem' }} title="Followers Only">people</span>;
-        if (visibility === 'private') return <span className="material-icons text-muted ml-1" style={{ fontSize: '0.85rem' }} title="Only Me">lock</span>;
-        return <span className="material-icons text-muted ml-1" style={{ fontSize: '0.85rem' }} title="Public">public</span>;
+        if (visibility === 'followers') return <i className="fas fa-users text-muted ml-1" style={{ fontSize: '0.78rem' }} title="Followers Only"></i>;
+        if (visibility === 'private') return <i className="fas fa-lock text-muted ml-1" style={{ fontSize: '0.78rem' }} title="Only Me"></i>;
+        return <i className="fas fa-globe text-muted ml-1" style={{ fontSize: '0.78rem' }} title="Public"></i>;
     }
 
     return (
