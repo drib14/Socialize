@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import Avatar from '../Avatar'
 import EditProfile from './Info/EditProfile'
 import FollowBtn from '../FollowBtn'
 import Followers from './Info/Followers'
 import Following from './Info/Following'
+import CreateMomentModal from '../home/CreateMomentModal'
 import { GLOBALTYPES } from '../../redux/actions/globalTypes'
 
 const Info = ({id, auth, profile, dispatch}) => {
     const [userData, setUserData] = useState([])
     const [onEdit, setOnEdit] = useState(false)
+    const [onAddMoment, setOnAddMoment] = useState(false)
 
     const [showFollowers, setShowFollowers] = useState(false)
     const [showFollowing, setShowFollowing] = useState(false)
@@ -43,16 +46,29 @@ const Info = ({id, auth, profile, dispatch}) => {
                             <div className="info_content_title">
                                 <h2>{user.fullname}</h2>
                                 {
-                                    user._id === auth.user._id
-                                    ?  <button className="btn btn-outline-info"
-                                    onClick={() => setOnEdit(true)} title="Edit Profile">
-                                        <span className="material-icons">edit</span>
-                                    </button>
-                                    
-                                    : <FollowBtn user={user} />
+                                    user._id === auth.user._id ? (
+                                        <div className="d-flex align-items-center gap-2">
+                                            <button className="btn btn-outline-info d-flex align-items-center gap-1"
+                                            onClick={() => setOnEdit(true)} title="Edit Profile">
+                                                <span className="material-icons" style={{ fontSize: '1.2rem' }}>edit</span>
+                                                Edit Profile
+                                            </button>
+                                            <button className="btn btn-success d-flex align-items-center gap-1"
+                                            onClick={() => setOnAddMoment(true)} title="Add Moment">
+                                                <span className="material-icons" style={{ fontSize: '1.2rem' }}>add_a_photo</span>
+                                                Add Moment
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="d-flex align-items-center gap-2">
+                                            <FollowBtn user={user} />
+                                            <Link to={`/message/${user._id}`} className="btn btn-outline-info d-flex align-items-center gap-1" title="Send Message">
+                                                <span className="material-icons" style={{ fontSize: '1.2rem' }}>near_me</span>
+                                                Message
+                                            </Link>
+                                        </div>
+                                    )
                                 }
-                               
-                                
                             </div>
 
                             <div className="follow_btn">
@@ -75,6 +91,14 @@ const Info = ({id, auth, profile, dispatch}) => {
 
                         {
                             onEdit && <EditProfile setOnEdit={setOnEdit} />
+                        }
+
+                        {
+                            onAddMoment && 
+                            <CreateMomentModal 
+                                isOpen={onAddMoment} 
+                                onClose={() => setOnAddMoment(false)} 
+                            />
                         }
 
                         {
