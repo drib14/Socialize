@@ -229,3 +229,17 @@
     transform: none !important;
     margin: 0 !important;
 }
+
+/* Custom scrollbars for notifications container dropdown */
+.notify-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notify-list-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.notify-list-container::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 3px;
+}

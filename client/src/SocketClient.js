@@ -4,6 +4,8 @@ import { POST_TYPES } from './redux/actions/postAction'
 import { GLOBALTYPES } from './redux/actions/globalTypes'
 import { NOTIFY_TYPES } from './redux/actions/notifyAction'
 import { MESS_TYPES } from './redux/actions/messageAction'
+import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 import audiobell from './audio/got-it-done-613.mp3'
 
@@ -91,6 +93,27 @@ const SocketClient = () => {
             dispatch({type: NOTIFY_TYPES.CREATE_NOTIFY, payload: msg})
 
             if(notify.sound) audioRef.current.play()
+
+            // In-app slide-in notification toast banner
+            toast(
+                <Link to={`${msg.url}`} className="d-flex align-items-center text-decoration-none" style={{ color: 'var(--text-main)' }}>
+                    <img src={msg.user.avatar} alt="avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', marginRight: '10px' }} />
+                    <div style={{ flex: 1 }}>
+                        <strong style={{ color: 'var(--primary-color)' }}>{msg.user.username}</strong>
+                        <span style={{ fontSize: '0.85rem', marginLeft: '5px' }}>{msg.text}</span>
+                        {msg.content && <small className="text-muted d-block" style={{ fontSize: '0.75rem' }}>{msg.content.slice(0, 20)}...</small>}
+                    </div>
+                </Link>,
+                {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                }
+            )
+
             spawnNotification(
                 msg.user.username + ' ' + msg.text,
                 msg.user.avatar,
