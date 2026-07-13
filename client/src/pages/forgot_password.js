@@ -27,21 +27,23 @@ const ForgotPassword = () => {
     return (
         <div className="auth_page">
             <form onSubmit={handleSubmit}>
-                <h3 className="text-uppercase text-center mb-4">Forgot Password</h3>
+                <h3 className="text-uppercase text-center mb-4">Reset Credentials</h3>
 
-                <div className="form-group">
-                    <input type="email" className="form-control" id="exampleInputEmail1" name="email"
+                <div className="input_group">
+                    <span className="material-icons text-muted">mail</span>
+                    <input type="email" className="form-control" name="email"
                     placeholder="Email address"
                     onChange={e => setEmail(e.target.value)} value={email} required />
                 </div>
                 
-                <button type="submit" className="btn btn-dark w-100 mb-2"
-                style={{ background: '#2b8a3e', borderColor: '#2b8a3e' }} title="Send Reset Link">
-                    <span className="material-icons">send</span>
+                <button type="submit" className="btn btn-success w-100 d-flex align-items-center justify-content-center py-2 mb-2"
+                style={{ borderRadius: '12px', fontWeight: 'bold' }} title="Send Reset Link">
+                    <span className="material-icons mr-2" style={{ fontSize: '1.2rem' }}>send</span>
+                    Send Reset Link
                 </button>
 
-                <p className="my-2 text-center">
-                    <Link to="/" style={{color: "#2b8a3e"}}>Back to Login</Link>
+                <p className="my-3 text-center">
+                    <Link to="/" style={{color: "var(--primary-color)"}}>Back to Login</Link>
                 </p>
             </form>
         </div>

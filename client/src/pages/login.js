@@ -34,43 +34,38 @@ const Login = () => {
             <form onSubmit={handleSubmit}>
                 <h3 className="text-uppercase text-center mb-4">Socialize</h3>
 
-                <div className="form-group">
-                    <input type="email" className="form-control" id="exampleInputEmail1" name="email"
+                <div className="input_group">
+                    <span className="material-icons text-muted">mail</span>
+                    <input type="email" className="form-control" name="email"
                     placeholder="Email address"
-                    aria-describedby="emailHelp" onChange={handleChangeInput} value={email} />
-                    
-                    <small id="emailHelp" className="form-text text-muted">
-                        We'll never share your email with anyone else.
-                    </small>
+                    onChange={handleChangeInput} value={email} required />
                 </div>
 
-                <div className="form-group">
-                    <div className="pass">
-                        
-                        <input type={ typePass ? "text" : "password" } 
-                        className="form-control" id="exampleInputPassword1"
-                        placeholder="Password"
-                        onChange={handleChangeInput} value={password} name="password" />
+                <div className="input_group">
+                    <span className="material-icons text-muted">lock</span>
+                    <input type={typePass ? "text" : "password"} 
+                    className="form-control"
+                    placeholder="Password"
+                    onChange={handleChangeInput} value={password} name="password" required />
 
-                        <small onClick={() => setTypePass(!typePass)}>
-                            {typePass ? 'Hide' : 'Show'}
-                        </small>
-                    </div>
-                   
+                    <span className="material-icons pass_toggle" onClick={() => setTypePass(!typePass)}>
+                        {typePass ? 'visibility_off' : 'visibility'}
+                    </span>
                 </div>
                 
-                <button type="submit" className="btn btn-dark w-100"
+                <button type="submit" className="btn btn-success w-100 d-flex align-items-center justify-content-center py-2"
                 disabled={email && password ? false : true}
-                style={{ background: '#2b8a3e', borderColor: '#2b8a3e' }} title="Login">
-                    <span className="material-icons">login</span>
+                style={{ borderRadius: '12px', fontWeight: 'bold' }} title="Login">
+                    <span className="material-icons mr-2" style={{ fontSize: '1.2rem' }}>login</span>
+                    Login
                 </button>
 
-                <p className="my-2">
-                    You don't have an account? <Link to="/register" style={{color: "#2b8a3e"}}>Register Now</Link>
+                <p className="my-3 text-center">
+                    Don't have an account? <Link to="/register" style={{color: "var(--primary-color)"}}>Register Now</Link>
                 </p>
 
-                <p className="my-2">
-                    <Link to="/forgot_password" style={{color: "#2b8a3e"}}>Forgot Password?</Link>
+                <p className="my-2 text-center">
+                    <Link to="/forgot_password" style={{color: "var(--text-secondary)", fontSize: '0.85rem'}}>Forgot Password?</Link>
                 </p>
             </form>
         </div>

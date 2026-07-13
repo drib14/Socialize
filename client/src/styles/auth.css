@@ -148,3 +148,119 @@
     color: var(--primary-hover);
     text-decoration: underline;
 }
+
+/* Glassmorphism auth card enhancements */
+[data-theme='light'] .auth_page form {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+[data-theme='dark'] .auth_page form {
+    background: rgba(30, 30, 30, 0.75) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.auth_page form {
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    max-width: 440px;
+    width: 100%;
+    border-radius: 20px;
+    padding: 40px 32px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    transition: var(--transition);
+}
+
+/* Input group layout with inside icons */
+.auth_page .input_group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.auth_page .input_group .material-icons-outlined,
+.auth_page .input_group .material-icons {
+    position: absolute;
+    left: 14px;
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.auth_page .input_group .form-control {
+    padding-left: 45px !important;
+    border-radius: 12px !important;
+    height: 48px !important;
+}
+
+.auth_page .input_group .pass_toggle {
+    position: absolute;
+    right: 14px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+    z-index: 10;
+    transition: color 0.2s ease;
+}
+
+.auth_page .input_group .pass_toggle:hover {
+    color: var(--primary-color);
+}
+
+/* Multi-step Onboarding Indicators */
+.auth_page .steps_indicator {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.auth_page .steps_indicator .step_dot {
+    width: 24px;
+    height: 4px;
+    border-radius: 2px;
+    background-color: var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.auth_page .steps_indicator .step_dot.active {
+    width: 48px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+}
+
+/* Password check status panel */
+.auth_page .password_requirements {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.auth_page .password_requirements ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.auth_page .password_requirements li {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    transition: color 0.2s ease;
+}
+
+.auth_page .password_requirements li.valid {
+    color: #2ecc71;
+}
+
+.auth_page .password_requirements li .material-icons {
+    font-size: 0.95rem;
+}
