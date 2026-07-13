@@ -20,7 +20,7 @@ class APIfeatures {
 const postCtrl = {
     createPost: async (req, res) => {
         try {
-            const { content, images, location, altText, commentsDisabled, hideLikeCounts, taggedUsers } = req.body
+            const { content, images, location, altText, commentsDisabled, hideLikeCounts, taggedUsers, audioTrack } = req.body
 
             if((!content || content.trim().length === 0) && (!images || images.length === 0))
             return res.status(400).json({msg: "Please add content or a photo."})
@@ -28,13 +28,21 @@ const postCtrl = {
             const contentStr = content || ''
             const hashtags = contentStr.match(/#\w+/g)?.map(tag => tag.slice(1).toLowerCase()) || []
 
+            const hasVideo = images && images.some(img => img.resource_type === 'video')
+            const isReel = hasVideo ? true : false
+
             const newPost = new Posts({
                 content, images, user: req.user._id, location,
                 tags: hashtags,
                 altText: altText || '',
                 commentsDisabled: commentsDisabled || false,
                 hideLikeCounts: hideLikeCounts || false,
-                taggedUsers: taggedUsers || []
+                taggedUsers: taggedUsers || [],
+                isReel,
+                audioTrack: {
+                    title: audioTrack?.title || 'Original Audio',
+                    artist: audioTrack?.artist || req.user.username
+                }
             })
             await newPost.save()
 
@@ -94,10 +102,13 @@ const postCtrl = {
     },
     updatePost: async (req, res) => {
         try {
-            const { content, images, location, altText, commentsDisabled, hideLikeCounts, taggedUsers } = req.body
+            const { content, images, location, altText, commentsDisabled, hideLikeCounts, taggedUsers, audioTrack } = req.body
 
             const contentStr = content || ''
             const hashtags = contentStr.match(/#\w+/g)?.map(tag => tag.slice(1).toLowerCase()) || []
+
+            const hasVideo = images && images.some(img => img.resource_type === 'video')
+            const isReel = hasVideo ? true : false
 
             const post = await Posts.findOneAndUpdate({_id: req.params.id, user: req.user._id}, {
                 content, images, location,
@@ -105,7 +116,14 @@ const postCtrl = {
                 commentsDisabled: commentsDisabled || false,
                 hideLikeCounts: hideLikeCounts || false,
                 taggedUsers: taggedUsers || [],
-                tags: hashtags
+                tags: hashtags,
+                isReel,
+                ...(audioTrack ? {
+                    audioTrack: {
+                        title: audioTrack.title || 'Original Audio',
+                        artist: audioTrack.artist || req.user.username
+                    }
+                } : {})
             }, { new: true }).populate("user likes", "avatar username fullname lastActive")
             .populate({
                 path: "comments",

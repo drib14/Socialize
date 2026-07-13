@@ -18,7 +18,12 @@ const postSchema = new mongoose.Schema({
     views: [{ type: mongoose.Types.ObjectId, ref: 'user' }],
     isPinned: { type: Boolean, default: false },
     commentsDisabled: { type: Boolean, default: false },
-    hideLikeCounts: { type: Boolean, default: false }
+    hideLikeCounts: { type: Boolean, default: false },
+    isReel: { type: Boolean, default: false },
+    audioTrack: {
+        title: { type: String, default: 'Original Audio' },
+        artist: { type: String, default: '' }
+    }
 }, {
     timestamps: true
 })
